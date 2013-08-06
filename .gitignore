@@ -2,3 +2,4 @@
 /build
 /WebContent/WEB-INF/config.properties
 .classpath
+bin/
