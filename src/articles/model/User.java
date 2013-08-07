@@ -1,5 +1,7 @@
 package articles.model;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -13,15 +15,13 @@ public class User {
 	private int userId;
 	private String username;
 	private String password;
+	@Column(name="last_login")
+	private Date lastLogin;
 	
 	public User() {
 	
 	}
-	public User(int userId, String username, String password) {
-		this.userId = userId;
-		this.username = username;
-		this.password = password;
-	}
+
 
 	public int getUserId() {
 		return userId;
@@ -47,16 +47,27 @@ public class User {
 		this.password = password;
 	}
 
+	public Date getLastLogin() {
+		return lastLogin;
+	}
+	public void setLastLogin(Date lastLogin) {
+		this.lastLogin = lastLogin;
+	}
+
+
 	@Override
 	public String toString() {
 		return "User [userId=" + userId + ", username=" + username
-				+ ", password=" + password + "]";
+				+ ", password=" + password + ", lastLogin=" + lastLogin + "]";
 	}
-	
+
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result
+				+ ((lastLogin == null) ? 0 : lastLogin.hashCode());
 		result = prime * result
 				+ ((password == null) ? 0 : password.hashCode());
 		result = prime * result + userId;
@@ -64,30 +75,27 @@ public class User {
 				+ ((username == null) ? 0 : username.hashCode());
 		return result;
 	}
-	
+
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+		if (!(obj instanceof User))
 			return false;
 		User other = (User) obj;
-		if (password == null) {
-			if (other.password != null)
-				return false;
-		} else if (!password.equals(other.password))
+		if (!lastLogin.equals(other.lastLogin))
+			return false;
+		if (!password.equals(other.password))
 			return false;
 		if (userId != other.userId)
 			return false;
-		if (username == null) {
-			if (other.username != null)
-				return false;
-		} else if (!username.equals(other.username))
+		if (!username.equals(other.username))
 			return false;
 		return true;
 	}
-	
+
 
 }
