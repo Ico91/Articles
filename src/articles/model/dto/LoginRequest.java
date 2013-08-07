@@ -1,5 +1,8 @@
 package articles.model.dto;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class LoginRequest {
 	private String username;
 	private String password;
