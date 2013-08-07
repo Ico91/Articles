@@ -3,3 +3,4 @@
 /WebContent/WEB-INF/config.properties
 .classpath
 bin/
+src/META-INF/persistence.xml
