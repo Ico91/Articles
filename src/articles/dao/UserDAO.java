@@ -18,7 +18,7 @@ public class UserDAO {
 	}
 	
 	public User find(String username, String password) {
-		Query selectUserQuery = this.entityManager.createQuery("SELECT u FROM user WHERE u.username = :username and u.password = :password");
+		Query selectUserQuery = this.entityManager.createQuery("SELECT u FROM User u WHERE u.username = :username AND u.password = :password");
 		selectUserQuery.setParameter("username", username);
 		selectUserQuery.setParameter("password", password);
 		
