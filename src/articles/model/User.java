@@ -6,6 +6,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
 @Table(name="user")
@@ -16,6 +18,7 @@ public class User {
 	private String username;
 	private String password;
 	@Column(name="last_login")
+	@Temporal(TemporalType.DATE)
 	private Date lastLogin;
 	
 	public User() {

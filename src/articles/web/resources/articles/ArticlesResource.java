@@ -1,4 +1,4 @@
-package articles.web.resources;
+package articles.web.resources.articles;
 
 import java.io.IOException;
 import java.util.ArrayList;

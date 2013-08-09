@@ -46,4 +46,40 @@ public class UserDTO {
 		this.lastLogin = lastLogin;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((lastLogin == null) ? 0 : lastLogin.hashCode());
+		result = prime * result + userId;
+		result = prime * result
+				+ ((username == null) ? 0 : username.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof UserDTO))
+			return false;
+		UserDTO other = (UserDTO) obj;
+		if (!lastLogin.equals(other.lastLogin))
+			return false;
+		if (userId != other.userId)
+			return false;
+		if (!username.equals(other.username))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "UserDTO [userId=" + userId + ", username=" + username
+				+ ", lastLogin=" + lastLogin + "]";
+	}
+
 }

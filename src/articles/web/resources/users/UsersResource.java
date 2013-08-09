@@ -1,4 +1,4 @@
-package articles.web.resources;
+package articles.web.resources.users;
 
 import java.io.IOException;
 
@@ -15,31 +15,34 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBElement;
 
 import articles.dao.UserDAO;
 import articles.model.User;
 import articles.model.dto.LoginRequest;
 import articles.model.dto.UserDTO;
 
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.filter.LoggingFilter;
+
 @Path("")
+
 public class UsersResource {
 	@Context
 	ServletContext context;
 
 	@POST
 	@Path("login")
+	@Consumes({"application/xml","application/json"})
 	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public UserDTO login(JAXBElement<LoginRequest> loginRequest,
+	public UserDTO login(LoginRequest loginRequest,
 			@Context HttpServletResponse servletResponse,
 			@Context HttpServletRequest servletRequest) throws IOException,
 			ServletException {
-		LoginRequest lr = loginRequest.getValue();
 		UserDAO userDAO = new UserDAO();
+		Client client = Client.create();
+		client.addFilter(new LoggingFilter(System.out));
 		try {
-			User user = userDAO.find(lr.getUsername(), lr.getPassword());
-			System.out.println(lr.toString());
+			User user = userDAO.find(loginRequest.getUsername(), loginRequest.getPassword());
 			HttpSession session = servletRequest.getSession();
 			session.setAttribute("userId", user.getUserId());
 			return new UserDTO(user);
