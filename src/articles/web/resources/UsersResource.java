@@ -1,8 +1,5 @@
 package articles.web.resources;
 
-import java.io.IOException;
-
-import javax.persistence.NoResultException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -15,37 +12,32 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBElement;
 
 import articles.dao.UserDAO;
 import articles.model.User;
 import articles.model.dto.LoginRequest;
 import articles.model.dto.UserDTO;
+import articles.web.resources.exception.UserResourceException;
 
 @Path("")
 public class UsersResource {
 	@Context
 	ServletContext context;
-
+	
 	@POST
 	@Path("login")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public UserDTO login(JAXBElement<LoginRequest> loginRequest,
+	@Consumes({"application/xml, application/json"})
+	public UserDTO login(LoginRequest loginRequest,
 			@Context HttpServletResponse servletResponse,
-			@Context HttpServletRequest servletRequest) throws IOException,
-			ServletException {
-		LoginRequest lr = loginRequest.getValue();
+			@Context HttpServletRequest servletRequest) throws 
+			ServletException, UserResourceException {
 		UserDAO userDAO = new UserDAO();
-		try {
-			User user = userDAO.find(lr.getUsername(), lr.getPassword());
-			System.out.println(lr.toString());
-			HttpSession session = servletRequest.getSession();
-			session.setAttribute("userId", user.getUserId());
-			return new UserDTO(user);
-		} catch (NoResultException e) {
-			return new UserDTO();
-		}
+		User user = userDAO.find(loginRequest.getUsername(), loginRequest.getPassword());
+		System.out.println(loginRequest.toString());
+		HttpSession session = servletRequest.getSession();
+		session.setAttribute("userId", user.getUserId());
+		return new UserDTO(user);
 	}
 
 	@POST

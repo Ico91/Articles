@@ -2,43 +2,41 @@ package articles.dao;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
+import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import articles.model.User;
+import articles.model.dto.LoginRequest;
 
 public class userDAOTest {
 	private User actualUser;
+	private LoginRequest loginRequest;
 	private UserDAO userDAO;
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		userDAO = new UserDAO();
+		loginRequest = new LoginRequest("admin", "123");
 		actualUser = new User(1, "admin", "123");
 	}
 	
 	@Test
-	public void test() {
-		Properties prop = new Properties();
-		 
-    	try {
-               //load a properties file
-    		prop.load(new FileInputStream("WebContent/WEB-INF/config.properties"));
-
-	        //get the property value and print it out
-	            System.out.println(prop.getProperty("path"));
-
-	        } 
-	    catch (IOException ex) {
-	        ex.printStackTrace();
-	    }
-		User expectedUser = userDAO.find("admin", "123");
-		assertEquals(actualUser, expectedUser);
+	public void findTest() {
+		User expectedUser;
+		expectedUser = userDAO.find(loginRequest.getUsername(), loginRequest.getPassword());
+		assertEquals(actualUser.getUsername(), expectedUser.getUsername());
 		System.out.println(expectedUser.toString());
 		System.out.println(actualUser.toString());
+	}
+	
+	@Test
+	public void updateLastLoginTest() {
+		int userId = 2;
+		Date lastLogin = new Date();
+		userDAO.updateLastLogin(lastLogin, userId);
+		System.out.println(userDAO.find(loginRequest.getUsername(), loginRequest.getPassword()).getLastLogin());
+		
 	}
 
 }

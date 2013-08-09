@@ -6,6 +6,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
 @Table(name="user")
@@ -15,13 +17,19 @@ public class User {
 	private int userId;
 	private String username;
 	private String password;
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="last_login")
 	private Date lastLogin;
 	
 	public User() {
 	
 	}
-
+	
+	public User(int userId, String username, String password) {
+		this.userId = userId;
+		this.username = username;
+		this.password = password;
+	}
 
 	public int getUserId() {
 		return userId;
