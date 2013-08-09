@@ -4,11 +4,13 @@ import java.util.Date;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 
 import articles.model.User;
+import articles.web.resources.exception.UserResourceException;
 
 public class UserDAO {
 	private static final String PERSISTENCE_UNIT_NAME = "UserPE";
@@ -21,7 +23,7 @@ public class UserDAO {
 		this.entityManager = UserDAO.factory.createEntityManager();
 	}
 
-	public User find(String username, String password) {
+	public User find(String username, String password) throws UserResourceException {
 		Query selectUserQuery = this.entityManager
 				.createQuery("SELECT u FROM User u WHERE u.username = :username AND u.password = :password");
 		selectUserQuery.setParameter("username", username);
@@ -31,18 +33,20 @@ public class UserDAO {
 			user = (User) selectUserQuery.getSingleResult();
 
 		} catch (NoResultException nre) {
-			nre.printStackTrace();
+			throw new UserResourceException();
 		}
 
 		return user;
 	}
 
 	public int updateLastLogin(Date lastLogin, int userId) {
-		Query updateLastLoginQuery = this.entityManager
-				.createQuery("UPDATE User u SET u.last_login=:lastLogin WHERE u.userid=:userId");
+		EntityTransaction trans = entityManager.getTransaction();
+		trans.begin();
+		Query updateLastLoginQuery = this.entityManager.createQuery("UPDATE User u SET u.lastLogin = :lastLogin WHERE u.userId = :userId");
 		updateLastLoginQuery.setParameter("lastLogin", lastLogin);
-		updateLastLoginQuery.setParameter("userid", userId);
-		int updated = updateLastLoginQuery.executeUpdate();
+		updateLastLoginQuery.setParameter("userId", userId);
+		int updated = updateLastLoginQuery.executeUpdate ();
+		trans.commit();
 		return updated;
 	}
 
