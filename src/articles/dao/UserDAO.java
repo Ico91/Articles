@@ -1,5 +1,7 @@
 package articles.dao;
 
+import java.util.Date;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -26,4 +28,14 @@ public class UserDAO {
 		
 		return user;
 	}
+	
+	public int updateLastLogin(Date lastLogin, int userId) {
+		Query updateLastLoginQuery = this.entityManager.createQuery("UPDATE User u SET u.last_login=:lastLogin WHERE u.userid=:userId");
+		updateLastLoginQuery.setParameter("lastLogin", lastLogin);
+		updateLastLoginQuery.setParameter("userid", userId);
+		int updated = updateLastLoginQuery.executeUpdate ();
+		return updated;
+	}
+	
+	
 }

@@ -8,22 +8,40 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
-public class AccessFilter implements Filter{
+import com.sun.research.ws.wadl.Response;
+
+public class AccessFilter implements Filter {
 
 	@Override
 	public void destroy() {
 	}
 
 	@Override
-	public void doFilter(ServletRequest arg0, ServletResponse arg1,
-			FilterChain arg2) throws IOException, ServletException {
-		
+	public void doFilter(ServletRequest request, ServletResponse response,
+			FilterChain chain) throws IOException, ServletException {
+		HttpServletResponse resp = (HttpServletResponse) response;
+		HttpServletRequest req = (HttpServletRequest) request;
+		HttpSession session = req.getSession(false);
+		Integer userId = (Integer) session.getAttribute("userId");
+		String url = req.getRequestURL().toString();
+
+		if (userId != null
+				&& url.substring(url.indexOf("users/") + 6).equals(
+						userId.toString())) {
+			chain.doFilter(req, resp);
+			return;	
+		}
+
+		resp.sendError(403, "Unauthorized access");
 	}
 
 	@Override
 	public void init(FilterConfig arg0) throws ServletException {
-		
+
 	}
 
 }
