@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import articles.model.User;
 import articles.model.dto.LoginRequest;
+import articles.web.resources.exception.UserResourceException;
 
 public class userDAOTest {
 	private User actualUser;
@@ -22,7 +23,7 @@ public class userDAOTest {
 	}
 	
 	@Test
-	public void findTest() {
+	public void findTest() throws UserResourceException {
 		User expectedUser;
 		expectedUser = userDAO.find(loginRequest.getUsername(), loginRequest.getPassword());
 		assertEquals(actualUser.getUsername(), expectedUser.getUsername());
@@ -31,7 +32,7 @@ public class userDAOTest {
 	}
 	
 	@Test
-	public void updateLastLoginTest() {
+	public void updateLastLoginTest() throws UserResourceException {
 		int userId = 2;
 		Date lastLogin = new Date();
 		userDAO.updateLastLogin(lastLogin, userId);
