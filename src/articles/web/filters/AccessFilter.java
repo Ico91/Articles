@@ -24,12 +24,8 @@ public class AccessFilter implements Filter {
 		HttpServletResponse resp = (HttpServletResponse) response;
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpSession session = req.getSession(false);
-		Integer userId = (Integer) session.getAttribute("userId");
-		String url = req.getRequestURL().toString();
 
-		if (userId != null
-				&& url.substring(url.indexOf("users/") + 6).equals(
-						userId.toString())) {
+		if ( session != null && session.getAttribute("userId") != null ) {
 			chain.doFilter(req, resp);
 			return;	
 		}

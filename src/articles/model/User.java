@@ -18,7 +18,7 @@ public class User {
 	private String username;
 	private String password;
 	@Column(name="last_login")
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date lastLogin;
 	
 	public User() {

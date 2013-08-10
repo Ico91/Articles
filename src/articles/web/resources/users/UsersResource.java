@@ -1,5 +1,7 @@
 package articles.web.resources.users;
 
+import java.util.Date;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +19,7 @@ import articles.dao.UserDAO;
 import articles.model.User;
 import articles.model.dto.LoginRequest;
 import articles.model.dto.UserDTO;
-import articles.web.resources.exception.UserResourceException;
+import articles.web.listener.SessionPathConfigurationListener;
 
 @Path("")
 
@@ -29,16 +31,28 @@ public class UsersResource {
 	@Path("login")
 	@Consumes({"application/xml, application/json"})
 	@Produces(MediaType.APPLICATION_JSON)
-	public UserDTO login(LoginRequest loginRequest,
+	public Response login(LoginRequest loginRequest,
 			@Context HttpServletResponse servletResponse,
 			@Context HttpServletRequest servletRequest) throws 
-			ServletException, UserResourceException {
+			ServletException {
 		UserDAO userDAO = new UserDAO();
 		User user = userDAO.find(loginRequest.getUsername(), loginRequest.getPassword());
-		System.out.println(loginRequest.toString());
-		HttpSession session = servletRequest.getSession();
-		session.setAttribute("userId", user.getUserId());
-		return new UserDTO(user);
+		if (user != null) {
+			
+			userDAO.updateLastLogin(new Date(), user.getUserId());
+			
+			HttpSession session = servletRequest.getSession();
+			
+			session.setAttribute("userId", user.getUserId());
+			
+			System.out.println(SessionPathConfigurationListener.getPath());
+			
+			//For testing only.
+			session.invalidate();
+			return Response.ok(new UserDTO(user)).build();
+		} else {
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		}
 	}
 
 	@POST

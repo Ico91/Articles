@@ -7,10 +7,10 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
 import articles.model.User;
-import articles.web.resources.exception.UserResourceException;
 
 public class UserDAO {
 	private static final String PERSISTENCE_UNIT_NAME = "UserPE";
@@ -23,31 +23,33 @@ public class UserDAO {
 		this.entityManager = UserDAO.factory.createEntityManager();
 	}
 
-	public User find(String username, String password) throws UserResourceException {
-		Query selectUserQuery = this.entityManager
-				.createQuery("SELECT u FROM User u WHERE u.username = :username AND u.password = :password");
+	public User find(String username, String password) {
+		Query selectUserQuery = this.entityManager.createQuery("SELECT u FROM User u WHERE u.username = :username AND u.password = :password");
 		selectUserQuery.setParameter("username", username);
 		selectUserQuery.setParameter("password", password);
 		User user = new User();
 		try {
 			user = (User) selectUserQuery.getSingleResult();
-
 		} catch (NoResultException nre) {
-			throw new UserResourceException();
+			return null;
 		}
 
 		return user;
 	}
 
-	public int updateLastLogin(Date lastLogin, int userId) {
-		EntityTransaction trans = entityManager.getTransaction();
-		trans.begin();
-		Query updateLastLoginQuery = this.entityManager.createQuery("UPDATE User u SET u.lastLogin = :lastLogin WHERE u.userId = :userId");
-		updateLastLoginQuery.setParameter("lastLogin", lastLogin);
-		updateLastLoginQuery.setParameter("userId", userId);
-		int updated = updateLastLoginQuery.executeUpdate ();
-		trans.commit();
-		return updated;
+	public void updateLastLogin(Date lastLogin, int userId) {
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		try {
+			entityTransaction.begin();
+			Query updateLastLoginQuery = this.entityManager.createQuery("UPDATE User u SET u.lastLogin = :lastLogin WHERE u.userId = :userId");
+			updateLastLoginQuery.setParameter("lastLogin", lastLogin);
+			updateLastLoginQuery.setParameter("userId", userId);
+			updateLastLoginQuery.executeUpdate();
+		} catch (PersistenceException e) {
+			entityTransaction.rollback();
+		} finally {
+			entityTransaction.commit();
+		}
 	}
 
 }
