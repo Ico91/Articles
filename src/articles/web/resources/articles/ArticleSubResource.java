@@ -9,8 +9,11 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import articles.dao.ArticlesDAO;
+import articles.dao.exceptions.ArticlesDAOException;
 import articles.model.Articles.Article;
 
 public class ArticleSubResource {
@@ -27,39 +30,49 @@ public class ArticleSubResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Article getArticle(@PathParam("id") int id) {
+	public Response getArticle(@PathParam("id") int id) {
 		for (Article art : listOfArticles) {
 			if (art.getId() == id) {
-				return art;
+				return Response.ok(art, MediaType.APPLICATION_JSON).build();
 			}
 		}
 
-		return new Article();
+		return Response.status(Status.NOT_FOUND).build();
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void updateArticle(Article article) {
+	public Response updateArticle(Article article, @PathParam("id") int id) {
 
 		for (int i = 0; i < this.listOfArticles.size(); i++) {
-			if (this.listOfArticles.get(i).getId() == article.getId()) {
+			if (this.listOfArticles.get(i).getId() == id) {
 				this.listOfArticles.set(i, article);
-				break;
+				try {
+					this.dao.saveArticles(this.userId, this.listOfArticles);
+				} catch (ArticlesDAOException e) {
+					return Response.status(418).build();
+				}
+				return Response.ok().build();
 			}
 		}
-
-		this.dao.saveArticles(this.userId, this.listOfArticles);
+		
+		return Response.status(Status.NOT_MODIFIED).build();
 	}
 
 	@DELETE
-	public void deleteArticle(@PathParam("id") int id) {
+	public Response deleteArticle(@PathParam("id") int id) {
 		for (int i = 0; i < this.listOfArticles.size(); i++) {
 			if (this.listOfArticles.get(i).getId() == id) {
 				this.listOfArticles.remove(i);
-				break;
+				try {
+					this.dao.saveArticles(this.userId, this.listOfArticles);
+				} catch (ArticlesDAOException e) {
+					return Response.status(418).build();
+				}
+				return Response.ok().build();
 			}
 		}
-
-		this.dao.saveArticles(this.userId, this.listOfArticles);
+		
+		return Response.status(Status.NOT_FOUND).build();
 	}
 }

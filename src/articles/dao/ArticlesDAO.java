@@ -8,6 +8,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import articles.dao.exceptions.ArticlesDAOException;
 import articles.model.Articles;
 import articles.model.Articles.Article;
 
@@ -18,11 +19,11 @@ public class ArticlesDAO {
 		this.articlesPath = articlesPath;
 	}
 
-	public List<Article> loadArticles(int id) {
+	public List<Article> loadArticles(int userId) throws ArticlesDAOException {
 		Articles articles = new Articles();
 		try {
 
-			File file = new File(pathToArticlesFile(id));
+			File file = new File(pathToArticlesFile(userId));
 			if (file.exists()) {
 				JAXBContext jaxbContext = JAXBContext
 						.newInstance(Articles.class);
@@ -33,28 +34,62 @@ public class ArticlesDAO {
 			}
 
 		} catch (JAXBException e) {
-			// TODO ???
-			e.printStackTrace();
+			throw new ArticlesDAOException("Invalid articles.xml file format");
 		}
 
 		return articles.getArticle();
 	}
 
-	public void saveArticles(int id, List<Article> articlesList) {
+	public int addArticle(int userId, Article article) throws ArticlesDAOException {
+		if (validArticle(article)) {
+			if (emptyTitle(article))
+				throw new ArticlesDAOException("Article title cannot be empty.");
+			List<Article> articles = loadArticles(userId);
+
+			article.setId(generateArticleId(articles));
+			articles.add(article);
+			saveArticles(userId, articles);
+
+			return article.getId();
+		} else
+			throw new ArticlesDAOException("Invalid article format");
+	}
+
+	public void saveArticles(int userId, List<Article> articlesList) throws ArticlesDAOException {
 		Articles article = new Articles();
 		article.setArticle(articlesList);
 		try {
 
-			File file = new File(pathToArticlesFile(id));
+			File file = new File(pathToArticlesFile(userId));
 			JAXBContext jaxbContext = JAXBContext.newInstance(Articles.class);
 
 			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 			jaxbMarshaller.marshal(article, file);
 
 		} catch (JAXBException e) {
-			// TODO: ???
-			e.printStackTrace();
+			throw new ArticlesDAOException("Invalid articles format.");
 		}
+	}
+
+	private int generateArticleId(List<Article> articles) {
+		int max = Integer.MIN_VALUE;
+
+		for (Article a : articles) {
+			if (a.getId() > max)
+				max = a.getId();
+		}
+		if (max < 1)
+			return 1;
+
+		return ++max;
+	}
+
+	private boolean emptyTitle(Article article) {
+		return (article.getTitle().equals(""));
+	}
+
+	private boolean validArticle(Article article) {
+		return (article.getContent() != null && article.getTitle() != null);
 	}
 
 	private String pathToArticlesFile(int userId) {

@@ -1,9 +1,7 @@
 package articles.web.resources.articles;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -18,10 +16,13 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import articles.dao.ArticlesDAO;
+import articles.dao.exceptions.ArticlesDAOException;
 import articles.model.Articles.Article;
 import articles.model.dto.ArticleIdDTO;
+import articles.web.listener.SessionPathConfigurationListener;
 import articles.web.resources.exception.ArticlesResourceException;
 
 @Path("")
@@ -30,56 +31,58 @@ public class ArticlesResource {
 	ServletContext context;
 	@Context
 	HttpServletRequest servletRequest;
-
+	
+	
+	private List<Article> articles;
 	private ArticlesDAO dao;
 
+	public ArticlesResource() throws ArticlesDAOException {
+		this.articles = getListOfArticles();
+	}
+	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Article> getArticles(@QueryParam("search") String searchTerm)
 			throws ArticlesResourceException {
 		initArticlesDao();
 		if (searchTerm == null) {
-			return getListOfArticles();
+			return this.articles;
 		} else {
-			return search(searchTerm, getListOfArticles());
+			return search(searchTerm, this.articles);
 		}
 	}
 
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response add(Article article) throws ArticlesResourceException {
-		if (validArticle(article)) {
-			if (emptyTitle(article))
-				return Response.status(400).entity("Title cannot be empty.")
-						.build();
-			initArticlesDao();
-			List<Article> articles = getListOfArticles();
+		initArticlesDao();
+		try {
+			int articleId = this.dao.addArticle(getUserId(), article);
+			return Response.ok(articleId, MediaType.APPLICATION_JSON).build();
 
-			article.setId(generateArticleId(articles));
-			articles.add(article);
-			this.dao.saveArticles(getUserId(), articles);
-
-			return Response.ok(article.getId().toString(),
-					MediaType.APPLICATION_JSON).build();
+		} catch (ArticlesDAOException e) {
+			return Response.status(400).build();
 		}
-
-		return Response.status(400)
-				.entity("Article title or content not specified!").build();
 	}
 
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void deleteArticles(ArticleIdDTO articleId)
+	public Response deleteArticles(ArticleIdDTO articleId)
 			throws ArticlesResourceException {
 		initArticlesDao();
-		List<Article> listOfArticles = getListOfArticles();
+		List<Article> listOfArticles = this.articles;
 		for (int i = 0; i < listOfArticles.size(); i++) {
 			if (listOfArticles.get(i).getId() == articleId.getId()) {
 				listOfArticles.remove(i);
-				break;
+				try {
+					this.dao.saveArticles(getUserId(), new ArrayList<Article>());
+				} catch (ArticlesDAOException e) {
+					return Response.status(418).build();
+				}
+				return Response.ok().build();
 			}
 		}
-		this.dao.saveArticles(getUserId(), new ArrayList<Article>());
+		return Response.status(Status.NOT_FOUND).build();
 	}
 
 	@Path("{id}")
@@ -87,35 +90,11 @@ public class ArticlesResource {
 			throws ArticlesResourceException {
 		initArticlesDao();
 		return new ArticleSubResource(articlesPath(), getUserId(),
-				getListOfArticles());
-	}
-
-	private int generateArticleId(List<Article> articles) {
-		int max = Integer.MIN_VALUE;
-
-		for (Article a : articles) {
-			if (a.getId() > max)
-				max = a.getId();
-		}
-		if (max < 1)
-			return 1;
-
-		return ++max;
+				this.articles);
 	}
 
 	private String articlesPath() throws ArticlesResourceException {
-		String path = "";
-		Properties properties = new Properties();
-		try {
-			properties.load(this.context
-					.getResourceAsStream("WEB-INF/config.properties"));
-			path = properties.getProperty("path") + "/";
-		} catch (IOException e) {
-			throw new ArticlesResourceException(
-					"Invalid properties file specified");
-		}
-
-		return path;
+		return SessionPathConfigurationListener.getPath();
 	}
 
 	private List<Article> search(String searchTerm, List<Article> listOfArticles)
@@ -145,17 +124,9 @@ public class ArticlesResource {
 		this.dao = new ArticlesDAO(articlesPath());
 	}
 
-	private List<Article> getListOfArticles() {
+	private List<Article> getListOfArticles() throws ArticlesDAOException {
 		List<Article> articles = dao.loadArticles(getUserId());
 
 		return articles;
-	}
-
-	private boolean emptyTitle(Article article) {
-		return (article.getTitle().equals(""));
-	}
-
-	private boolean validArticle(Article article) {
-		return (article.getContent() != null && article.getTitle() != null);
 	}
 }
