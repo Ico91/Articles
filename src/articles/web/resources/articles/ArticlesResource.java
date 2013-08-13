@@ -18,6 +18,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.log4j.Logger;
+
 import articles.dao.ArticlesDAO;
 import articles.dao.exceptions.ArticlesDAOException;
 import articles.model.Articles.Article;
@@ -27,22 +29,22 @@ import articles.web.resources.exception.ArticlesResourceException;
 
 @Path("")
 public class ArticlesResource {
+	static final Logger logger = Logger.getLogger(ArticlesResource.class);
 	@Context
 	ServletContext context;
 	@Context
 	HttpServletRequest servletRequest;
-	
-	
+
 	private List<Article> articles;
 	private ArticlesDAO dao;
 
-	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Article> getArticles(@QueryParam("search") String searchTerm)
 			throws ArticlesResourceException {
 		initArticlesList();
 		if (searchTerm == null) {
+
 			return this.articles;
 		} else {
 			return search(searchTerm, this.articles);
@@ -55,9 +57,13 @@ public class ArticlesResource {
 		initArticlesList();
 		try {
 			int articleId = this.dao.addArticle(getUserId(), article);
+			logger.info("User with id = " + getUserId()
+					+ " created an article.");
 			return Response.ok(articleId, MediaType.APPLICATION_JSON).build();
 
 		} catch (ArticlesDAOException e) {
+			logger.error("User with id = " + getUserId()
+					+ " failed to create an article.");
 			return Response.status(400).build();
 		}
 	}
@@ -74,8 +80,12 @@ public class ArticlesResource {
 				try {
 					this.dao.saveArticles(getUserId(), new ArrayList<Article>());
 				} catch (ArticlesDAOException e) {
+					logger.error("User with id = " + getUserId()
+							+ " failed to delete all articles.");
 					return Response.status(418).build();
 				}
+				logger.info("User with id = " + getUserId()
+						+ " deleted all articles.");
 				return Response.ok().build();
 			}
 		}
@@ -91,7 +101,9 @@ public class ArticlesResource {
 	}
 
 	private String articlesPath() throws ArticlesResourceException {
-		return SessionPathConfigurationListener.getPath();
+		String s = SessionPathConfigurationListener.getPath();
+		System.out.println(s);
+		return s;
 	}
 
 	private List<Article> search(String searchTerm, List<Article> listOfArticles)
@@ -113,7 +125,7 @@ public class ArticlesResource {
 	}
 
 	private int getUserId() {
-		return (int)servletRequest.getSession().getAttribute("userId");
+		return (int) servletRequest.getSession().getAttribute("userId");
 	}
 
 	private void initArticlesList() throws ArticlesResourceException {
@@ -126,8 +138,6 @@ public class ArticlesResource {
 	}
 
 	private List<Article> getListOfArticles() throws ArticlesDAOException {
-		List<Article> articles = dao.loadArticles(getUserId());
-
-		return articles;
+		return dao.loadArticles(getUserId());
 	}
 }

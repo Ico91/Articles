@@ -12,14 +12,18 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.log4j.Logger;
+
 import articles.dao.ArticlesDAO;
 import articles.dao.exceptions.ArticlesDAOException;
 import articles.model.Articles.Article;
+import articles.web.resources.users.UsersResource;
 
 public class ArticleSubResource {
 	private int userId;
 	private List<Article> listOfArticles;
 	private ArticlesDAO dao;
+	static final Logger logger = Logger.getLogger(UsersResource.class);
 	// TODO: Change String articlesPath to ArticlesDTO
 	public ArticleSubResource(String articlesPath, int userId,
 			List<Article> listOfArticles) {
@@ -33,10 +37,11 @@ public class ArticleSubResource {
 	public Response getArticle(@PathParam("id") int id) {
 		for (Article art : listOfArticles) {
 			if (art.getId() == id) {
+				logger.info("User with id = " + userId + " opened an article with id = " + id + ".");
 				return Response.ok(art, MediaType.APPLICATION_JSON).build();
 			}
 		}
-
+		logger.error("User with id = " + userId + " failed to open an article with id = " + id + ".");
 		return Response.status(Status.NOT_FOUND).build();
 	}
 
@@ -50,8 +55,10 @@ public class ArticleSubResource {
 				try {
 					this.dao.saveArticles(this.userId, this.listOfArticles);
 				} catch (ArticlesDAOException e) {
+					logger.error("User with id = " + userId + " failed to update an article with id = " + id + ".");
 					return Response.status(418).build();
 				}
+				logger.info("User with id = " + userId + " updated an article with id = " + id + ".");
 				return Response.ok().build();
 			}
 		}
@@ -67,8 +74,10 @@ public class ArticleSubResource {
 				try {
 					this.dao.saveArticles(this.userId, this.listOfArticles);
 				} catch (ArticlesDAOException e) {
+					logger.error("User with id = " + userId + " failed to delete an article with id = " + id + ".");
 					return Response.status(418).build();
 				}
+				logger.info("User with id = " + userId + " deleted an article with id = " + id + ".");
 				return Response.ok().build();
 			}
 		}
