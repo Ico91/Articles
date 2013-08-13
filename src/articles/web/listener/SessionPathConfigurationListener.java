@@ -7,8 +7,11 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+<<<<<<< HEAD
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionBindingEvent;
+=======
+>>>>>>> 77a855cc12e1e889547316d4fcaded5e231cd9c0
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import javax.ws.rs.core.Context;
@@ -38,6 +41,12 @@ public class SessionPathConfigurationListener implements HttpSessionListener, Se
 		// TODO Auto-generated method stub
 		this.context = event.getServletContext();
 	}
+
+	@Override
+	public void sessionDestroyed(HttpSessionEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 	@Override
 	public void sessionCreated(HttpSessionEvent arg0) {
 		// TODO Auto-generated method stub
@@ -54,10 +63,6 @@ public class SessionPathConfigurationListener implements HttpSessionListener, Se
 		}
 		
 		path = properties.getProperty("path") + "/";
-	}
-	@Override
-	public void sessionDestroyed(HttpSessionEvent arg0) {
-		System.out.println("Session destroyed");
 	}
 	
 }
