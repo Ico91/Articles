@@ -36,15 +36,12 @@ public class ArticlesResource {
 	private List<Article> articles;
 	private ArticlesDAO dao;
 
-	public ArticlesResource() throws ArticlesDAOException {
-		this.articles = getListOfArticles();
-	}
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Article> getArticles(@QueryParam("search") String searchTerm)
 			throws ArticlesResourceException {
-		initArticlesDao();
+		initArticlesList();
 		if (searchTerm == null) {
 			return this.articles;
 		} else {
@@ -55,7 +52,7 @@ public class ArticlesResource {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response add(Article article) throws ArticlesResourceException {
-		initArticlesDao();
+		initArticlesList();
 		try {
 			int articleId = this.dao.addArticle(getUserId(), article);
 			return Response.ok(articleId, MediaType.APPLICATION_JSON).build();
@@ -69,7 +66,7 @@ public class ArticlesResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response deleteArticles(ArticleIdDTO articleId)
 			throws ArticlesResourceException {
-		initArticlesDao();
+		initArticlesList();
 		List<Article> listOfArticles = this.articles;
 		for (int i = 0; i < listOfArticles.size(); i++) {
 			if (listOfArticles.get(i).getId() == articleId.getId()) {
@@ -88,7 +85,7 @@ public class ArticlesResource {
 	@Path("{id}")
 	public ArticleSubResource getArticle(@PathParam("id") int id)
 			throws ArticlesResourceException {
-		initArticlesDao();
+		initArticlesList();
 		return new ArticleSubResource(articlesPath(), getUserId(),
 				this.articles);
 	}
@@ -99,7 +96,7 @@ public class ArticlesResource {
 
 	private List<Article> search(String searchTerm, List<Article> listOfArticles)
 			throws ArticlesResourceException {
-		initArticlesDao();
+		initArticlesList();
 		List<Article> articles = listOfArticles;
 		List<Article> articlesToReturn = new ArrayList<Article>();
 
@@ -116,12 +113,16 @@ public class ArticlesResource {
 	}
 
 	private int getUserId() {
-		// TODO: Must return userId attribute from session
-		return 1;
+		return (int)servletRequest.getSession().getAttribute("userId");
 	}
 
-	private void initArticlesDao() throws ArticlesResourceException {
+	private void initArticlesList() throws ArticlesResourceException {
 		this.dao = new ArticlesDAO(articlesPath());
+		try {
+			this.articles = getListOfArticles();
+		} catch (ArticlesDAOException e) {
+			throw new ArticlesResourceException(e.getMessage());
+		}
 	}
 
 	private List<Article> getListOfArticles() throws ArticlesDAOException {
