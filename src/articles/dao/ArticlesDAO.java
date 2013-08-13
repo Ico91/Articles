@@ -46,7 +46,7 @@ public class ArticlesDAO {
 			if (emptyTitle(article))
 				throw new ArticlesDAOException("Article title cannot be empty.");
 			List<Article> articles = loadArticles(userId);
-
+			
 			if (hasUniqueTitle(article, articles) == false)
 				throw new ArticlesDAOException(
 						"Article with same title already exist!");
@@ -79,8 +79,10 @@ public class ArticlesDAO {
 
 	private boolean hasUniqueTitle(Article article, List<Article> articles) {
 		for (Article a : articles) {
-			if (a.getTitle().equals(article.getTitle()))
+			if (a.getTitle().equals(article.getTitle())) {
+				System.out.println(articles.size());
 				return false;
+			}
 		}
 		return true;
 	}
@@ -107,6 +109,6 @@ public class ArticlesDAO {
 	}
 
 	private String pathToArticlesFile(int userId) {
-		return this.articlesPath + userId + ".xml";
+		return this.articlesPath + "/" + userId + ".xml";
 	}
 }

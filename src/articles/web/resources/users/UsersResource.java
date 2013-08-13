@@ -21,6 +21,7 @@ import articles.dao.UserDAO;
 import articles.model.User;
 import articles.model.dto.LoginRequest;
 import articles.model.dto.UserDTO;
+import articles.web.listener.SessionPathConfigurationListener;
 
 @Path("")
 
@@ -42,10 +43,14 @@ public class UsersResource {
 		if (user != null) {
 			userDAO.updateLastLogin(new Date(), user.getUserId());
 			
+			servletRequest.getSession().invalidate();
 			HttpSession session = servletRequest.getSession();
+			session.setAttribute("userId", user.getUserId());
+			
 			logger.info("User with id = " + user.getUserId() + " logged in the system.");
-			session.invalidate();
-		
+			
+			System.out.println(SessionPathConfigurationListener.getPath());
+			
 			return Response.ok(new UserDTO(user)).build();
 		} else {
 			logger.error("Unauthorized user tried to log in.");
