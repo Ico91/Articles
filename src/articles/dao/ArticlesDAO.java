@@ -40,11 +40,16 @@ public class ArticlesDAO {
 		return articles.getArticle();
 	}
 
-	public int addArticle(int userId, Article article) throws ArticlesDAOException {
+	public int addArticle(int userId, Article article)
+			throws ArticlesDAOException {
 		if (validArticle(article)) {
 			if (emptyTitle(article))
 				throw new ArticlesDAOException("Article title cannot be empty.");
 			List<Article> articles = loadArticles(userId);
+
+			if (hasUniqueTitle(article, articles) == false)
+				throw new ArticlesDAOException(
+						"Article with same title already exist!");
 
 			article.setId(generateArticleId(articles));
 			articles.add(article);
@@ -54,8 +59,9 @@ public class ArticlesDAO {
 		} else
 			throw new ArticlesDAOException("Invalid article format");
 	}
-
-	public void saveArticles(int userId, List<Article> articlesList) throws ArticlesDAOException {
+	
+	public void saveArticles(int userId, List<Article> articlesList)
+			throws ArticlesDAOException {
 		Articles article = new Articles();
 		article.setArticle(articlesList);
 		try {
@@ -69,6 +75,14 @@ public class ArticlesDAO {
 		} catch (JAXBException e) {
 			throw new ArticlesDAOException("Invalid articles format.");
 		}
+	}
+
+	private boolean hasUniqueTitle(Article article, List<Article> articles) {
+		for (Article a : articles) {
+			if (a.getTitle().equals(article.getTitle()))
+				return false;
+		}
+		return true;
 	}
 
 	private int generateArticleId(List<Article> articles) {
