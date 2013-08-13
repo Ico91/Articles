@@ -18,6 +18,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.log4j.Logger;
+
 import articles.dao.ArticlesDAO;
 import articles.dao.exceptions.ArticlesDAOException;
 import articles.model.Articles.Article;
@@ -27,25 +29,27 @@ import articles.web.resources.exception.ArticlesResourceException;
 
 @Path("")
 public class ArticlesResource {
+	static final Logger logger = Logger.getLogger(ArticlesResource.class);
 	@Context
 	ServletContext context;
 	@Context
 	HttpServletRequest servletRequest;
-	
-	
+
 	private List<Article> articles;
 	private ArticlesDAO dao;
 
-	public ArticlesResource() throws ArticlesDAOException {
-		this.articles = getListOfArticles();
-	}
+	/*public ArticlesResource() throws ArticlesDAOException {
+		
+	}*/
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Article> getArticles(@QueryParam("search") String searchTerm)
-			throws ArticlesResourceException {
+			throws ArticlesResourceException, ArticlesDAOException {
 		initArticlesDao();
+		this.articles = getListOfArticles();
 		if (searchTerm == null) {
+			
 			return this.articles;
 		} else {
 			return search(searchTerm, this.articles);
@@ -58,9 +62,11 @@ public class ArticlesResource {
 		initArticlesDao();
 		try {
 			int articleId = this.dao.addArticle(getUserId(), article);
+			logger.info("User with id = " + getUserId() + " created an article.");
 			return Response.ok(articleId, MediaType.APPLICATION_JSON).build();
 
 		} catch (ArticlesDAOException e) {
+			logger.error("User with id = " + getUserId() + " failed to create an article.");
 			return Response.status(400).build();
 		}
 	}
@@ -77,8 +83,10 @@ public class ArticlesResource {
 				try {
 					this.dao.saveArticles(getUserId(), new ArrayList<Article>());
 				} catch (ArticlesDAOException e) {
+					logger.error("User with id = " + getUserId() + " failed to delete all articles.");
 					return Response.status(418).build();
 				}
+				logger.info("User with id = " + getUserId() + " deleted all articles.");
 				return Response.ok().build();
 			}
 		}
@@ -94,7 +102,8 @@ public class ArticlesResource {
 	}
 
 	private String articlesPath() throws ArticlesResourceException {
-		return SessionPathConfigurationListener.getPath();
+		return "E:\\Server\\Articles\\";
+		//return SessionPathConfigurationListener.getPath();
 	}
 
 	private List<Article> search(String searchTerm, List<Article> listOfArticles)
@@ -125,7 +134,11 @@ public class ArticlesResource {
 	}
 
 	private List<Article> getListOfArticles() throws ArticlesDAOException {
-		List<Article> articles = dao.loadArticles(getUserId());
+		List<Article> articles = null;
+		if (this.dao != null) {
+			articles = dao.loadArticles(1);
+		} else
+			System.out.println("null e");
 
 		return articles;
 	}
