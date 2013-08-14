@@ -6,7 +6,6 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -16,17 +15,21 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.apache.log4j.Logger;
 
 import articles.dao.ArticlesDAO;
 import articles.dao.exceptions.ArticlesDAOException;
 import articles.model.Articles.Article;
-import articles.model.dto.ArticleIdDTO;
 import articles.web.listener.SessionPathConfigurationListener;
 import articles.web.resources.exception.ArticlesResourceException;
 
+/**
+ * Class used to process article requests
+ * 
+ * @author Krasimir Atanasov
+ * 
+ */
 @Path("")
 public class ArticlesResource {
 	static final Logger logger = Logger.getLogger(ArticlesResource.class);
@@ -38,28 +41,48 @@ public class ArticlesResource {
 	private List<Article> articles;
 	private ArticlesDAO dao;
 
+	/**
+	 * If searchTerm is specified, returns list of articles
+	 * containing the searchTerm in title or content, else return
+	 * list of all articles
+	 * @param searchTerm 
+	 * @return List of articles
+	 * @throws ArticlesResourceException
+	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Article> getArticles(@QueryParam("search") String searchTerm)
 			throws ArticlesResourceException {
-		initArticlesList();
-		if (searchTerm == null) {
-
-			return this.articles;
-		} else {
-			return search(searchTerm, this.articles);
+		initArticlesDAO();
+		try {
+			this.articles = this.dao.loadArticles(getUserId());
+			if (searchTerm == null) {
+				return this.articles;
+			} else {
+				return search(searchTerm, this.articles);
+			}
+		} catch (ArticlesDAOException e) {
+			return new ArrayList<Article>();
 		}
 	}
-
+	
+	/**
+	 * Add new article in already existing list of articles
+	 * Returns response code: 200 on success, 400 on fail
+	 * @param article Article to add
+	 * @return Added article with generated unique article ID
+	 * @throws ArticlesResourceException
+	 */
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response add(Article article) throws ArticlesResourceException {
-		initArticlesList();
+		initArticlesDAO();
 		try {
-			int articleId = this.dao.addArticle(getUserId(), article);
+			article = this.dao.addArticle(getUserId(), article);
 			logger.info("User with id = " + getUserId()
 					+ " created an article.");
-			return Response.ok(articleId, MediaType.APPLICATION_JSON).build();
+			return Response.ok(article, MediaType.APPLICATION_JSON).build();
 
 		} catch (ArticlesDAOException e) {
 			logger.error("User with id = " + getUserId()
@@ -67,52 +90,42 @@ public class ArticlesResource {
 			return Response.status(400).build();
 		}
 	}
-
-	@DELETE
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response deleteArticles(ArticleIdDTO articleId)
-			throws ArticlesResourceException {
-		initArticlesList();
-		List<Article> listOfArticles = this.articles;
-		for (int i = 0; i < listOfArticles.size(); i++) {
-			if (listOfArticles.get(i).getId() == articleId.getId()) {
-				listOfArticles.remove(i);
-				try {
-					this.dao.saveArticles(getUserId(), new ArrayList<Article>());
-				} catch (ArticlesDAOException e) {
-					logger.error("User with id = " + getUserId()
-							+ " failed to delete all articles.");
-					return Response.status(418).build();
-				}
-				logger.info("User with id = " + getUserId()
-						+ " deleted all articles.");
-				return Response.ok().build();
-			}
-		}
-		return Response.status(Status.NOT_FOUND).build();
-	}
-
+	
+	/**
+	 * Process all request on path /articles/{id}
+	 * @param id Id of article
+	 * @return ArticleSubResource
+	 * @throws ArticlesResourceException
+	 */
 	@Path("{id}")
 	public ArticleSubResource getArticle(@PathParam("id") int id)
 			throws ArticlesResourceException {
-		initArticlesList();
-		return new ArticleSubResource(articlesPath(), getUserId(),
-				this.articles);
+		initArticlesDAO();
+		return new ArticleSubResource(this.dao, getUserId());
 	}
-
+	
+	/**
+	 * Read the articles directory from configuration file
+	 * @return
+	 * @throws ArticlesResourceException
+	 */
 	private String articlesPath() throws ArticlesResourceException {
 		String s = SessionPathConfigurationListener.getPath();
-		System.out.println(s);
 		return s;
 	}
 
+	/**
+	 * Search for searchTerm in title and content of articles 
+	 * @param searchTerm String to search
+	 * @param listOfArticles List of articles that seek
+	 * @return List of articles that contains the searchTerm
+	 * @throws ArticlesResourceException
+	 */
 	private List<Article> search(String searchTerm, List<Article> listOfArticles)
 			throws ArticlesResourceException {
-		initArticlesList();
-		List<Article> articles = listOfArticles;
 		List<Article> articlesToReturn = new ArrayList<Article>();
 
-		for (Article a : articles) {
+		for (Article a : listOfArticles) {
 			String articleTitle = a.getTitle();
 			String articleContent = a.getContent();
 
@@ -123,21 +136,20 @@ public class ArticlesResource {
 
 		return articlesToReturn;
 	}
-
+	
+	/**
+	 * Get user ID from session
+	 * @return User ID
+	 */
 	private int getUserId() {
 		return (int) servletRequest.getSession().getAttribute("userId");
 	}
 
-	private void initArticlesList() throws ArticlesResourceException {
+	/**
+	 * Initialize ArticlesDAO object
+	 * @throws ArticlesResourceException
+	 */
+	private void initArticlesDAO() throws ArticlesResourceException {
 		this.dao = new ArticlesDAO(articlesPath());
-		try {
-			this.articles = getListOfArticles();
-		} catch (ArticlesDAOException e) {
-			throw new ArticlesResourceException(e.getMessage());
-		}
-	}
-
-	private List<Article> getListOfArticles() throws ArticlesDAOException {
-		return dao.loadArticles(getUserId());
 	}
 }
