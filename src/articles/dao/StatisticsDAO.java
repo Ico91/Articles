@@ -44,17 +44,15 @@ public class StatisticsDAO {
 	 *            - the id of the user
 	 * @param event
 	 *            - specified by the Event enumeration
-	 * @param eventDate
-	 *            - the time of the event
 	 * @throws StatisticsDAOException
 	 */
-	public void save(int userId, Event event, Date eventDate)
+	public void save(int userId, Event event)
 			throws StatisticsDAOException {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		try {
 			entityTransaction.begin();
 			UserStatistics statistics = new UserStatistics();
-			statistics.setDate(eventDate);
+			statistics.setDate(new Date());
 			statistics.setEvent(event.getValue());
 			statistics.setUser(userId);
 			entityManager.persist(statistics);
