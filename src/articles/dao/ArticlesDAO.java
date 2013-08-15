@@ -42,7 +42,7 @@ public class ArticlesDAO {
 	public List<Article> loadArticles(int userId) throws ArticlesDAOException {
 		Articles articles = new Articles();
 		try {
-
+			System.out.println(pathToArticlesFile(userId));
 			File file = new File(pathToArticlesFile(userId));
 			if (file.exists()) {
 				JAXBContext jaxbContext = JAXBContext

@@ -83,7 +83,6 @@ public class StatisticsDAO {
 					.createQuery("SELECT us.event, us.eventDate FROM UserStatistics us WHERE SUBSTRING(us.eventDate, 1, 10) = :date AND us.user.userId = :userId");
 			selectQuery.setParameter("date", databaseFormat.format(validateDate(date)));
 			selectQuery.setParameter("userId", userId);
-			@SuppressWarnings("unchecked")
 			List<Object[]> resultList = selectQuery.getResultList();
 			List<UserStatisticsDTO> statisticsList = new ArrayList<UserStatisticsDTO>();
 			for (Object[] result : resultList) {
@@ -97,7 +96,9 @@ public class StatisticsDAO {
 		}
 	}
 
-	private Date validateDate(String dateToValidate) throws ParseException {
+	private Date validateDate(String dateToValidate) throws ParseException, IllegalArgumentException {
+		if(dateToValidate == null)
+			throw new IllegalArgumentException("Date is empty!");
 		SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy/MM/dd");
 		isoFormat.setLenient(false);
 		Date date = isoFormat.parse(dateToValidate);

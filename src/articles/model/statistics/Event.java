@@ -1,7 +1,7 @@
 package articles.model.statistics;
 
 public enum Event {
-	LOGIN(1), LOGOUT(2), CREATE(3), MODIFY(4), DELETE(5);
+	LOGIN(1), LOGOUT(2), CREATE_ARTICLE(3), MODIFY_ARTICLE(4), DELETE_ARTICLE(5);
 	
 	private int value;
 	

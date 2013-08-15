@@ -19,8 +19,11 @@ import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 
 import articles.dao.ArticlesDAO;
+import articles.dao.StatisticsDAO;
 import articles.dao.exceptions.ArticlesDAOException;
+import articles.dao.exceptions.StatisticsDAOException;
 import articles.model.Articles.Article;
+import articles.model.statistics.Event;
 import articles.web.listener.SessionPathConfigurationListener;
 import articles.web.resources.exception.ArticlesResourceException;
 
@@ -82,6 +85,14 @@ public class ArticlesResource {
 			article = this.dao.addArticle(getUserId(), article);
 			logger.info("User with id = " + getUserId()
 					+ " created an article.");
+			
+			try {
+				StatisticsDAO statDao = new StatisticsDAO();
+				statDao.save(getUserId(), Event.CREATE_ARTICLE);
+			} catch (StatisticsDAOException e) {
+				return Response.status(400).entity(e.getMessage()).build();
+			}
+			
 			return Response.ok(article, MediaType.APPLICATION_JSON).build();
 
 		} catch (ArticlesDAOException e) {

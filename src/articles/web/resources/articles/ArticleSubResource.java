@@ -13,8 +13,11 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.log4j.Logger;
 
 import articles.dao.ArticlesDAO;
+import articles.dao.StatisticsDAO;
 import articles.dao.exceptions.ArticlesDAOException;
+import articles.dao.exceptions.StatisticsDAOException;
 import articles.model.Articles.Article;
+import articles.model.statistics.Event;
 import articles.web.resources.users.UsersResource;
 
 /**
@@ -85,6 +88,13 @@ public class ArticleSubResource {
 			if (result)
 				logger.info("User with id = " + userId
 						+ " updated an article with id = " + id + ".");
+			
+			try {
+				StatisticsDAO statDao = new StatisticsDAO();
+				statDao.save(this.userId, Event.MODIFY_ARTICLE);
+			} catch (StatisticsDAOException e) {
+				return Response.status(400).entity(e.getMessage()).build();
+			}
 
 			return (result == true) ? Response.ok().build() : Response.status(
 					Status.NOT_MODIFIED).build();
@@ -112,6 +122,14 @@ public class ArticleSubResource {
 			if (result) {
 				logger.info("User with id = " + userId
 						+ " deleted an article with id = " + id + ".");
+				
+				try {
+					StatisticsDAO statDao = new StatisticsDAO();
+					statDao.save(this.userId, Event.DELETE_ARTICLE);
+				} catch (StatisticsDAOException e) {
+					return Response.status(400).entity(e.getMessage()).build();
+				}
+				
 				return Response.ok().build();
 			} else {
 				return Response.status(Status.NOT_FOUND).build();

@@ -17,10 +17,13 @@ import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 
+import articles.dao.StatisticsDAO;
 import articles.dao.UserDAO;
+import articles.dao.exceptions.StatisticsDAOException;
 import articles.model.User;
 import articles.model.dto.LoginRequest;
 import articles.model.dto.UserDTO;
+import articles.model.statistics.Event;
 import articles.web.listener.SessionPathConfigurationListener;
 
 @Path("")
@@ -49,6 +52,13 @@ public class UsersResource {
 			
 			logger.info("User with id = " + user.getUserId() + " logged in the system.");
 			
+			try {
+				StatisticsDAO statDao = new StatisticsDAO();
+				statDao.save(user.getUserId(), Event.LOGIN);
+			} catch (StatisticsDAOException e) {
+				return Response.status(400).entity(e.getMessage()).build();
+			}
+			
 			System.out.println(SessionPathConfigurationListener.getPath());
 			
 			return Response.ok(new UserDTO(user)).build();
@@ -68,6 +78,14 @@ public class UsersResource {
 			int userId = (int)session.getAttribute("userId");
 			session.invalidate();
 			logger.info("User with id = " + userId + " logged out from the system.");
+			
+			try {
+				StatisticsDAO statDao = new StatisticsDAO();
+				statDao.save(userId, Event.LOGOUT);
+			} catch (StatisticsDAOException e) {
+				return Response.status(400).entity(e.getMessage()).build();
+			}
+			
 			return Response.ok().build();
 		}
 		logger.error("Unauthorized user tried to log out.");

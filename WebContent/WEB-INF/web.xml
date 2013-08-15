@@ -12,6 +12,10 @@
   <filter-name>AccessFilter</filter-name>
   <url-pattern>/articles/*</url-pattern>
  </filter-mapping>
+ <filter-mapping>
+ 	<filter-name>AccessFilter</filter-name>
+ 	<url-pattern>/statistics/*</url-pattern>
+ </filter-mapping>
  <servlet>
   <display-name>User Authorization</display-name>
   <servlet-name>User Authorization</servlet-name>
