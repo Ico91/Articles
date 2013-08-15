@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -14,6 +15,7 @@ import javax.persistence.TemporalType;
 public class User {
 	@Id
 	@Column(name="userid")
+	@OneToMany(mappedBy="userid")
 	private int userId;
 	private String username;
 	private String password;
