@@ -17,12 +17,19 @@ import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 
+import articles.dao.StatisticsDAO;
 import articles.dao.UserDAO;
+import articles.dao.exceptions.StatisticsDAOException;
 import articles.model.User;
 import articles.model.dto.LoginRequest;
 import articles.model.dto.UserDTO;
+import articles.model.statistics.Event;
 import articles.web.listener.SessionPathConfigurationListener;
 
+/**Class for performing user requests
+ * @author Galina Hristova
+ *
+ */
 @Path("")
 
 public class UsersResource {
@@ -30,6 +37,15 @@ public class UsersResource {
 	@Context
 	ServletContext context;
 	
+	/**
+	 * If a user with the username and password, entered by a client, exists returns a response for success,
+	 * otherwise returns response the the client is not authorized. On success a new session is created.
+	 * @param loginRequest
+	 * @param servletResponse
+	 * @param servletRequest
+	 * @return
+	 * @throws ServletException
+	 */
 	@POST
 	@Path("login")
 	@Consumes({"application/xml, application/json"})
@@ -39,7 +55,7 @@ public class UsersResource {
 			@Context HttpServletRequest servletRequest) throws 
 			ServletException {
 		UserDAO userDAO = new UserDAO();
-		User user = userDAO.find(loginRequest.getUsername(), loginRequest.getPassword());
+		User user = userDAO.getUser(loginRequest.getUsername(), loginRequest.getPassword());
 		if (user != null) {
 			userDAO.updateLastLogin(new Date(), user.getUserId());
 			
@@ -48,6 +64,13 @@ public class UsersResource {
 			session.setAttribute("userId", user.getUserId());
 			
 			logger.info("User with id = " + user.getUserId() + " logged in the system.");
+			
+			try {
+				StatisticsDAO statDao = new StatisticsDAO();
+				statDao.save(user.getUserId(), Event.LOGIN);
+			} catch (StatisticsDAOException e) {
+				return Response.status(400).entity(e.getMessage()).build();
+			}
 			
 			System.out.println(SessionPathConfigurationListener.getPath());
 			
@@ -58,6 +81,12 @@ public class UsersResource {
 		}
 	}
 
+	/**
+	 * On success a user session is destroyed.
+	 * @param servletResponse
+	 * @param servletRequest
+	 * @return
+	 */
 	@POST
 	@Path("logout")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -68,6 +97,14 @@ public class UsersResource {
 			int userId = (int)session.getAttribute("userId");
 			session.invalidate();
 			logger.info("User with id = " + userId + " logged out from the system.");
+			
+			try {
+				StatisticsDAO statDao = new StatisticsDAO();
+				statDao.save(userId, Event.LOGOUT);
+			} catch (StatisticsDAOException e) {
+				return Response.status(400).entity(e.getMessage()).build();
+			}
+			
 			return Response.ok().build();
 		}
 		logger.error("Unauthorized user tried to log out.");

@@ -5,6 +5,7 @@
 	<persistence-unit name="UserPE" transaction-type="RESOURCE_LOCAL">
 		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
 		<class>articles.model.User</class>
+		<class>articles.model.statistics.UserStatistics</class>
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />

@@ -12,8 +12,8 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import javax.ws.rs.core.Context;
 
-/**
- * Author Galina
+/**Generate the path from a property file which defines where the articles to be stored.
+ * Author Galina Hristova
  * Application Lifecycle Listener implementation class SessionAttributesConfigurationListener
  *
  */
@@ -46,11 +46,6 @@ public class SessionPathConfigurationListener implements HttpSessionListener, Se
 	@Override
 	public void sessionCreated(HttpSessionEvent arg0) {
 		// TODO Auto-generated method stub
-		System.out.println("Session created");
-		System.out.println("Session created");
-		System.out.println("Session created");
-		System.out.println("Session created");
-		System.out.println("Session created");
     	Properties properties = new Properties();
 		try {
 			properties.load(this.context.getResourceAsStream("WEB-INF/config.properties"));

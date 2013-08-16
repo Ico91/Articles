@@ -5,6 +5,10 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**Object that contains the entered username and password.
+ * @author Galina Hristova
+ *
+ */
 @XmlRootElement(name = "request")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class LoginRequest{
