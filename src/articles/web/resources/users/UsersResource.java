@@ -26,6 +26,10 @@ import articles.model.dto.UserDTO;
 import articles.model.statistics.Event;
 import articles.web.listener.SessionPathConfigurationListener;
 
+/**Class for performing user requests
+ * @author Galina Hristova
+ *
+ */
 @Path("")
 
 public class UsersResource {
@@ -33,6 +37,15 @@ public class UsersResource {
 	@Context
 	ServletContext context;
 	
+	/**
+	 * If a user with the username and password, entered by a client, exists returns a response for success,
+	 * otherwise returns response the the client is not authorized. On success a new session is created.
+	 * @param loginRequest
+	 * @param servletResponse
+	 * @param servletRequest
+	 * @return
+	 * @throws ServletException
+	 */
 	@POST
 	@Path("login")
 	@Consumes({"application/xml, application/json"})
@@ -42,7 +55,7 @@ public class UsersResource {
 			@Context HttpServletRequest servletRequest) throws 
 			ServletException {
 		UserDAO userDAO = new UserDAO();
-		User user = userDAO.find(loginRequest.getUsername(), loginRequest.getPassword());
+		User user = userDAO.getUser(loginRequest.getUsername(), loginRequest.getPassword());
 		if (user != null) {
 			userDAO.updateLastLogin(new Date(), user.getUserId());
 			
@@ -68,6 +81,12 @@ public class UsersResource {
 		}
 	}
 
+	/**
+	 * On success a user session is destroyed.
+	 * @param servletResponse
+	 * @param servletRequest
+	 * @return
+	 */
 	@POST
 	@Path("logout")
 	@Produces(MediaType.APPLICATION_JSON)

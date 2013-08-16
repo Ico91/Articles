@@ -6,16 +6,27 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import articles.model.User;
 
+/**A transport object for class User that does not contain information about the password.
+ * @author Galina Hristova
+ *
+ */
 @XmlRootElement
 public class UserDTO {
 	private int userId;
 	private String username;
 	private Date lastLogin;
 
+	/**
+	 * Class constructor.
+	 */
 	public UserDTO() {
 
 	}
 
+	/**
+	 * Class constructor specifying the user.
+	 * @param user
+	 */
 	public UserDTO(User user) {
 		this.userId = user.getUserId();
 		this.username = user.getUsername();

@@ -10,6 +10,10 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+/** Object which stores all data for a user.
+ * @author Galina Hristova
+ *
+ */
 @Entity
 @Table(name="user")
 public class User {
@@ -23,10 +27,19 @@ public class User {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date lastLogin;
 	
+	/**
+	 * Class constructor
+	 */
 	public User() {
 	
 	}
 	
+	/**
+	 * Class constructor specifying userid, username and password.
+	 * @param userId
+	 * @param username
+	 * @param password
+	 */
 	public User(int userId, String username, String password) {
 		this.userId = userId;
 		this.username = username;
@@ -64,13 +77,11 @@ public class User {
 		this.lastLogin = lastLogin;
 	}
 
-
 	@Override
 	public String toString() {
 		return "User [userId=" + userId + ", username=" + username
 				+ ", password=" + password + ", lastLogin=" + lastLogin + "]";
 	}
-
 
 	@Override
 	public int hashCode() {
@@ -85,7 +96,6 @@ public class User {
 				+ ((username == null) ? 0 : username.hashCode());
 		return result;
 	}
-
 
 	@Override
 	public boolean equals(Object obj) {
