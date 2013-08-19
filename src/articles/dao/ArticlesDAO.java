@@ -13,7 +13,7 @@ import articles.model.Articles;
 import articles.model.Articles.Article;
 
 /**
- * Provides access and manipulation to articles file of specified user
+ * Provides access to article files
  * 
  * @author Krasimir Atanasov
  * 
