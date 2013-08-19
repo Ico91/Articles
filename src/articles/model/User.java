@@ -4,28 +4,34 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /** Object which stores all data for a user.
  * @author Galina Hristova
  *
  */
 @Entity
-@Table(name="user")
+@Table(name="users")
+@XmlRootElement
 public class User {
 	@Id
-	@Column(name="userid")
-	@OneToMany(mappedBy="userid")
+	@Column(name="userId")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@OneToMany(mappedBy="userId")
 	private int userId;
 	private String username;
 	private String password;
 	@Column(name="last_login")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date lastLogin;
+	private int type;
 	
 	/**
 	 * Class constructor
@@ -40,10 +46,11 @@ public class User {
 	 * @param username
 	 * @param password
 	 */
-	public User(int userId, String username, String password) {
+	public User(int userId, String username, String password, int type) {
 		this.userId = userId;
 		this.username = username;
 		this.password = password;
+		this.type = type;
 	}
 
 	public int getUserId() {
@@ -73,14 +80,24 @@ public class User {
 	public Date getLastLogin() {
 		return lastLogin;
 	}
+	
 	public void setLastLogin(Date lastLogin) {
 		this.lastLogin = lastLogin;
+	}
+
+	public int getType() {
+		return type;
+	}
+	
+	public void setType(int type) {
+		this.type = type;
 	}
 
 	@Override
 	public String toString() {
 		return "User [userId=" + userId + ", username=" + username
-				+ ", password=" + password + ", lastLogin=" + lastLogin + "]";
+				+ ", password=" + password + ", lastLogin=" + lastLogin
+				+ ", type=" + UserType.getType(type).toString() + "]";
 	}
 
 	@Override
@@ -88,9 +105,8 @@ public class User {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((lastLogin == null) ? 0 : lastLogin.hashCode());
-		result = prime * result
 				+ ((password == null) ? 0 : password.hashCode());
+		result = prime * result + type;
 		result = prime * result + userId;
 		result = prime * result
 				+ ((username == null) ? 0 : username.hashCode());
@@ -103,19 +119,24 @@ public class User {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof User))
+		if (getClass() != obj.getClass())
 			return false;
 		User other = (User) obj;
-		if (!lastLogin.equals(other.lastLogin))
+		if (password == null) {
+			if (other.password != null)
+				return false;
+		} else if (!password.equals(other.password))
 			return false;
-		if (!password.equals(other.password))
+		if (type != other.type)
 			return false;
 		if (userId != other.userId)
 			return false;
-		if (!username.equals(other.username))
+		if (username == null) {
+			if (other.username != null)
+				return false;
+		} else if (!username.equals(other.username))
 			return false;
 		return true;
 	}
-
-
+	
 }
