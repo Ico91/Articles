@@ -125,7 +125,7 @@ public class Articles {
 		@XmlElement(required = true)
 		protected String content;
 		@XmlAttribute(name = "id")
-		protected Integer id;
+		protected int id;
 
 		/**
 		 * Gets the value of the title property.
@@ -175,7 +175,7 @@ public class Articles {
 		 * @return possible object is {@link Integer }
 		 * 
 		 */
-		public Integer getId() {
+		public int getId() {
 			return id;
 		}
 
@@ -186,7 +186,7 @@ public class Articles {
 		 *            allowed object is {@link Integer }
 		 * 
 		 */
-		public void setId(Integer value) {
+		public void setId(int value) {
 			this.id = value;
 		}
 
