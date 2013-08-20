@@ -23,7 +23,7 @@ import articles.dao.exceptions.StatisticsDAOException;
 import articles.model.User;
 import articles.model.dto.LoginRequest;
 import articles.model.dto.UserDTO;
-import articles.model.statistics.Event;
+import articles.model.statistics.UserActivity;
 import articles.web.listener.SessionPathConfigurationListener;
 
 /**Class for performing user requests
@@ -67,7 +67,7 @@ public class UsersResource {
 			
 			try {
 				StatisticsDAO statDao = new StatisticsDAO();
-				statDao.save(user.getUserId(), Event.LOGIN);
+				statDao.save(user.getUserId(), UserActivity.LOGIN);
 			} catch (StatisticsDAOException e) {
 				return Response.status(400).entity(e.getMessage()).build();
 			}
@@ -100,7 +100,7 @@ public class UsersResource {
 			
 			try {
 				StatisticsDAO statDao = new StatisticsDAO();
-				statDao.save(userId, Event.LOGOUT);
+				statDao.save(userId, UserActivity.LOGOUT);
 			} catch (StatisticsDAOException e) {
 				return Response.status(400).entity(e.getMessage()).build();
 			}

@@ -3,6 +3,7 @@ package articles.dao;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -10,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import articles.dao.exceptions.StatisticsDAOException;
-import articles.model.statistics.Event;
+import articles.model.statistics.UserActivity;
 import articles.statistics.dto.UserStatisticsDTO;
 
 public class StatisticsDAOTest {
@@ -25,11 +26,14 @@ public class StatisticsDAOTest {
 	@Test
 	public void testLoad() throws StatisticsDAOException {
 		List<UserStatisticsDTO> expectedResult = new ArrayList<UserStatisticsDTO>();
-		expectedResult.add(new UserStatisticsDTO(new Date(Long.valueOf("1376399080000")), Event.LOGIN));
-		expectedResult.add(new UserStatisticsDTO(new Date(Long.valueOf("1376399220000")), Event.LOGIN));
-		expectedResult.add(new UserStatisticsDTO(new Date(Long.valueOf("1376427264000")), Event.LOGIN));
+		expectedResult.add(new UserStatisticsDTO(new Date(Long.valueOf("1376399080000")), UserActivity.LOGIN));
+		expectedResult.add(new UserStatisticsDTO(new Date(Long.valueOf("1376399220000")), UserActivity.LOGIN));
+		expectedResult.add(new UserStatisticsDTO(new Date(Long.valueOf("1376427264000")), UserActivity.LOGIN));
 	
-		List<UserStatisticsDTO> actualResult = statisticsDAO.load(111, "2013/08/13");
+		Calendar date = Calendar.getInstance();
+		date.clear(); // clear hours and minutes
+		date.set(2013, 8, 13);
+		List<UserStatisticsDTO> actualResult = statisticsDAO.load(111, date.getTime());
 		
 		assertEquals("Returned result should be equal to actual", expectedResult, actualResult);
 	}

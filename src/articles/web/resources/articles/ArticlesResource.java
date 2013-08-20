@@ -23,7 +23,7 @@ import articles.dao.StatisticsDAO;
 import articles.dao.exceptions.ArticlesDAOException;
 import articles.dao.exceptions.StatisticsDAOException;
 import articles.model.Articles.Article;
-import articles.model.statistics.Event;
+import articles.model.statistics.UserActivity;
 import articles.web.listener.SessionPathConfigurationListener;
 import articles.web.resources.exception.ArticlesResourceException;
 
@@ -88,7 +88,7 @@ public class ArticlesResource {
 			
 			try {
 				StatisticsDAO statDao = new StatisticsDAO();
-				statDao.save(getUserId(), Event.CREATE_ARTICLE);
+				statDao.save(getUserId(), UserActivity.CREATE_ARTICLE);
 			} catch (StatisticsDAOException e) {
 				return Response.status(400).entity(e.getMessage()).build();
 			}
