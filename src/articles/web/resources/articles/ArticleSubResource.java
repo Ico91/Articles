@@ -17,7 +17,7 @@ import articles.dao.StatisticsDAO;
 import articles.dao.exceptions.ArticlesDAOException;
 import articles.dao.exceptions.StatisticsDAOException;
 import articles.model.Articles.Article;
-import articles.model.statistics.Event;
+import articles.model.statistics.UserActivity;
 import articles.web.resources.users.UsersResource;
 
 /**
@@ -91,7 +91,7 @@ public class ArticleSubResource {
 			
 			try {
 				StatisticsDAO statDao = new StatisticsDAO();
-				statDao.save(this.userId, Event.MODIFY_ARTICLE);
+				statDao.save(this.userId, UserActivity.MODIFY_ARTICLE);
 			} catch (StatisticsDAOException e) {
 				return Response.status(400).entity(e.getMessage()).build();
 			}
@@ -125,7 +125,7 @@ public class ArticleSubResource {
 				
 				try {
 					StatisticsDAO statDao = new StatisticsDAO();
-					statDao.save(this.userId, Event.DELETE_ARTICLE);
+					statDao.save(this.userId, UserActivity.DELETE_ARTICLE);
 				} catch (StatisticsDAOException e) {
 					return Response.status(400).entity(e.getMessage()).build();
 				}

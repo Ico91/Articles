@@ -4,7 +4,7 @@ import java.util.Date;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import articles.model.statistics.Event;
+import articles.model.statistics.UserActivity;
 
 /**
  * Transport object for the UserStatistics class, which contains only the event
@@ -16,31 +16,10 @@ import articles.model.statistics.Event;
 @XmlRootElement
 public class UserStatisticsDTO {
 	private Date eventDate;
-	private Event event;
+	private UserActivity event;
 	
 	public UserStatisticsDTO() { }
-
-	public UserStatisticsDTO(Date eventDate, Event event) {
-		this.eventDate = eventDate;
-		this.event = event;
-	}
-
-	public Date getEventDate() {
-		return eventDate;
-	}
-
-	public void setEventDate(Date eventDate) {
-		this.eventDate = eventDate;
-	}
-
-	public Event getEvent() {
-		return event;
-	}
-
-	public void setEvent(Event event) {
-		this.event = event;
-	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -74,5 +53,26 @@ public class UserStatisticsDTO {
 	public String toString() {
 		return "{\"event\":\"" + event + "\",\"eventDate\":\""
 				+ eventDate.toString() + "\"}";
+	}
+
+	public UserStatisticsDTO(Date eventDate, UserActivity event) {
+		this.eventDate = eventDate;
+		this.event = event;
+	}
+
+	public Date getEventDate() {
+		return eventDate;
+	}
+
+	public void setEventDate(Date eventDate) {
+		this.eventDate = eventDate;
+	}
+
+	public UserActivity getEvent() {
+		return event;
+	}
+
+	public void setEvent(UserActivity event) {
+		this.event = event;
 	}
 }
