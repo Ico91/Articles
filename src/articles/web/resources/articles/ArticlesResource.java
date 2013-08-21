@@ -18,7 +18,7 @@ import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 
 import articles.dao.ArticlesDAO;
-import articles.dao.StatisticsDAO;
+import articles.dao.StatisticsStorage;
 import articles.dao.exceptions.ArticlesDAOException;
 import articles.dao.exceptions.StatisticsDAOException;
 import articles.model.Articles.Article;
@@ -87,7 +87,7 @@ public class ArticlesResource {
 
 			// TODO: :(
 			try {
-				StatisticsDAO statDao = new StatisticsDAO();
+				StatisticsStorage statDao = new StatisticsStorage();
 				statDao.save(getUserId(), UserActivity.CREATE_ARTICLE);
 			} catch (StatisticsDAOException e) {
 				return Response.status(400).entity(e.getMessage()).build();
