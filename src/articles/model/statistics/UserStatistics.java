@@ -4,6 +4,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -26,6 +28,7 @@ import articles.model.User;
 public class UserStatistics {
 	@Id
 	@Column(name="event_id")
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int eventId;
 	@ManyToOne
 	@JoinColumn(name = "user_id")

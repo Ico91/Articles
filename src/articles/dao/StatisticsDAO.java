@@ -5,13 +5,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.EntityTransaction;
+import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
 
 import articles.dao.exceptions.StatisticsDAOException;
+import articles.database.transactions.TransactionManager;
+import articles.database.transactions.TransactionalTask;
 import articles.model.statistics.UserActivity;
 import articles.model.statistics.UserStatistics;
 import articles.statistics.dto.UserStatisticsDTO;
@@ -22,39 +24,43 @@ import articles.statistics.dto.UserStatisticsDTO;
  * @author Hristo
  * 
  */
-public class StatisticsDAO extends PersistenceDAO {
+public class StatisticsDAO {
 	static final Logger logger = Logger.getLogger(StatisticsDAO.class);
 
 	public StatisticsDAO() {
-		this.entityManager = PersistenceDAO.factory.createEntityManager();
+		super();
 	}
 
 	/**
-	 * Saves a new record of user activity in the database.
+	 * Saves a new record for a user activity in the database.
 	 * 
 	 * @param userId
 	 *            - the id of the user
 	 * @param event
 	 *            - specified by the Event enumeration
 	 * @throws StatisticsDAOException
-	 */
-	public void save(int userId, UserActivity event) throws StatisticsDAOException {
-		EntityTransaction entityTransaction = entityManager.getTransaction();
-		try {
-			entityTransaction.begin();
-			UserStatistics statistics = new UserStatistics();
-			statistics.setDate(new Date());
-			statistics.setEvent(event.getValue());
-			statistics.setUser(userId);
-			entityManager.persist(statistics);
-		} catch (PersistenceException e) {
-			entityTransaction.rollback();
-			logger.error("Error, while saving activity statistics for user with user id = " + userId);
-			throw new StatisticsDAOException(e.getMessage());
-		} finally {
-			if(entityTransaction.isActive())
-				entityTransaction.commit();
-		}
+	 */	
+	public boolean save(final int userId, final UserActivity event) {
+		TransactionManager<Boolean> manager = new TransactionManager<Boolean>();
+		boolean res = false;
+		if (manager.execute(new TransactionalTask<Boolean>() {
+
+			@Override
+			public Boolean executeTask(EntityManager entityManager) throws PersistenceException {
+				UserStatistics statistics = new UserStatistics();
+				statistics.setDate(new Date());
+				statistics.setEvent(event.getValue());
+				statistics.setUser(userId);
+				entityManager.persist(statistics);
+				entityManager.flush();
+				
+				return Boolean.TRUE;
+			}
+
+		}))
+			res = true;
+		System.out.println(res);
+		return res;
 	}
 
 	/**
@@ -69,26 +75,54 @@ public class StatisticsDAO extends PersistenceDAO {
 	 * @return List of UserStatistics transport objects
 	 * @throws StatisticsDAOException
 	 */
-	public List<UserStatisticsDTO> load(int userId, Date date) {
-
-		SimpleDateFormat databaseFormat = new SimpleDateFormat("yyyy-MM-dd");
-		Query selectQuery = this.entityManager
-				.createNativeQuery("SELECT event, event_date FROM statistics WHERE DATE(event_date) = ?1 AND user_id = ?2");
-		selectQuery.setParameter(1, databaseFormat.format(date));
-		selectQuery.setParameter(2, userId);
-
-		return getStatisticsFromDatabase(selectQuery);
-	}
+	/*
+	 * public List<UserStatisticsDTO> load(int userId, Date date) {
+	 * 
+	 * SimpleDateFormat databaseFormat = new SimpleDateFormat("yyyy-MM-dd");
+	 * Query selectQuery = this.entityManager .createNativeQuery(
+	 * "SELECT event, event_date FROM statistics WHERE DATE(event_date) = ?1 AND user_id = ?2"
+	 * ); selectQuery.setParameter(1, databaseFormat.format(date));
+	 * selectQuery.setParameter(2, userId);
+	 * 
+	 * return getStatisticsFromDatabase(selectQuery); }
+	 * 
+	 * @SuppressWarnings("unchecked") private List<UserStatisticsDTO>
+	 * getStatisticsFromDatabase(Query selectQuery) { List<Object[]> resultList
+	 * = selectQuery.getResultList(); List<UserStatisticsDTO> statisticsList =
+	 * new ArrayList<UserStatisticsDTO>(); for (Object[] result : resultList) {
+	 * statisticsList.add(new UserStatisticsDTO((Date) result[1], UserActivity
+	 * .getEvent((int) result[0]))); } return statisticsList; }
+	 */
 
 	@SuppressWarnings("unchecked")
-	private List<UserStatisticsDTO> getStatisticsFromDatabase(Query selectQuery) {
-		List<Object[]> resultList = selectQuery.getResultList();
-		List<UserStatisticsDTO> statisticsList = new ArrayList<UserStatisticsDTO>();
-		for (Object[] result : resultList) {
-			statisticsList.add(new UserStatisticsDTO((Date) result[1], UserActivity
-					.getEvent((int) result[0])));
-		}
-		return statisticsList;
+	public List<UserStatisticsDTO> load(final int userId, final Date date) {
+
+		TransactionManager<List<UserStatisticsDTO>> manager = new TransactionManager<List<UserStatisticsDTO>>();
+		List<UserStatisticsDTO> res = (List<UserStatisticsDTO>) manager
+				.execute(new TransactionalTask<List<UserStatisticsDTO>>() {
+
+					@Override
+					public List<UserStatisticsDTO> executeTask(EntityManager entityManager) {
+						SimpleDateFormat databaseFormat = new SimpleDateFormat(
+								"yyyy-MM-dd");
+						Query selectQuery = entityManager
+								.createNativeQuery("SELECT event, event_date FROM statistics WHERE DATE(event_date) = ?1 AND user_id = ?2");
+						selectQuery.setParameter(1, databaseFormat.format(date));
+						selectQuery.setParameter(2, userId);
+
+						List<Object[]> resultList = selectQuery.getResultList();
+						List<UserStatisticsDTO> statisticsList = new ArrayList<UserStatisticsDTO>();
+						for (Object[] result : resultList) {
+							statisticsList.add(new UserStatisticsDTO(
+									(Date) result[1],
+									UserActivity.values()[(int) result[0] - 1]));
+						}
+						return statisticsList;
+					}
+				});
+
+		return res;
+
 	}
 
 }

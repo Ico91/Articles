@@ -9,4 +9,8 @@ public class PersistenceDAO {
 	protected static EntityManagerFactory factory = Persistence
 			.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
 	protected EntityManager entityManager;
+	
+	public PersistenceDAO() {
+		entityManager = factory.createEntityManager();
+	}
 }

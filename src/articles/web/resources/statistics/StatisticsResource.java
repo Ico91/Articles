@@ -12,7 +12,6 @@ import javax.ws.rs.core.Response;
 
 import articles.dao.StatisticsDAO;
 import articles.statistics.dto.UserStatisticsDTO;
-import articles.validators.DateValidator;
 
 @Path("")
 public class StatisticsResource {
@@ -21,12 +20,9 @@ public class StatisticsResource {
 	@Path("{userid}")
 	@Produces("application/json")
 	public Response getUserStatistics(@PathParam("userid") int userId,
-			@QueryParam("date") String dateInput) {
+			@QueryParam("date") DateAdapter dateInput) {
 		StatisticsDAO statistics = new StatisticsDAO();
-		DateValidator validator = new DateValidator();
-		Date date = validator.validateAndParseDate(dateInput);
-		if (date == null)
-			return Response.status(Response.Status.BAD_REQUEST).build();
+		Date date = dateInput.getDate();
 		List<UserStatisticsDTO> userStatistics = statistics.load(userId, date);
 		return Response.ok().entity(userStatistics.toString()).build();
 	}

@@ -65,12 +65,8 @@ public class UsersResource {
 			
 			logger.info("User with id = " + user.getUserId() + " logged in the system.");
 			
-			try {
-				StatisticsDAO statDao = new StatisticsDAO();
-				statDao.save(user.getUserId(), UserActivity.LOGIN);
-			} catch (StatisticsDAOException e) {
-				return Response.status(400).entity(e.getMessage()).build();
-			}
+			StatisticsDAO statDao = new StatisticsDAO();
+			statDao.save(user.getUserId(), UserActivity.LOGIN);
 			
 			System.out.println(SessionPathConfigurationListener.getPath());
 			
