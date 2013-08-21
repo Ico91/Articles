@@ -11,6 +11,7 @@ import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
 
+import articles.dao.exceptions.PersistenceDAOException;
 import articles.dao.exceptions.StatisticsDAOException;
 import articles.database.transactions.TransactionManager;
 import articles.database.transactions.TransactionalTask;
@@ -39,21 +40,26 @@ public class StatisticsDAO {
 	 * @param event
 	 *            - specified by the Event enumeration
 	 * @throws StatisticsDAOException
-	 */	
+	 */
 	public boolean save(final int userId, final UserActivity event) {
 		TransactionManager<Boolean> manager = new TransactionManager<Boolean>();
 		boolean res = false;
 		if (manager.execute(new TransactionalTask<Boolean>() {
 
 			@Override
-			public Boolean executeTask(EntityManager entityManager) throws PersistenceException {
+			public Boolean executeTask(EntityManager entityManager)
+					throws PersistenceDAOException {
 				UserStatistics statistics = new UserStatistics();
 				statistics.setDate(new Date());
 				statistics.setEvent(event.getValue());
 				statistics.setUser(userId);
-				entityManager.persist(statistics);
-				entityManager.flush();
-				
+				try {
+					entityManager.persist(statistics);
+				} catch (PersistenceException e) {
+					throw new PersistenceDAOException(
+							"Error while saving statistics for user with user id: "
+									+ userId);
+				}
 				return Boolean.TRUE;
 			}
 
@@ -74,7 +80,7 @@ public class StatisticsDAO {
 	 * @return List of UserStatistics transport objects
 	 * @throws StatisticsDAOException
 	 */
-	
+
 	@SuppressWarnings("unchecked")
 	public List<UserStatisticsDTO> load(final int userId, final Date date) {
 
@@ -83,22 +89,29 @@ public class StatisticsDAO {
 				.execute(new TransactionalTask<List<UserStatisticsDTO>>() {
 
 					@Override
-					public List<UserStatisticsDTO> executeTask(EntityManager entityManager) {
+					public List<UserStatisticsDTO> executeTask(
+							EntityManager entityManager) {
 						SimpleDateFormat databaseFormat = new SimpleDateFormat(
 								"yyyy-MM-dd");
 						Query selectQuery = entityManager
 								.createNativeQuery("SELECT event, event_date FROM statistics WHERE DATE(event_date) = ?1 AND user_id = ?2");
 						selectQuery.setParameter(1, databaseFormat.format(date));
 						selectQuery.setParameter(2, userId);
-
-						List<Object[]> resultList = selectQuery.getResultList();
-						List<UserStatisticsDTO> statisticsList = new ArrayList<UserStatisticsDTO>();
-						for (Object[] result : resultList) {
-							statisticsList.add(new UserStatisticsDTO(
-									(Date) result[1],
-									UserActivity.values()[(int) result[0] - 1]));
+						try {
+							List<Object[]> resultList = selectQuery
+									.getResultList();
+							List<UserStatisticsDTO> statisticsList = new ArrayList<UserStatisticsDTO>();
+							for (Object[] result : resultList) {
+								statisticsList.add(new UserStatisticsDTO(
+										(Date) result[1],
+										UserActivity.values()[(int) result[0] - 1]));
+							}
+							return statisticsList;
+						} catch (PersistenceException e) {
+							throw new PersistenceDAOException(
+									"Error while loading statistics for user with user id: "
+											+ userId);
 						}
-						return statisticsList;
 					}
 				});
 
