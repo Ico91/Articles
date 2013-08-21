@@ -22,8 +22,8 @@ import articles.model.Articles.Article;
 import articles.model.dto.validators.ArticleValidator;
 import articles.model.dto.validators.MessageBuilder;
 import articles.model.dto.validators.MessageKeys;
-import articles.model.statistics.Event;
 import articles.web.resources.exception.ArticlesResourceException;
+import articles.model.statistics.UserActivity;
 import articles.web.resources.users.UsersResource;
 
 /**
@@ -108,7 +108,7 @@ public class ArticleSubResource {
 			// TODO: Ko? He!
 			try {
 				StatisticsDAO statDao = new StatisticsDAO();
-				statDao.save(this.userId, Event.MODIFY_ARTICLE);
+				statDao.save(this.userId, UserActivity.MODIFY_ARTICLE);
 			} catch (StatisticsDAOException e) {
 				return Response.status(400).entity(e.getMessage()).build();
 			}
@@ -145,7 +145,7 @@ public class ArticleSubResource {
 
 				try {
 					StatisticsDAO statDao = new StatisticsDAO();
-					statDao.save(this.userId, Event.DELETE_ARTICLE);
+					statDao.save(this.userId, UserActivity.DELETE_ARTICLE);
 				} catch (StatisticsDAOException e) {
 					return Response.status(400).entity(e.getMessage()).build();
 				}

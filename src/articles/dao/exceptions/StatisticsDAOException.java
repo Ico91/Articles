@@ -1,6 +1,6 @@
 package articles.dao.exceptions;
 
-public class StatisticsDAOException extends Exception {
+public class StatisticsDAOException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 	
 	public StatisticsDAOException(String message) {

@@ -25,8 +25,8 @@ import articles.model.Articles.Article;
 import articles.model.dto.validators.ArticleValidator;
 import articles.model.dto.validators.MessageBuilder;
 import articles.model.dto.validators.MessageKeys;
-import articles.model.statistics.Event;
-import articles.web.listener.SessionPathConfigurationListener;
+import articles.model.statistics.UserActivity;
+import articles.web.listener.ConfigurationListener;
 import articles.web.resources.exception.ArticlesResourceException;
 
 /**
@@ -88,7 +88,7 @@ public class ArticlesResource {
 			// TODO: :(
 			try {
 				StatisticsDAO statDao = new StatisticsDAO();
-				statDao.save(getUserId(), Event.CREATE_ARTICLE);
+				statDao.save(getUserId(), UserActivity.CREATE_ARTICLE);
 			} catch (StatisticsDAOException e) {
 				return Response.status(400).entity(e.getMessage()).build();
 			}
@@ -129,7 +129,7 @@ public class ArticlesResource {
 	 * @throws ArticlesResourceException
 	 */
 	private String articlesPath() {
-		String path = SessionPathConfigurationListener.getPath();
+		String path = ConfigurationListener.getPath();
 
 		if (path == null) {
 			String message = "Cannot read articles file path.";

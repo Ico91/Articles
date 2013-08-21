@@ -4,6 +4,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -26,6 +28,7 @@ import articles.model.User;
 public class UserStatistics {
 	@Id
 	@Column(name="event_id")
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int eventId;
 	@ManyToOne
 	@JoinColumn(name = "user_id")
@@ -39,6 +42,30 @@ public class UserStatistics {
 		
 	}
 	
+	@Override
+	public int hashCode() {
+		return eventId;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof UserStatistics))
+			return false;
+		UserStatistics other = (UserStatistics) obj;
+		if (eventId != other.eventId)
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Statistics [eventId=" + eventId + ", eventDate=" + eventDate + ", event="
+				+ event + "]";
+	}
 
 	public int getEventId() {
 		return eventId;
@@ -76,40 +103,5 @@ public class UserStatistics {
 	public void setEvent(int event) {
 		this.event = event;
 	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + eventDate.hashCode();
-		result = prime * result + event;
-		result = prime * result + eventId;
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof UserStatistics))
-			return false;
-		UserStatistics other = (UserStatistics) obj;
-		if (!eventDate.equals(other.eventDate))
-			return false;
-		if (event != other.event)
-			return false;
-		if (eventId != other.eventId)
-			return false;
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "Statistics [eventId=" + eventId + ", eventDate=" + eventDate + ", event="
-				+ event + "]";
-	}
-	
 	
 }

@@ -1,44 +1,39 @@
 package articles.dao;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
-import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
+import org.apache.log4j.Logger;
+
+import articles.dao.exceptions.PersistenceDAOException;
 import articles.dao.exceptions.StatisticsDAOException;
-import articles.model.statistics.Event;
+import articles.database.transactions.TransactionManager;
+import articles.database.transactions.TransactionalTask;
+import articles.model.statistics.UserActivity;
 import articles.model.statistics.UserStatistics;
 import articles.statistics.dto.UserStatisticsDTO;
 
 /**
- * Gives access to the representation of the UserStatistics class in the
- * database, using defined operations on it.
+ * Provides methods saving and loading statistics from the database
  * 
  * @author Hristo
  * 
  */
 public class StatisticsDAO {
-	private static final String PERSISTENCE_UNIT_NAME = "UserPE";
-	private static EntityManagerFactory factory;
-	private EntityManager entityManager;
+	static final Logger logger = Logger.getLogger(StatisticsDAO.class);
 
 	public StatisticsDAO() {
-		StatisticsDAO.factory = Persistence
-				.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
-		this.entityManager = StatisticsDAO.factory.createEntityManager();
+		super();
 	}
 
 	/**
-	 * Saves a new record of user activity in the database.
+	 * Saves a new record for a user activity in the database.
 	 * 
 	 * @param userId
 	 *            - the id of the user
@@ -46,20 +41,31 @@ public class StatisticsDAO {
 	 *            - specified by the Event enumeration
 	 * @throws StatisticsDAOException
 	 */
-	public void save(int userId, Event event)
-			throws StatisticsDAOException {
-		EntityTransaction entityTransaction = entityManager.getTransaction();
-		try {
-			entityTransaction.begin();
-			UserStatistics statistics = new UserStatistics();
-			statistics.setDate(new Date());
-			statistics.setEvent(event.getValue());
-			statistics.setUser(userId);
-			entityManager.persist(statistics);
-			entityTransaction.commit();
-		} catch (PersistenceException e) {
-			throw new StatisticsDAOException(e.getMessage());
-		}
+	public boolean save(final int userId, final UserActivity event) {
+		TransactionManager<Boolean> manager = new TransactionManager<Boolean>();
+		boolean res = false;
+		if (manager.execute(new TransactionalTask<Boolean>() {
+
+			@Override
+			public Boolean executeTask(EntityManager entityManager)
+					throws PersistenceDAOException {
+				UserStatistics statistics = new UserStatistics();
+				statistics.setDate(new Date());
+				statistics.setEvent(event.getValue());
+				statistics.setUser(userId);
+				try {
+					entityManager.persist(statistics);
+				} catch (PersistenceException e) {
+					throw new PersistenceDAOException(
+							"Error while saving statistics for user with user id: "
+									+ userId);
+				}
+				return Boolean.TRUE;
+			}
+
+		}))
+			res = true;
+		return res;
 	}
 
 	/**
@@ -74,34 +80,42 @@ public class StatisticsDAO {
 	 * @return List of UserStatistics transport objects
 	 * @throws StatisticsDAOException
 	 */
-	public List<UserStatisticsDTO> load(int userId, String date)
-			throws StatisticsDAOException {
-		try {
 
-			SimpleDateFormat databaseFormat = new SimpleDateFormat("yyyy-MM-dd");
-			Query selectQuery = this.entityManager
-					.createQuery("SELECT us.event, us.eventDate FROM UserStatistics us WHERE SUBSTRING(us.eventDate, 1, 10) = :date AND us.user.userId = :userId");
-			selectQuery.setParameter("date", databaseFormat.format(validateDate(date)));
-			selectQuery.setParameter("userId", userId);
-			List<Object[]> resultList = selectQuery.getResultList();
-			List<UserStatisticsDTO> statisticsList = new ArrayList<UserStatisticsDTO>();
-			for (Object[] result : resultList) {
-				statisticsList.add(new UserStatisticsDTO((Date) result[1],
-						Event.getEvent((int) result[0])));
-			}
+	@SuppressWarnings("unchecked")
+	public List<UserStatisticsDTO> load(final int userId, final Date date) {
 
-			return statisticsList;
-		} catch (NoResultException | IllegalArgumentException | ParseException e) {
-			throw new StatisticsDAOException(e.getMessage());
-		}
-	}
+		TransactionManager<List<UserStatisticsDTO>> manager = new TransactionManager<List<UserStatisticsDTO>>();
+		List<UserStatisticsDTO> res = (List<UserStatisticsDTO>) manager
+				.execute(new TransactionalTask<List<UserStatisticsDTO>>() {
 
-	private Date validateDate(String dateToValidate) throws ParseException, IllegalArgumentException {
-		if(dateToValidate == null)
-			throw new IllegalArgumentException("Date is empty!");
-		SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy/MM/dd");
-		isoFormat.setLenient(false);
-		Date date = isoFormat.parse(dateToValidate);
-		return date;
+					@Override
+					public List<UserStatisticsDTO> executeTask(
+							EntityManager entityManager) {
+						SimpleDateFormat databaseFormat = new SimpleDateFormat(
+								"yyyy-MM-dd");
+						Query selectQuery = entityManager
+								.createNativeQuery("SELECT event, event_date FROM statistics WHERE DATE(event_date) = ?1 AND user_id = ?2");
+						selectQuery.setParameter(1, databaseFormat.format(date));
+						selectQuery.setParameter(2, userId);
+						try {
+							List<Object[]> resultList = selectQuery
+									.getResultList();
+							List<UserStatisticsDTO> statisticsList = new ArrayList<UserStatisticsDTO>();
+							for (Object[] result : resultList) {
+								statisticsList.add(new UserStatisticsDTO(
+										(Date) result[1],
+										UserActivity.values()[(int) result[0] - 1]));
+							}
+							return statisticsList;
+						} catch (PersistenceException e) {
+							throw new PersistenceDAOException(
+									"Error while loading statistics for user with user id: "
+											+ userId);
+						}
+					}
+				});
+
+		return res;
+
 	}
 }

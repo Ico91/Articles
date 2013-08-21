@@ -23,8 +23,7 @@ import articles.dao.exceptions.StatisticsDAOException;
 import articles.model.User;
 import articles.model.dto.LoginRequest;
 import articles.model.dto.UserDTO;
-import articles.model.statistics.Event;
-import articles.web.listener.SessionPathConfigurationListener;
+import articles.model.statistics.UserActivity;
 
 /**Class for performing user requests
  * @author Galina Hristova
@@ -65,14 +64,8 @@ public class UsersResource {
 			
 			logger.info("User with id = " + user.getUserId() + " logged in the system.");
 			
-			try {
-				StatisticsDAO statDao = new StatisticsDAO();
-				statDao.save(user.getUserId(), Event.LOGIN);
-			} catch (StatisticsDAOException e) {
-				return Response.status(400).entity(e.getMessage()).build();
-			}
-			
-			System.out.println(SessionPathConfigurationListener.getPath());
+			StatisticsDAO statDao = new StatisticsDAO();
+			statDao.save(user.getUserId(), UserActivity.LOGIN);
 			
 			return Response.ok(new UserDTO(user)).build();
 		} else {
@@ -100,7 +93,7 @@ public class UsersResource {
 			
 			try {
 				StatisticsDAO statDao = new StatisticsDAO();
-				statDao.save(userId, Event.LOGOUT);
+				statDao.save(userId, UserActivity.LOGOUT);
 			} catch (StatisticsDAOException e) {
 				return Response.status(400).entity(e.getMessage()).build();
 			}
