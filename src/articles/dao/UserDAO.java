@@ -83,7 +83,6 @@ public class UserDAO extends PersistenceDAO {
 							"Error while updating the last login date for user with user id = "
 									+ userId);
 				}
-				//updateLastLoginQuery.executeUpdate();
 				
 				return Boolean.TRUE;
 			}
