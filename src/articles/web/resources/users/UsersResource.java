@@ -24,7 +24,6 @@ import articles.model.User;
 import articles.model.dto.LoginRequest;
 import articles.model.dto.UserDTO;
 import articles.model.statistics.UserActivity;
-import articles.web.listener.SessionPathConfigurationListener;
 
 /**Class for performing user requests
  * @author Galina Hristova
@@ -71,8 +70,6 @@ public class UsersResource {
 			} catch (StatisticsDAOException e) {
 				return Response.status(400).entity(e.getMessage()).build();
 			}
-			
-			System.out.println(SessionPathConfigurationListener.getPath());
 			
 			return Response.ok(new UserDTO(user)).build();
 		} else {

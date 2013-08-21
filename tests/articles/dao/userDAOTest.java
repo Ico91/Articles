@@ -18,7 +18,7 @@ public class userDAOTest {
 	public void setUp() {
 		userDAO = new UserDAO();
 		loginRequest = new LoginRequest("admin", "123");
-		actualUser = new User(1, "admin", "123");
+		actualUser = new User(1, "admin", "123", 2);
 	}
 	
 	@Test

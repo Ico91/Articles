@@ -24,7 +24,7 @@ import articles.dao.exceptions.ArticlesDAOException;
 import articles.dao.exceptions.StatisticsDAOException;
 import articles.model.Articles.Article;
 import articles.model.statistics.UserActivity;
-import articles.web.listener.SessionPathConfigurationListener;
+import articles.web.listener.ConfigurationListener;
 import articles.web.resources.exception.ArticlesResourceException;
 
 /**
@@ -121,7 +121,7 @@ public class ArticlesResource {
 	 * @throws ArticlesResourceException
 	 */
 	private String articlesPath() throws ArticlesResourceException {
-		String s = SessionPathConfigurationListener.getPath();
+		String s = ConfigurationListener.getPath();
 		return s;
 	}
 

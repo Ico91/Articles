@@ -18,7 +18,7 @@ import javax.ws.rs.core.Context;
  *
  */
 @WebListener
-public class SessionPathConfigurationListener implements HttpSessionListener, ServletContextListener {
+public class ConfigurationListener implements HttpSessionListener, ServletContextListener {
 	private static String path = "";
 	@Context
 	ServletContext context;
@@ -28,32 +28,29 @@ public class SessionPathConfigurationListener implements HttpSessionListener, Se
 	}
 	@Override
 	public void contextDestroyed(ServletContextEvent event) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
-		// TODO Auto-generated method stub
 		this.context = event.getServletContext();
 	}
 
 	@Override
 	public void sessionDestroyed(HttpSessionEvent arg0) {
-		// TODO Auto-generated method stub
 		
 	}
 	@Override
 	public void sessionCreated(HttpSessionEvent arg0) {
-		// TODO Auto-generated method stub
     	Properties properties = new Properties();
 		try {
 			properties.load(this.context.getResourceAsStream("WEB-INF/config.properties"));
+			path = properties.getProperty("path") + "/";
 		} catch (IOException e) {
-			e.printStackTrace();
+			path = null;
 		}
 		
-		path = properties.getProperty("path") + "/";
+		
 	}
 	
 }

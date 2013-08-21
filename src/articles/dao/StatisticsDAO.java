@@ -85,8 +85,7 @@ public class StatisticsDAO extends PersistenceDAO {
 		List<Object[]> resultList = selectQuery.getResultList();
 		List<UserStatisticsDTO> statisticsList = new ArrayList<UserStatisticsDTO>();
 		for (Object[] result : resultList) {
-			statisticsList.add(new UserStatisticsDTO((Date) result[1], UserActivity
-					.getEvent((int) result[0])));
+			statisticsList.add(new UserStatisticsDTO((Date) result[1], UserActivity.values()[((int) result[0])]));
 		}
 		return statisticsList;
 	}

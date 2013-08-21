@@ -12,12 +12,4 @@ public enum UserActivity {
 	public int getValue() {
 		return this.value;
 	}
-	
-	public static UserActivity getEvent(int value) {
-		for(UserActivity e : UserActivity.values()) {
-			if(e.value == value)
-				return e;
-		}
-		throw new IllegalArgumentException("Invalid enum value");
-	}
 }
