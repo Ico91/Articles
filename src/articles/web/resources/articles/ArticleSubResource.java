@@ -15,7 +15,6 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.log4j.Logger;
 
 import articles.dao.ArticlesDAO;
-import articles.dao.StatisticsStorage;
 import articles.dao.exceptions.ArticlesDAOException;
 import articles.dao.exceptions.StatisticsDAOException;
 import articles.model.Articles.Article;
@@ -105,13 +104,6 @@ public class ArticleSubResource {
 				logger.info("User with id = " + userId
 						+ " updated an article with id = " + id + ".");
 
-			// TODO: Ko? He!
-			try {
-				StatisticsStorage statDao = new StatisticsStorage();
-				statDao.save(this.userId, UserActivity.MODIFY_ARTICLE);
-			} catch (StatisticsDAOException e) {
-				return Response.status(400).entity(e.getMessage()).build();
-			}
 
 			return (result == true) ? Response.ok().build() : Response.status(
 					Status.NOT_MODIFIED).build();
@@ -142,13 +134,6 @@ public class ArticleSubResource {
 			if (result) {
 				logger.info("User with id = " + userId
 						+ " deleted an article with id = " + id + ".");
-
-				try {
-					StatisticsStorage statDao = new StatisticsStorage();
-					statDao.save(this.userId, UserActivity.DELETE_ARTICLE);
-				} catch (StatisticsDAOException e) {
-					return Response.status(400).entity(e.getMessage()).build();
-				}
 
 				return Response.ok().build();
 			} else {
