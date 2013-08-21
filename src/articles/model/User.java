@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  */
 @Entity
-@Table(name="users")
+@Table(name="user")
 @XmlRootElement
 public class User {
 	@Id
