@@ -24,7 +24,6 @@ import articles.model.User;
 import articles.model.dto.LoginRequest;
 import articles.model.dto.UserDTO;
 import articles.model.statistics.UserActivity;
-import articles.web.listener.SessionPathConfigurationListener;
 
 /**Class for performing user requests
  * @author Galina Hristova
@@ -67,8 +66,6 @@ public class UsersResource {
 			
 			StatisticsDAO statDao = new StatisticsDAO();
 			statDao.save(user.getUserId(), UserActivity.LOGIN);
-			
-			System.out.println(SessionPathConfigurationListener.getPath());
 			
 			return Response.ok(new UserDTO(user)).build();
 		} else {

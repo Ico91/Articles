@@ -59,7 +59,6 @@ public class StatisticsDAO {
 
 		}))
 			res = true;
-		System.out.println(res);
 		return res;
 	}
 
@@ -75,25 +74,7 @@ public class StatisticsDAO {
 	 * @return List of UserStatistics transport objects
 	 * @throws StatisticsDAOException
 	 */
-	/*
-	 * public List<UserStatisticsDTO> load(int userId, Date date) {
-	 * 
-	 * SimpleDateFormat databaseFormat = new SimpleDateFormat("yyyy-MM-dd");
-	 * Query selectQuery = this.entityManager .createNativeQuery(
-	 * "SELECT event, event_date FROM statistics WHERE DATE(event_date) = ?1 AND user_id = ?2"
-	 * ); selectQuery.setParameter(1, databaseFormat.format(date));
-	 * selectQuery.setParameter(2, userId);
-	 * 
-	 * return getStatisticsFromDatabase(selectQuery); }
-	 * 
-	 * @SuppressWarnings("unchecked") private List<UserStatisticsDTO>
-	 * getStatisticsFromDatabase(Query selectQuery) { List<Object[]> resultList
-	 * = selectQuery.getResultList(); List<UserStatisticsDTO> statisticsList =
-	 * new ArrayList<UserStatisticsDTO>(); for (Object[] result : resultList) {
-	 * statisticsList.add(new UserStatisticsDTO((Date) result[1], UserActivity
-	 * .getEvent((int) result[0]))); } return statisticsList; }
-	 */
-
+	
 	@SuppressWarnings("unchecked")
 	public List<UserStatisticsDTO> load(final int userId, final Date date) {
 
@@ -124,5 +105,4 @@ public class StatisticsDAO {
 		return res;
 
 	}
-
 }
