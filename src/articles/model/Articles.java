@@ -9,6 +9,7 @@ package articles.model;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -189,7 +190,32 @@ public class Articles {
 		public void setId(int value) {
 			this.id = value;
 		}
+		
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result
+					+ ((content == null) ? 0 : content.hashCode());
+			result = prime * result + id;
+			result = prime * result + ((title == null) ? 0 : title.hashCode());
+			return result;
+		}
 
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Article other = (Article) obj;
+			if (id == other.getId()) {
+				return true;
+			}
+			return false;
+		}
 	}
 
 }

@@ -6,7 +6,7 @@ package articles.dao.exceptions;
  * @author Krasimir Atanasov
  * 
  */
-public class ArticlesDAOException extends Exception {
+public class ArticlesDAOException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
 	/**

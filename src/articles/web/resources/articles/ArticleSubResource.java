@@ -1,5 +1,7 @@
 package articles.web.resources.articles;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -14,8 +16,11 @@ import org.apache.log4j.Logger;
 
 import articles.dao.ArticlesDAO;
 import articles.dao.exceptions.ArticlesDAOException;
-import articles.dao.exceptions.StatisticsDAOException;
 import articles.model.Articles.Article;
+import articles.model.dto.validators.ArticleValidator;
+import articles.model.dto.validators.MessageBuilder;
+import articles.model.dto.validators.MessageKeys;
+import articles.web.resources.exception.ArticlesResourceException;
 import articles.web.resources.users.UsersResource;
 
 /**
@@ -27,6 +32,7 @@ import articles.web.resources.users.UsersResource;
 public class ArticleSubResource {
 	private int userId;
 	private ArticlesDAO dao;
+	private ArticleValidator articleValidator;
 	static final Logger logger = Logger.getLogger(UsersResource.class);
 
 	/**
@@ -40,6 +46,7 @@ public class ArticleSubResource {
 	public ArticleSubResource(ArticlesDAO dao, int userId) {
 		this.userId = userId;
 		this.dao = dao;
+		this.articleValidator = new ArticleValidator();
 	}
 
 	/**
@@ -54,15 +61,21 @@ public class ArticleSubResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getArticle(@PathParam("id") int id) {
 		try {
-			Article article = this.dao.getArticle(userId, id);
-			logger.info("User with id = " + userId
-					+ " opened an article with id = " + id + ".");
-			return Response.ok(article, MediaType.APPLICATION_JSON).build();
+			Article article = this.dao.getArticleById(userId, id);
+			if (article != null) {
+				logger.info("User with id = " + userId
+						+ " opened an article with id = " + id + ".");
+				return Response.ok(article, MediaType.APPLICATION_JSON).build();
+			} else {
+				logger.info("User with id = " + userId
+						+ " request article that does not exist.");
+				return Response.status(Status.NOT_FOUND).build();
+			}
 
 		} catch (ArticlesDAOException e) {
 			logger.error("User with id = " + userId
 					+ " failed to open an article with id = " + id + ".");
-			return Response.status(Status.NOT_FOUND).build();
+			throw e;
 		}
 	}
 
@@ -81,18 +94,13 @@ public class ArticleSubResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateArticle(Article article, @PathParam("id") int id) {
 		article.setId(id);
+
 		try {
+			validateArticle(article);
 			boolean result = this.dao.updateArticle(this.userId, article);
 			if (result)
 				logger.info("User with id = " + userId
 						+ " updated an article with id = " + id + ".");
-			
-			try {
-				//StatisticsStorage statDao = new StatisticsStorage();
-				//statDao.save(this.userId, UserActivity.MODIFY_ARTICLE);
-			} catch (StatisticsDAOException e) {
-				return Response.status(400).entity(e.getMessage()).build();
-			}
 
 			return (result == true) ? Response.ok().build() : Response.status(
 					Status.NOT_MODIFIED).build();
@@ -100,7 +108,10 @@ public class ArticleSubResource {
 		} catch (ArticlesDAOException e) {
 			logger.error("User with id = " + userId
 					+ " failed to update an article with id = " + id + ".");
-			return Response.status(418).entity(e.getMessage()).build();
+			throw e;
+		} catch (ArticlesResourceException e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getMessage())
+					.build();
 		}
 	}
 
@@ -120,14 +131,7 @@ public class ArticleSubResource {
 			if (result) {
 				logger.info("User with id = " + userId
 						+ " deleted an article with id = " + id + ".");
-				
-				try {
-					//StatisticsStorage statDao = new StatisticsStorage();
-					//statDao.save(this.userId, UserActivity.DELETE_ARTICLE);
-				} catch (StatisticsDAOException e) {
-					return Response.status(400).entity(e.getMessage()).build();
-				}
-				
+
 				return Response.ok().build();
 			} else {
 				return Response.status(Status.NOT_FOUND).build();
@@ -136,7 +140,23 @@ public class ArticleSubResource {
 		} catch (ArticlesDAOException e) {
 			logger.error("User with id = " + userId
 					+ " failed to delete an article with id = " + id + ".");
-			return Response.status(418).build();
+			throw e;
 		}
 	}
+
+	/**
+	 * Validate article format
+	 * 
+	 * @param article
+	 *            Article to validate
+	 */
+	private void validateArticle(Article article) {
+		List<MessageKeys> messageKeys = this.articleValidator.validate(article);
+
+		if (messageKeys.size() != 0) {
+			MessageBuilder builder = new MessageBuilder(messageKeys);
+			throw new ArticlesResourceException(builder.getMessage());
+		}
+	}
+
 }
