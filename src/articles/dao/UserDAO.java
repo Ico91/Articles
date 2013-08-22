@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
@@ -15,9 +14,6 @@ import articles.database.transactions.TransactionManager;
 import articles.database.transactions.TransactionalTask;
 import articles.model.User;
 import articles.model.statistics.UserActivity;
-import articles.model.statistics.UserStatistics;
-import articles.statistics.dto.UserStatisticsDTO;
-import articles.web.resources.users.UsersResource;
 
 /**
  * Provides access for manipulation of users data.
@@ -37,7 +33,7 @@ public class UserDAO extends PersistenceDAO {
 	 * @param password
 	 * @return
 	 */
-	public User getUser(final String username, final String password) {
+	public User getUser(final String username, final String password, final UserActivity userActivity) {
 		TransactionManager<User> manager = new TransactionManager<User>();
 		User user = (User) manager.execute(new TransactionalTask<User>() {
 			@SuppressWarnings("unchecked")
@@ -50,13 +46,20 @@ public class UserDAO extends PersistenceDAO {
 				List<User> users = (List<User>) selectUserQuery.getResultList();
 				
 				if (users.size() != 0) {
+					StatisticsStorage statisticsStorage = new StatisticsStorage(entityManager);
+					try {
+						statisticsStorage.save(users.get(0).getUserId(), userActivity);
+						
+					} catch(StatisticsStorageException e) {
+						throw new PersistenceDAOException(e.getMessage());
+					}
+					logger.info("User with username = " + username + " and passwor = " + password + " is found.");
 					return users.get(0);
 				} else
 					logger.error("User with username = " + username + " and password = " + password + " does not exist.");
 					return null;
 			}
 		});
-		
 		return user;
 	}
 	
@@ -78,6 +81,7 @@ public class UserDAO extends PersistenceDAO {
 				updateLastLoginQuery.setParameter("userId", userId);
 				try {
 					updateLastLoginQuery.executeUpdate();
+					logger.info("Last login date for user with id = " + userId + " is updated.");
 				} catch (PersistenceException e) {
 					throw new PersistenceDAOException(
 							"Error while updating the last login date for user with user id = "
@@ -87,6 +91,29 @@ public class UserDAO extends PersistenceDAO {
 				return Boolean.TRUE;
 			}
 
+		}))
+			res = true;
+		return res;
+	}
+	
+	public boolean exitUser(final int userId, final UserActivity userActivity) {
+		TransactionManager<Boolean> manager = new TransactionManager<Boolean>();
+		boolean res = false;
+		if (manager.execute(new TransactionalTask<Boolean>() {
+			
+			@Override
+			public Boolean executeTask(EntityManager entityManager) throws PersistenceException {
+				
+				StatisticsStorage statisticsStorage = new StatisticsStorage(entityManager);
+				try {
+					statisticsStorage.save(userId, userActivity);
+					
+				} catch(StatisticsStorageException e) {
+					throw new PersistenceDAOException(e.getMessage());
+				}
+				
+				return Boolean.TRUE;
+			}
 		}))
 			res = true;
 		return res;

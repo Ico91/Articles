@@ -13,11 +13,9 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.log4j.Logger;
 
 import articles.dao.ArticlesDAO;
-import articles.dao.StatisticsDAO;
 import articles.dao.exceptions.ArticlesDAOException;
 import articles.dao.exceptions.StatisticsDAOException;
 import articles.model.Articles.Article;
-import articles.model.statistics.UserActivity;
 import articles.web.resources.users.UsersResource;
 
 /**
@@ -90,8 +88,8 @@ public class ArticleSubResource {
 						+ " updated an article with id = " + id + ".");
 			
 			try {
-				StatisticsDAO statDao = new StatisticsDAO();
-				statDao.save(this.userId, UserActivity.MODIFY_ARTICLE);
+				//StatisticsStorage statDao = new StatisticsStorage();
+				//statDao.save(this.userId, UserActivity.MODIFY_ARTICLE);
 			} catch (StatisticsDAOException e) {
 				return Response.status(400).entity(e.getMessage()).build();
 			}
@@ -124,8 +122,8 @@ public class ArticleSubResource {
 						+ " deleted an article with id = " + id + ".");
 				
 				try {
-					StatisticsDAO statDao = new StatisticsDAO();
-					statDao.save(this.userId, UserActivity.DELETE_ARTICLE);
+					//StatisticsStorage statDao = new StatisticsStorage();
+					//statDao.save(this.userId, UserActivity.DELETE_ARTICLE);
 				} catch (StatisticsDAOException e) {
 					return Response.status(400).entity(e.getMessage()).build();
 				}
