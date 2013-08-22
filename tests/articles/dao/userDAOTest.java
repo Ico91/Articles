@@ -11,7 +11,7 @@ import articles.model.User;
 import articles.model.dto.LoginRequest;
 import articles.model.statistics.UserActivity;
 
-public class userDAOTest {
+public class UserDAOTest {
 	private User actualUser;
 	private LoginRequest loginRequest;
 	private UserDAO userDAO;

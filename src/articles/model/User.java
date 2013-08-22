@@ -24,8 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class User {
 	@Id
 	@Column(name="userId")
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@OneToMany(mappedBy="userId")
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	private int userId;
 	private String username;
 	private String password;

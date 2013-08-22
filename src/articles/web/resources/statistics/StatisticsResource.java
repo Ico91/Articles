@@ -23,9 +23,13 @@ public class StatisticsResource {
 			@QueryParam("date") DateAdapter dateInput) {
 
 		StatisticsDAO statistics = new StatisticsDAO();
-		Date date = dateInput.getDate();
-		List<UserStatisticsDTO> userStatistics = statistics.load(userId, date);
-		return Response.ok().entity(userStatistics.toString()).build();
+		if(dateInput != null) {
+			Date date = dateInput.getDate();
+			List<UserStatisticsDTO> userStatistics = statistics.load(userId, date);
+			return Response.ok().entity(userStatistics.toString()).build();
+		}
+		
+		return Response.status(400).entity("No date provided").build();
 	}
 
 }

@@ -44,7 +44,7 @@ class StatisticsStorage {
 		UserStatistics statistics = new UserStatistics();
 		statistics.setDate(new Date());
 		statistics.setEvent(event.getValue());
-		statistics.setUser(userId);
+		statistics.setUserId(userId);
 		try {
 			entityManager.persist(statistics);
 		} catch (PersistenceException e) {
@@ -74,7 +74,7 @@ class StatisticsStorage {
 
 		SimpleDateFormat databaseFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Query selectQuery = entityManager
-				.createNativeQuery("SELECT event, event_date FROM statistics WHERE DATE(event_date) = ?1 AND user_id = ?2");
+				.createNativeQuery("SELECT event, event_date FROM statistics WHERE DATE(event_date) = ?1 AND userid = ?2");
 		selectQuery.setParameter(1, databaseFormat.format(date));
 		selectQuery.setParameter(2, userId);
 		try {

@@ -22,6 +22,7 @@ import articles.model.User;
 import articles.model.dto.LoginRequest;
 import articles.model.dto.UserDTO;
 import articles.model.statistics.UserActivity;
+import articles.web.listener.ConfigurationListener;
 
 /**Class for performing user requests
  * @author Galina Hristova
@@ -58,7 +59,7 @@ public class UsersResource {
 			
 			servletRequest.getSession().invalidate();
 			HttpSession session = servletRequest.getSession();
-			session.setAttribute("userId", user.getUserId());
+			session.setAttribute(ConfigurationListener.USERID, user.getUserId());
 			
 			logger.info("User with id = " + user.getUserId() + " logged in the system.");
 
@@ -84,7 +85,7 @@ public class UsersResource {
 		HttpSession session = servletRequest.getSession(false);
 		UserDAO userDAO = new UserDAO();
 		if (session != null) {
-			int userId = (int)session.getAttribute("userId");
+			int userId = (int)session.getAttribute(ConfigurationListener.USERID);
 			session.invalidate();
 			logger.info("User with id = " + userId + " logged out from the system.");
 	
