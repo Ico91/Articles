@@ -21,6 +21,7 @@ public class StatisticsResource {
 	@Produces("application/json")
 	public Response getUserStatistics(@PathParam("userid") int userId,
 			@QueryParam("date") DateAdapter dateInput) {
+
 		StatisticsDAO statistics = new StatisticsDAO();
 		Date date = dateInput.getDate();
 		List<UserStatisticsDTO> userStatistics = statistics.load(userId, date);
