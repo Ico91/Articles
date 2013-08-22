@@ -20,7 +20,7 @@ import articles.model.statistics.UserActivity;
  * @author Galina Hristova
  *
  */
-public class UserDAO extends PersistenceDAO {
+public class UserDAO {
 	static final Logger logger = Logger.getLogger(UserDAO.class);
 	
 	public UserDAO() {

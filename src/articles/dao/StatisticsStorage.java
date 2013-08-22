@@ -44,7 +44,7 @@ class StatisticsStorage {
 		UserStatistics statistics = new UserStatistics();
 		statistics.setDate(new Date());
 		statistics.setEvent(event.getValue());
-		statistics.setUser(userId);
+		statistics.setUserId(userId);
 		try {
 			entityManager.persist(statistics);
 		} catch (PersistenceException e) {

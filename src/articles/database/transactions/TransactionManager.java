@@ -5,7 +5,7 @@ import javax.persistence.RollbackException;
 
 import org.apache.log4j.Logger;
 
-import articles.dao.PersistenceDAO;
+import articles.dao.PersistenceDAOTest;
 import articles.dao.exceptions.PersistenceDAOException;
 
 /**
@@ -14,7 +14,7 @@ import articles.dao.exceptions.PersistenceDAOException;
  *
  * @param <T>
  */
-public class TransactionManager<T> extends PersistenceDAO {
+public class TransactionManager<T> extends PersistenceDAOTest {
 	static final Logger logger = Logger.getLogger(TransactionManager.class);
 	
 	public TransactionManager() {

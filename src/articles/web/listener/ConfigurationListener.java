@@ -20,6 +20,11 @@ import javax.ws.rs.core.Context;
 @WebListener
 public class ConfigurationListener implements HttpSessionListener, ServletContextListener {
 	private static String path = "";
+	private final String CONFIGURATION_PATH = "WEB-INF/config.properties";
+	public static final String USERID = "userId";
+	public static final String PERSISTENCE_NAME = "UserPE";
+	public static final String PERSISTENCE_NAME_TEST = "UserPE";
+	
 	@Context
 	ServletContext context;
 
@@ -44,7 +49,7 @@ public class ConfigurationListener implements HttpSessionListener, ServletContex
 	public void sessionCreated(HttpSessionEvent arg0) {
     	Properties properties = new Properties();
 		try {
-			properties.load(this.context.getResourceAsStream("WEB-INF/config.properties"));
+			properties.load(this.context.getResourceAsStream(CONFIGURATION_PATH));
 			path = properties.getProperty("path") + "/";
 		} catch (IOException e) {
 			path = null;

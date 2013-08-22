@@ -4,10 +4,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import articles.web.listener.ConfigurationListener;
+
 public class PersistenceDAO {
-	private static final String PERSISTENCE_UNIT_NAME = "UserPE";
 	protected static EntityManagerFactory factory = Persistence
-			.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+			.createEntityManagerFactory(ConfigurationListener.PERSISTENCE_NAME);
 	protected EntityManager entityManager;
 	
 	public PersistenceDAO() {

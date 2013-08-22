@@ -30,9 +30,9 @@ public class UserStatistics {
 	@Column(name="event_id")
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int eventId;
-	@ManyToOne
-	@JoinColumn(name = "user_id")
-	private User user;
+	
+	private int userId;
+	
 	@Column(name="event_date")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date eventDate;
@@ -75,17 +75,12 @@ public class UserStatistics {
 		this.eventId = eventId;
 	}
 	
-	public User getUser() { 
-		return this.user;
+	public int getUserId() {
+		return userId;
 	}
-	
-	public void setUser(User user) {
-		this.user = user;
-	}
-	
-	public void setUser(int userId) {
-		this.user = new User();
-		this.user.setUserId(userId);
+
+	public void setUserId(int userId) {
+		this.userId = userId;
 	}
 
 	public Date getDate() {
