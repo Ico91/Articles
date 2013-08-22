@@ -20,7 +20,7 @@ import javax.ws.rs.core.Context;
 @WebListener
 public class ConfigurationListener implements HttpSessionListener, ServletContextListener {
 	private static String path = "";
-	private final String CONFIGURATION_PATH = "WEB-INF/config.properties";
+	private static final String CONFIGURATION_PATH = "WEB-INF/config.properties";
 	public static final String USERID = "userId";
 	public static final String PERSISTENCE_NAME = "UserPE";
 	public static final String PERSISTENCE_NAME_TEST = "UserPE";

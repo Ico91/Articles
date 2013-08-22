@@ -7,7 +7,7 @@ import javax.persistence.Persistence;
 import articles.web.listener.ConfigurationListener;
 
 public class PersistenceDAO {
-	protected static EntityManagerFactory factory = Persistence
+	protected static final EntityManagerFactory factory = Persistence
 			.createEntityManagerFactory(ConfigurationListener.PERSISTENCE_NAME);
 	protected EntityManager entityManager;
 	
