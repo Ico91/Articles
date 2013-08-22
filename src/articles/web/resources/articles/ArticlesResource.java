@@ -78,13 +78,13 @@ public class ArticlesResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response add(Article article) throws ArticlesResourceException {
 		initialize();
-		validateArticle(article);
 		
 		if(this.validator.uniqueTitle(article, this.dao.loadArticles(getUserId())) == false) {
 			return Response.status(Status.BAD_REQUEST).entity("Article title must be unique").build();
 		}
 		
 		try {
+			validateArticle(article);
 			article = this.dao.addArticle(getUserId(), article);
 
 			logger.info("User with id = " + getUserId()
