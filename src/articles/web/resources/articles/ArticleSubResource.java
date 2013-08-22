@@ -16,13 +16,11 @@ import org.apache.log4j.Logger;
 
 import articles.dao.ArticlesDAO;
 import articles.dao.exceptions.ArticlesDAOException;
-import articles.dao.exceptions.StatisticsDAOException;
 import articles.model.Articles.Article;
 import articles.model.dto.validators.ArticleValidator;
 import articles.model.dto.validators.MessageBuilder;
 import articles.model.dto.validators.MessageKeys;
 import articles.web.resources.exception.ArticlesResourceException;
-import articles.model.statistics.UserActivity;
 import articles.web.resources.users.UsersResource;
 
 /**

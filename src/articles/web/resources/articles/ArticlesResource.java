@@ -14,6 +14,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.log4j.Logger;
 
@@ -78,10 +79,13 @@ public class ArticlesResource {
 	public Response add(Article article) throws ArticlesResourceException {
 		initialize();
 		validateArticle(article);
-
+		
+		if(this.validator.uniqueTitle(article, this.dao.loadArticles(getUserId())) == false) {
+			return Response.status(Status.BAD_REQUEST).entity("Article title must be unique").build();
+		}
+		
 		try {
 			article = this.dao.addArticle(getUserId(), article);
-
 
 			logger.info("User with id = " + getUserId()
 					+ " created an article.");

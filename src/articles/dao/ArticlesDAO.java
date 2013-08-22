@@ -135,11 +135,6 @@ public class ArticlesDAO {
 		});
 	}
 
-	private <T> T transaction(TransactionalTask<T> task) {
-		TransactionManager<T> transactionManager = new TransactionManager<T>();
-		return transactionManager.execute(task);
-	}
-
 	/**
 	 * Update content or title of specified article
 	 * 
@@ -167,7 +162,7 @@ public class ArticlesDAO {
 								entityManager);
 						storage.save(userId, UserActivity.MODIFY_ARTICLE);
 
-						// TODO: log
+						logger.info("User with id " + userId + " updated article with id " + articles.get(i).getId());
 						saveArticles(userId, articles);
 
 						return true;
@@ -262,7 +257,12 @@ public class ArticlesDAO {
 			throw new ArticlesDAOException(builder.getMessage());
 		}
 	}
-
+	
+	private <T> T transaction(TransactionalTask<T> task) {
+		TransactionManager<T> transactionManager = new TransactionManager<T>();
+		return transactionManager.execute(task);
+	}
+	
 	/**
 	 * Generate unique article id
 	 * 
