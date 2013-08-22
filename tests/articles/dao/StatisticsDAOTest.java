@@ -16,11 +16,11 @@ import articles.statistics.dto.UserStatisticsDTO;
 
 public class StatisticsDAOTest {
 
-	private StatisticsStorage statisticsDAO;
+	private StatisticsDAO statisticsDAO;
 	
 	@Before
 	public void setUp() {
-		statisticsDAO = new StatisticsStorage();
+		statisticsDAO = new StatisticsDAO();
 	}
 	
 	@Test
