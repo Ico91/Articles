@@ -102,7 +102,6 @@ public class ArticleSubResource {
 				logger.info("User with id = " + userId
 						+ " updated an article with id = " + id + ".");
 
-
 			return (result == true) ? Response.ok().build() : Response.status(
 					Status.NOT_MODIFIED).build();
 

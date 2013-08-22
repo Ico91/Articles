@@ -17,9 +17,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 
-import articles.dao.StatisticsStorage;
 import articles.dao.UserDAO;
-import articles.dao.exceptions.StatisticsDAOException;
 import articles.model.User;
 import articles.model.dto.LoginRequest;
 import articles.model.dto.UserDTO;
@@ -54,7 +52,7 @@ public class UsersResource {
 			@Context HttpServletRequest servletRequest) throws 
 			ServletException {
 		UserDAO userDAO = new UserDAO();
-		User user = userDAO.getUser(loginRequest.getUsername(), loginRequest.getPassword());
+		User user = userDAO.getUser(loginRequest.getUsername(), loginRequest.getPassword(), UserActivity.LOGIN);
 		if (user != null) {
 			userDAO.updateLastLogin(new Date(), user.getUserId());
 			
@@ -63,9 +61,7 @@ public class UsersResource {
 			session.setAttribute("userId", user.getUserId());
 			
 			logger.info("User with id = " + user.getUserId() + " logged in the system.");
-			
-			StatisticsStorage statDao = new StatisticsStorage();
-			statDao.save(user.getUserId(), UserActivity.LOGIN);
+
 			
 			return Response.ok(new UserDTO(user)).build();
 		} else {
@@ -86,17 +82,13 @@ public class UsersResource {
 	public Response logout(@Context HttpServletResponse servletResponse,
 			@Context HttpServletRequest servletRequest) {
 		HttpSession session = servletRequest.getSession(false);
+		UserDAO userDAO = new UserDAO();
 		if (session != null) {
 			int userId = (int)session.getAttribute("userId");
 			session.invalidate();
 			logger.info("User with id = " + userId + " logged out from the system.");
-			
-			try {
-				StatisticsStorage statDao = new StatisticsStorage();
-				statDao.save(userId, UserActivity.LOGOUT);
-			} catch (StatisticsDAOException e) {
-				return Response.status(400).entity(e.getMessage()).build();
-			}
+	
+			userDAO.exitUser(userId, UserActivity.LOGOUT);
 			
 			return Response.ok().build();
 		}

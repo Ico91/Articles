@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import articles.model.User;
 import articles.model.dto.LoginRequest;
+import articles.model.statistics.UserActivity;
 
 public class userDAOTest {
 	private User actualUser;
@@ -24,7 +25,7 @@ public class userDAOTest {
 	@Test
 	public void findTest() {
 		User expectedUser;
-		expectedUser = userDAO.getUser(loginRequest.getUsername(), loginRequest.getPassword());
+		expectedUser = userDAO.getUser(loginRequest.getUsername(), loginRequest.getPassword(), UserActivity.LOGIN);
 		assertEquals(actualUser.getUsername(), expectedUser.getUsername());
 		System.out.println(expectedUser.toString());
 		System.out.println(actualUser.toString());
@@ -35,7 +36,7 @@ public class userDAOTest {
 		int userId = 1;
 		Date lastLogin = new Date();
 		userDAO.updateLastLogin(lastLogin, userId);
-		System.out.println(userDAO.getUser(loginRequest.getUsername(), loginRequest.getPassword()).getLastLogin());
+		//System.out.println(userDAO.getUser(loginRequest.getUsername(), loginRequest.getPassword()).getLastLogin(), null);
 		
 	}
 
