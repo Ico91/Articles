@@ -170,6 +170,7 @@ public class ArticlesResource {
 	 * @param article
 	 *            Article to validate
 	 */
+	// TODO: :(
 	private void validateArticle(Article article) {
 		List<MessageKeys> messageKeys = this.validator.validate(article);
 

@@ -151,6 +151,7 @@ public class ArticleSubResource {
 	 * @param article
 	 *            Article to validate
 	 */
+	// TODO: :(
 	private void validateArticle(Article article) {
 		List<MessageKeys> messageKeys = this.articleValidator.validate(article);
 
