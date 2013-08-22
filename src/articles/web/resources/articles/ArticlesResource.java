@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 import articles.dao.ArticlesDAO;
 import articles.dao.exceptions.ArticlesDAOException;
 import articles.model.Articles.Article;
+import articles.model.dto.ErrorMessage;
 import articles.model.dto.validators.ArticleValidator;
 import articles.model.dto.validators.MessageBuilder;
 import articles.model.dto.validators.MessageKeys;
@@ -78,11 +79,14 @@ public class ArticlesResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response add(Article article) throws ArticlesResourceException {
 		initialize();
-		
-		if(this.validator.uniqueTitle(article, this.dao.loadArticles(getUserId())) == false) {
-			return Response.status(Status.BAD_REQUEST).entity("Article title must be unique").build();
+
+		if (this.validator.uniqueTitle(article,
+				this.dao.loadArticles(getUserId())) == false) {
+			return Response.status(Status.BAD_REQUEST)
+					.entity(new ErrorMessage("Article title must be unique"))
+					.build();
 		}
-		
+
 		try {
 			validateArticle(article);
 			article = this.dao.addArticle(getUserId(), article);
@@ -94,7 +98,8 @@ public class ArticlesResource {
 		} catch (ArticlesResourceException e) {
 			logger.error("User with id = " + getUserId()
 					+ " failed to create an article.");
-			return Response.status(400).entity(e.getMessage()).build();
+			return Response.status(400)
+					.entity(new ErrorMessage(e.getMessage())).build();
 		} catch (ArticlesDAOException e) {
 			logger.error("User with id = " + getUserId()
 					+ " failed to create an article.");
