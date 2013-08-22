@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import articles.dao.ArticlesDAO;
 import articles.dao.exceptions.ArticlesDAOException;
 import articles.model.Articles.Article;
+import articles.model.dto.ErrorMessage;
 import articles.model.dto.validators.ArticleValidator;
 import articles.model.dto.validators.MessageBuilder;
 import articles.model.dto.validators.MessageKeys;
@@ -110,8 +111,8 @@ public class ArticleSubResource {
 					+ " failed to update an article with id = " + id + ".");
 			throw e;
 		} catch (ArticlesResourceException e) {
-			return Response.status(Status.BAD_REQUEST).entity(e.getMessage())
-					.build();
+			return Response.status(Status.BAD_REQUEST)
+					.entity(new ErrorMessage(e.getMessage())).build();
 		}
 	}
 
