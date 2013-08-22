@@ -52,7 +52,7 @@ public class ArticlesDAO {
 	 * @throws ArticlesDAOException
 	 */
 	public List<Article> loadArticles(int userId) throws ArticlesDAOException {
-		Articles articles = new Articles();
+		Articles articles;
 		try {
 			File file = new File(pathToArticlesFile(userId));
 			if (file.exists()) {
