@@ -11,7 +11,8 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import javax.ws.rs.core.Context;
 
-//TODO comment structure ? 
+import org.apache.log4j.Logger;
+
 /**Generate the path from a property file which defines where the articles to be stored.
  * Application Lifecycle Listener implementation class SessionAttributesConfigurationListener
  *
@@ -19,11 +20,12 @@ import javax.ws.rs.core.Context;
  */
 @WebListener
 public class ConfigurationListener implements HttpSessionListener, ServletContextListener {
-	private static String path = "";
 	private static final String CONFIGURATION_PATH = "WEB-INF/config.properties";
 	public static final String USERID = "userId";
 	public static final String PERSISTENCE_NAME = "UserPE";
 	public static final String PERSISTENCE_NAME_TEST = "UserPE";
+	private static String path = "";
+	private Logger logger = Logger.getLogger( getClass() );
 	
 	@Context
 	ServletContext context;
@@ -50,8 +52,9 @@ public class ConfigurationListener implements HttpSessionListener, ServletContex
 		try { 
 			Properties properties = new Properties();
 			properties.load(this.context.getResourceAsStream(CONFIGURATION_PATH));
-			path = properties.getProperty("path") + "/";	
+			path = properties.getProperty("path") + "/";
 		} catch ( IOException e ) {
+			logger.error("Error while configuring the path.");
 			throw new RuntimeException(e);
 		}
 	}

@@ -20,12 +20,11 @@ import articles.model.statistics.UserActivity;
  * @author Galina Hristova
  *
  */
-public class UserDAO {
+public class UserDAO extends DAOBase {
 	
 	private static final String LOGIN_QUERY = 
 			"SELECT u FROM User u WHERE u.username = :username AND u.password = :password";
-
-	private Logger logger = Logger.getLogger( getClass() );
+	private static final String UPDATE_QUERY = "UPDATE User u SET u.lastLogin = :lastLogin WHERE u.userId = :userId";
 	
 	/**
 	 * Searches if a user with the entered username and password exists and returns it as a result. Otherwise returns as a result null.
@@ -33,12 +32,10 @@ public class UserDAO {
 	 * @param password
 	 * @return
 	 */
-	//TODO bad method name - last argument ill suited
-	public User getUser(final String username, final String password, final UserActivity userActivity) {
-		TransactionManager<User> manager = new TransactionManager<User>();
+	
+	public User login(final String username, final String password, final UserActivity userActivity) {
 		
-		//TODO why this (User) cast is used
-		User user = (User) manager.execute(new TransactionalTask<User>() {
+		User user = manager.execute(new TransactionalTask<User>() {
 			
 			@SuppressWarnings("unchecked")
 			@Override
@@ -84,12 +81,11 @@ public class UserDAO {
 	 */
 	
 	public boolean updateLastLogin(final Date lastLogin, final int userId) {
-		TransactionManager<Boolean> manager = new TransactionManager<Boolean>();
 		return manager.execute(new TransactionalTask<Boolean>() {
 
 			@Override
 			public Boolean executeTask(EntityManager entityManager) {
-				Query updateLastLoginQuery = entityManager.createQuery("UPDATE User u SET u.lastLogin = :lastLogin WHERE u.userId = :userId");
+				Query updateLastLoginQuery = entityManager.createQuery(UPDATE_QUERY);
 				updateLastLoginQuery.setParameter("lastLogin", lastLogin);
 				updateLastLoginQuery.setParameter("userId", userId);
 				try {
@@ -107,9 +103,7 @@ public class UserDAO {
 	}
 	
 	public boolean exitUser(final int userId, final UserActivity userActivity) {
-		TransactionManager<Boolean> manager = new TransactionManager<Boolean>();
-		boolean res = false;
-		if (manager.execute(new TransactionalTask<Boolean>() {
+		return manager.execute(new TransactionalTask<Boolean>() {
 			
 			@Override
 			public Boolean executeTask(EntityManager entityManager) throws PersistenceException {
@@ -118,15 +112,13 @@ public class UserDAO {
 				try {
 					statisticsStorage.save(userId, userActivity);
 					
-				} catch(StatisticsStorageException e) {
+				} catch(Exception e) {
 					throw new PersistenceDAOException(e.getMessage());
 				}
 				
-				return Boolean.TRUE;
+				return true;
 			}
-		}))
-			res = true;
-		return res;
+		});
 	}
 
 }
