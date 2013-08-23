@@ -29,10 +29,8 @@ public class UserStatisticsDTO {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		//TODO could any of these be null ?
-		result = prime * result + ((event == null) ? 0 : event.hashCode());
-		result = prime * result
-				+ ((eventDate == null) ? 0 : eventDate.hashCode());
+		result = prime * result + event.hashCode();
+		result = prime * result + eventDate.hashCode();
 		return result;
 	}
 
