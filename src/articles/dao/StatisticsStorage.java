@@ -11,6 +11,7 @@ import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
 
+import articles.dao.exceptions.PersistenceDAOException;
 import articles.dao.exceptions.StatisticsDAOException;
 import articles.model.statistics.UserActivity;
 import articles.model.statistics.UserStatistics;
@@ -24,7 +25,7 @@ import articles.statistics.dto.UserStatisticsDTO;
  */
 class StatisticsStorage {
 	private EntityManager entityManager;
-	static final Logger logger = Logger.getLogger(UserDAO.class);
+	private Logger logger = Logger.getLogger(getClass());
 
 	public StatisticsStorage(EntityManager entityManager) {
 		this.entityManager = entityManager;
@@ -43,14 +44,14 @@ class StatisticsStorage {
 			throws StatisticsStorageException {
 		UserStatistics statistics = new UserStatistics();
 		statistics.setDate(new Date());
-		statistics.setEvent(event.getValue());
+		statistics.setUserActivity(event);
 		statistics.setUserId(userId);
 		try {
 			entityManager.persist(statistics);
 		} catch (PersistenceException e) {
 			logger.error("Error while saving activity statistics "
 					+ event.toString() + ", for user with user id: " + userId);
-			throw new StatisticsStorageException(
+			throw new PersistenceDAOException(
 					"Error while saving activity statistics "
 							+ event.toString() + ", for user with user id: "
 							+ userId);

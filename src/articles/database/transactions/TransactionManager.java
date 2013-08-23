@@ -14,8 +14,8 @@ import articles.dao.exceptions.PersistenceDAOException;
  *
  * @param <T>
  */
-public class TransactionManager<T> extends PersistenceDAO {
-	static final Logger logger = Logger.getLogger(TransactionManager.class);
+public class TransactionManager extends PersistenceDAO {
+	private Logger logger = Logger.getLogger(getClass());
 	
 	public TransactionManager() {
 		super();
@@ -27,7 +27,7 @@ public class TransactionManager<T> extends PersistenceDAO {
 	 * @param task - instance of the TransactionalTask interface.
 	 * @return
 	 */
-	public T execute(TransactionalTask<T> task) throws TransactionException {
+	public <T> T execute(TransactionalTask<T> task) throws TransactionException {
 		EntityTransaction entityTransaction = super.entityManager.getTransaction();
 		try {
 			entityTransaction.begin();

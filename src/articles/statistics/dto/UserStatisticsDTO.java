@@ -20,6 +20,11 @@ public class UserStatisticsDTO {
 	
 	public UserStatisticsDTO() { }
 	
+	public UserStatisticsDTO(Date eventDate, UserActivity event) {
+		this.eventDate = eventDate;
+		this.event = event;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -45,19 +50,11 @@ public class UserStatisticsDTO {
 			return false;
 		return true;
 	}
-
-	/**
-	 * @return JSON String representation of the class instances.
-	 */
+	
 	@Override
 	public String toString() {
-		return "{\"event\":\"" + event + "\",\"eventDate\":\""
-				+ eventDate.toString() + "\"}";
-	}
-
-	public UserStatisticsDTO(Date eventDate, UserActivity event) {
-		this.eventDate = eventDate;
-		this.event = event;
+		return "UserStatisticsDTO [eventDate=" + eventDate + ", event=" + event
+				+ "]";
 	}
 
 	public Date getEventDate() {

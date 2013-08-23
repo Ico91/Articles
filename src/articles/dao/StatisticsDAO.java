@@ -9,6 +9,11 @@ import articles.database.transactions.TransactionManager;
 import articles.database.transactions.TransactionalTask;
 import articles.statistics.dto.UserStatisticsDTO;
 
+/**
+ * Provides methods for accessing statistics information from database
+ * 
+ * @author Hristo
+ */
 public class StatisticsDAO {
 
 	/**
@@ -23,14 +28,15 @@ public class StatisticsDAO {
 	 */
 	public List<UserStatisticsDTO> load(final int userId, final Date date) {
 
-		TransactionManager<List<UserStatisticsDTO>> manager = new TransactionManager<List<UserStatisticsDTO>>();
-		List<UserStatisticsDTO> res = (List<UserStatisticsDTO>) manager
+		TransactionManager manager = new TransactionManager();
+		List<UserStatisticsDTO> res = manager
 				.execute(new TransactionalTask<List<UserStatisticsDTO>>() {
 
 					@Override
 					public List<UserStatisticsDTO> executeTask(
 							EntityManager entityManager) {
-						StatisticsStorage statisticsStorage = new StatisticsStorage(entityManager);
+						StatisticsStorage statisticsStorage = new StatisticsStorage(
+								entityManager);
 						return statisticsStorage.load(userId, date);
 					}
 				});

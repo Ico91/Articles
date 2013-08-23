@@ -22,14 +22,13 @@ public class StatisticsResource {
 	public Response getUserStatistics(@PathParam("userid") int userId,
 			@QueryParam("date") DateAdapter dateInput) {
 
-		StatisticsDAO statistics = new StatisticsDAO();
-		if(dateInput != null) {
-			Date date = dateInput.getDate();
-			List<UserStatisticsDTO> userStatistics = statistics.load(userId, date);
-			return Response.ok().entity(userStatistics.toString()).build();
-		}
+		if(dateInput == null)
+			return Response.status(400).entity("No date provided").build();
 		
-		return Response.status(400).entity("No date provided").build();
+		Date date = dateInput.getDate();
+		StatisticsDAO statistics = new StatisticsDAO();
+		List<UserStatisticsDTO> userStatistics = statistics.load(userId, date);
+		return Response.ok().entity(userStatistics).build();
 	}
 
 }
