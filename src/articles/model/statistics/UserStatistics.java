@@ -14,7 +14,7 @@ import javax.persistence.TemporalType;
 /**
  * Holds statistics for the specified user, based on his
  * activities. The statistics contains the event itself,
- * the time it happened and the user.
+ * the time it happened and the user's id.
  * 
  * @author Hristo
  *
