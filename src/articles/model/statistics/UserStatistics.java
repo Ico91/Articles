@@ -7,13 +7,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import articles.model.User;
 
 /**
  * Holds statistics for the specified user, based on his
@@ -30,19 +26,11 @@ public class UserStatistics {
 	@Column(name="event_id")
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int eventId;
-	
 	private int userId;
-	
 	@Column(name="event_date")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date eventDate;
-	
-	//TODO why this field is integer ?
-	private int event;
-	
-	public UserStatistics() {
-		
-	}
+	private UserActivity userActivity;
 	
 	@Override
 	public int hashCode() {
@@ -66,7 +54,7 @@ public class UserStatistics {
 	@Override
 	public String toString() {
 		return "Statistics [eventId=" + eventId + ", eventDate=" + eventDate + ", event="
-				+ event + "]";
+				+ userActivity + "]";
 	}
 
 	public int getEventId() {
@@ -93,12 +81,12 @@ public class UserStatistics {
 		this.eventDate = eventDate;
 	}
 
-	public int getEvent() {
-		return event;
+	public UserActivity getEvent() {
+		return userActivity;
 	}
 
-	public void setEvent(int event) {
-		this.event = event;
+	public void setUserActivity(UserActivity userActivity) {
+		this.userActivity = userActivity;
 	}
 	
 }

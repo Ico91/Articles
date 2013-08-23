@@ -24,8 +24,7 @@ public class UserStatisticsDTO {
 		this.eventDate = eventDate;
 		this.event = event;
 	}
-	
-	//TODO ill formatted method blocks
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -53,15 +52,10 @@ public class UserStatisticsDTO {
 		return true;
 	}
 
-	/**
-	 * @return JSON String representation of the class instances.
-	 * 
-	 */
-	///TODO how about SRP principle ?
 	@Override
 	public String toString() {
-		return "{\"event\":\"" + event + "\",\"eventDate\":\""
-				+ eventDate.toString() + "\"}";
+		return "UserStatisticsDTO [eventDate=" + eventDate + ", event=" + event
+				+ "]";
 	}
 
 	public Date getEventDate() {
