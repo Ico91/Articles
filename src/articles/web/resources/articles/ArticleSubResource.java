@@ -19,7 +19,7 @@ import articles.dao.exceptions.ArticlesDAOException;
 import articles.model.Articles.Article;
 import articles.model.dto.ErrorMessage;
 import articles.model.dto.validators.ArticleValidator;
-import articles.model.dto.validators.MessageBuilder;
+import articles.model.dto.validators.ErrorMessageBuilder;
 import articles.model.dto.validators.MessageKeys;
 import articles.web.resources.exception.ArticlesResourceException;
 import articles.web.resources.users.UsersResource;
@@ -95,25 +95,17 @@ public class ArticleSubResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateArticle(Article article, @PathParam("id") int id) {
 		article.setId(id);
+		
+		// TODO Validations
+		
+		boolean result = this.dao.updateArticle(this.userId, article);
+		if (result)
+			logger.info("User with id = " + userId
+					+ " updated an article with id = " + id + ".");
 
-		try {
-			validateArticle(article);
-			boolean result = this.dao.updateArticle(this.userId, article);
-			if (result)
-				logger.info("User with id = " + userId
-						+ " updated an article with id = " + id + ".");
+		return (result) ? Response.ok().build() : Response.status(
+				Status.BAD_REQUEST).build(); // TODO NOT_MODIFIED ?
 
-			return (result) ? Response.ok().build() : Response.status(
-					Status.NOT_MODIFIED).build(); //TODO NOT_MODIFIED ?
-
-		} catch (ArticlesDAOException e) {
-			logger.error("User with id = " + userId
-					+ " failed to update an article with id = " + id + ".");
-			throw e;
-		} catch (ArticlesResourceException e) {
-			return Response.status(Status.BAD_REQUEST)
-					.entity(new ErrorMessage(e.getMessage())).build();
-		}
 	}
 
 	/**
@@ -142,22 +134,6 @@ public class ArticleSubResource {
 			logger.error("User with id = " + userId
 					+ " failed to delete an article with id = " + id + ".");
 			throw e;
-		}
-	}
-
-	/**
-	 * Validate article format
-	 * 
-	 * @param article
-	 *            Article to validate
-	 */
-	// TODO: :(
-	private void validateArticle(Article article) {
-		List<MessageKeys> messageKeys = this.articleValidator.validate(article);
-
-		if (messageKeys.size() != 0) {
-			MessageBuilder builder = new MessageBuilder(messageKeys);
-			throw new ArticlesResourceException(builder.getMessage());
 		}
 	}
 

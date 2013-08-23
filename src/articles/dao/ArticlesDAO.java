@@ -17,7 +17,7 @@ import articles.database.transactions.TransactionalTask;
 import articles.model.Articles;
 import articles.model.Articles.Article;
 import articles.model.dto.validators.ArticleValidator;
-import articles.model.dto.validators.MessageBuilder;
+import articles.model.dto.validators.ErrorMessageBuilder;
 import articles.model.dto.validators.MessageKeys;
 import articles.model.statistics.UserActivity;
 
@@ -30,7 +30,7 @@ import articles.model.statistics.UserActivity;
 public class ArticlesDAO {
 	private String articlesPath;
 	private ArticleValidator articleValidator;
-	static final Logger logger = Logger.getLogger(ArticlesDAO.class);
+	private Logger logger = Logger.getLogger(getClass());
 
 	/**
 	 * Constructs new ArticlesDAO object
@@ -111,7 +111,6 @@ public class ArticlesDAO {
 		final List<Article> articles = loadArticles(userId);
 		validateArticle(article);
 
-		//TODO boolean expression too long
 		if ( !this.articleValidator.uniqueTitle(article, articles) ) {
 			logger.error("User with id " + userId
 					+ " failed to add article. Reason: title not unique");
@@ -158,7 +157,7 @@ public class ArticlesDAO {
 			public Boolean executeTask(EntityManager entityManager) {
 				for (int i = 0; i < articles.size(); i++) {
 					if (articles.get(i).getId() == article.getId()) {
-						articles.remove(i); //TODO possible ConcurrentModificationException ?
+						articles.remove(i); //TODO possible ConcurrentModificationException ? [He]
 						articles.add(i, article);
 
 						StatisticsStorage storage = new StatisticsStorage(
@@ -254,15 +253,15 @@ public class ArticlesDAO {
 		List<MessageKeys> messageKeys = this.articleValidator.validate(article);
 
 		if (messageKeys.size() != 0) {
-			MessageBuilder builder = new MessageBuilder(messageKeys);
-			logger.error(builder.getMessage());
+			ErrorMessageBuilder builder = new ErrorMessageBuilder(messageKeys);
+			logger.error(builder.getMessage().getMessage());
 
-			throw new ArticlesDAOException(builder.getMessage());
+			throw new ArticlesDAOException(builder.getMessage().getMessage());
 		}
 	}
 	
 	private <T> T transaction(TransactionalTask<T> task) {
-		TransactionManager<T> transactionManager = new TransactionManager<T>();
+		TransactionManager transactionManager = new TransactionManager();
 		return transactionManager.execute(task);
 	}
 	
@@ -284,7 +283,9 @@ public class ArticlesDAO {
 
 		return ++max;
 	}
-
+	
+	
+	
 	/**
 	 * Returns path to articles file of the specified user
 	 * 

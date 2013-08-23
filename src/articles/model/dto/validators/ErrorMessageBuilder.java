@@ -2,19 +2,21 @@ package articles.model.dto.validators;
 
 import java.util.List;
 
+import articles.model.dto.ErrorMessage;
+
 /**
  * Class used to build message from list of message keys
  * @author Krasimir Atanasov
  *
  */
-public class MessageBuilder {
+public class ErrorMessageBuilder {
 	private List<MessageKeys> messageKeys;
 	
-	public MessageBuilder(List<MessageKeys> messageKeys) {
+	public ErrorMessageBuilder(List<MessageKeys> messageKeys) {
 		this.messageKeys = messageKeys;
 	}
 	
-	public String getMessage() {
+	public ErrorMessage getMessage() {
 		StringBuilder stringBuilder = new StringBuilder();
 		for(MessageKeys key : this.messageKeys) {
 			stringBuilder.append(key.getValue());
@@ -22,6 +24,6 @@ public class MessageBuilder {
 			stringBuilder.append(System.lineSeparator());
 		}
 		
-		return stringBuilder.toString();
+		return new ErrorMessage(stringBuilder.toString());
 	}
 }

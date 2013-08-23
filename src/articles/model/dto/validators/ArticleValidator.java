@@ -11,7 +11,7 @@ import articles.model.Articles.Article;
  * @author Krasimir Atanasov
  * 
  */
-//TODO why this class is placed in package dto ? 
+// TODO why this class is placed in package dto ?
 public class ArticleValidator {
 
 	public ArticleValidator() {
@@ -52,7 +52,9 @@ public class ArticleValidator {
 	public boolean uniqueTitle(Article article, List<Article> listOfArticles) {
 		for (Article a : listOfArticles) {
 			if (a.getTitle().equals(article.getTitle())) {
-				return false;
+				if (!a.equals(article)) {
+					return false;
+				}
 			}
 		}
 

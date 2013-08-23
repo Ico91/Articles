@@ -19,11 +19,10 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.log4j.Logger;
 
 import articles.dao.ArticlesDAO;
-import articles.dao.exceptions.ArticlesDAOException;
 import articles.model.Articles.Article;
 import articles.model.dto.ErrorMessage;
 import articles.model.dto.validators.ArticleValidator;
-import articles.model.dto.validators.MessageBuilder;
+import articles.model.dto.validators.ErrorMessageBuilder;
 import articles.model.dto.validators.MessageKeys;
 import articles.web.listener.ConfigurationListener;
 import articles.web.resources.exception.ArticlesResourceException;
@@ -36,15 +35,20 @@ import articles.web.resources.exception.ArticlesResourceException;
  */
 @Path("")
 public class ArticlesResource {
-	static final Logger logger = Logger.getLogger(ArticlesResource.class);
+	private static final Logger logger = Logger
+			.getLogger(ArticlesResource.class);
 	@Context
 	HttpServletRequest servletRequest;
 
-	
-	//TODO potential thread issues here
+	// TODO potential thread issues here
 	private List<Article> articles;
 	private ArticlesDAO dao;
 	private ArticleValidator validator;
+
+	public ArticlesResource() {
+		this.validator = new ArticleValidator();
+		this.dao = new ArticlesDAO(articlesPath());
+	}
 
 	/**
 	 * If searchTerm is specified, returns list of articles containing the
@@ -57,7 +61,6 @@ public class ArticlesResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Article> getArticles(@QueryParam("search") String searchTerm) {
-		initialize();
 		this.articles = this.dao.loadArticles(getUserId());
 
 		if (searchTerm == null) {
@@ -80,34 +83,28 @@ public class ArticlesResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response add(Article article) throws ArticlesResourceException {
-		initialize();
+		List<MessageKeys> messageKeys = this.validator.validate(article);
+		if (!messageKeys.isEmpty()) {
+			logger.error("User with id = " + getUserId()
+					+ " failed to create an article.");
+			return Response.status(Status.BAD_REQUEST)
+					.entity(new ErrorMessageBuilder(messageKeys).getMessage())
+					.build();
+		}
 
-		if (this.validator.uniqueTitle(article,
-				this.dao.loadArticles(getUserId())) == false) {
+		if (!this.validator.uniqueTitle(article,
+				this.dao.loadArticles(getUserId()))) {
+			logger.error("User with id = " + getUserId()
+					+ " failed to create an article.");
 			return Response.status(Status.BAD_REQUEST)
 					.entity(new ErrorMessage("Article title must be unique"))
 					.build();
 		}
 
-		try {
-			//TODO validate throws exception ?
-			validateArticle(article);
-			article = this.dao.addArticle(getUserId(), article);
+		article = this.dao.addArticle(getUserId(), article);
 
-			logger.info("User with id = " + getUserId()
-					+ " created an article.");
-			return Response.ok(article, MediaType.APPLICATION_JSON).build();
-
-		} catch (ArticlesResourceException e) {
-			logger.error("User with id = " + getUserId()
-					+ " failed to create an article.");
-			return Response.status(400)
-					.entity(new ErrorMessage(e.getMessage())).build();
-		} catch (ArticlesDAOException e) {
-			logger.error("User with id = " + getUserId()
-					+ " failed to create an article.");
-			throw e;
-		}
+		logger.info("User with id = " + getUserId() + " created an article.");
+		return Response.ok(article, MediaType.APPLICATION_JSON).build();
 	}
 
 	/**
@@ -120,7 +117,6 @@ public class ArticlesResource {
 	 */
 	@Path("{id}")
 	public ArticleSubResource getArticle(@PathParam("id") int id) {
-		initialize();
 		return new ArticleSubResource(this.dao, getUserId());
 	}
 
@@ -168,26 +164,6 @@ public class ArticlesResource {
 	}
 
 	/**
-	 * Validate article format
-	 * 
-	 * @param article
-	 *            Article to validate
-	 */
-	// TODO: :(
-	private void validateArticle(Article article) {
-		List<MessageKeys> messageKeys = this.validator.validate(article);
-
-		if (messageKeys.size() != 0) {
-			MessageBuilder messageBuilder = new MessageBuilder(messageKeys);
-
-			logger.error("User with id = " + getUserId()
-					+ " failed to create an article.");
-
-			throw new ArticlesResourceException(messageBuilder.getMessage());
-		}
-	}
-
-	/**
 	 * Get user ID from session
 	 * 
 	 * @return User ID
@@ -195,16 +171,4 @@ public class ArticlesResource {
 	private int getUserId() {
 		return (int) servletRequest.getSession().getAttribute("userId");
 	}
-
-	/**
-	 * Initialize object
-	 * 
-	 * @throws ArticlesResourceException
-	 */
-	//TODO why is this called multiple times ?
-	private void initialize() {
-		this.validator = new ArticleValidator();
-		this.dao = new ArticlesDAO(articlesPath());
-	}
-
 }
