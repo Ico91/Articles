@@ -4,7 +4,6 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -31,8 +30,6 @@ public class User {
 	@Column(name="last_login")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date lastLogin;
-	
-	//TODO why not use the UserType enum here ?
 	private UserType userType;
 	
 	public User() {

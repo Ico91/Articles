@@ -26,7 +26,7 @@ public class UserDAOTest {
 	@Test
 	public void findTest() {
 		User expectedUser;
-		expectedUser = userDAO.getUser(loginRequest.getUsername(), loginRequest.getPassword(), UserActivity.LOGIN);
+		expectedUser = userDAO.login(loginRequest.getUsername(), loginRequest.getPassword(), UserActivity.LOGIN);
 		assertEquals(actualUser.getUsername(), expectedUser.getUsername());
 		System.out.println(expectedUser.toString());
 		System.out.println(actualUser.toString());
