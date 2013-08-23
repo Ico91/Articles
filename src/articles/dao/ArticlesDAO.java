@@ -111,7 +111,8 @@ public class ArticlesDAO {
 		final List<Article> articles = loadArticles(userId);
 		validateArticle(article);
 
-		if (this.articleValidator.uniqueTitle(article, articles) == false) {
+		//TODO boolean expression too long
+		if ( !this.articleValidator.uniqueTitle(article, articles) ) {
 			logger.error("User with id " + userId
 					+ " failed to add article. Reason: title not unique");
 			throw new ArticlesDAOException("Article title must be unique");
@@ -148,6 +149,8 @@ public class ArticlesDAO {
 	public boolean updateArticle(final int userId, final Article article) {
 		final List<Article> articles = loadArticles(userId);
 
+		//TODO title unique check ?
+		
 		validateArticle(article);
 		return transaction(new TransactionalTask<Boolean>() {
 
@@ -155,7 +158,7 @@ public class ArticlesDAO {
 			public Boolean executeTask(EntityManager entityManager) {
 				for (int i = 0; i < articles.size(); i++) {
 					if (articles.get(i).getId() == article.getId()) {
-						articles.remove(i);
+						articles.remove(i); //TODO possible ConcurrentModificationException ?
 						articles.add(i, article);
 
 						StatisticsStorage storage = new StatisticsStorage(

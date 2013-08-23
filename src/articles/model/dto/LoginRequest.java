@@ -9,6 +9,9 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Galina Hristova
  *
  */
+//TODO why this class is in this package
+//TODO why this package exists at all
+
 @XmlRootElement(name = "request")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class LoginRequest{

@@ -7,15 +7,15 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import javax.ws.rs.core.Context;
 
+//TODO comment structure ? 
 /**Generate the path from a property file which defines where the articles to be stored.
- * Author Galina Hristova
  * Application Lifecycle Listener implementation class SessionAttributesConfigurationListener
  *
+ *@author Galina Hristova
  */
 @WebListener
 public class ConfigurationListener implements HttpSessionListener, ServletContextListener {
@@ -47,15 +47,13 @@ public class ConfigurationListener implements HttpSessionListener, ServletContex
 	}
 	@Override
 	public void sessionCreated(HttpSessionEvent arg0) {
-    	Properties properties = new Properties();
-		try {
+		try { 
+			Properties properties = new Properties();
 			properties.load(this.context.getResourceAsStream(CONFIGURATION_PATH));
-			path = properties.getProperty("path") + "/";
-		} catch (IOException e) {
-			path = null;
+			path = properties.getProperty("path") + "/";	
+		} catch ( IOException e ) {
+			throw new RuntimeException(e);
 		}
-		
-		
 	}
 	
 }

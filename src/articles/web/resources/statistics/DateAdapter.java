@@ -29,6 +29,7 @@ public class DateAdapter {
 		return date;
 	}
 
+	//TODO is this used ?
 	public void setDate(Date date) {
 		this.date = date;
 	}

@@ -19,11 +19,18 @@ public class UserStatisticsDTO {
 	private UserActivity event;
 	
 	public UserStatisticsDTO() { }
+
+	public UserStatisticsDTO(Date eventDate, UserActivity event) {
+		this.eventDate = eventDate;
+		this.event = event;
+	}
 	
+	//TODO ill formatted method blocks
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		//TODO could any of these be null ?
 		result = prime * result + ((event == null) ? 0 : event.hashCode());
 		result = prime * result
 				+ ((eventDate == null) ? 0 : eventDate.hashCode());
@@ -48,16 +55,13 @@ public class UserStatisticsDTO {
 
 	/**
 	 * @return JSON String representation of the class instances.
+	 * 
 	 */
+	///TODO how about SRP principle ?
 	@Override
 	public String toString() {
 		return "{\"event\":\"" + event + "\",\"eventDate\":\""
 				+ eventDate.toString() + "\"}";
-	}
-
-	public UserStatisticsDTO(Date eventDate, UserActivity event) {
-		this.eventDate = eventDate;
-		this.event = event;
 	}
 
 	public Date getEventDate() {

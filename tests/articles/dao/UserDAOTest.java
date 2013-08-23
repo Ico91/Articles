@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import articles.model.User;
+import articles.model.UserType;
 import articles.model.dto.LoginRequest;
 import articles.model.statistics.UserActivity;
 
@@ -19,7 +20,7 @@ public class UserDAOTest {
 	public void setUp() {
 		userDAO = new UserDAO();
 		loginRequest = new LoginRequest("admin", "123");
-		actualUser = new User(1, "admin", "123", 2);
+		actualUser = new User(1, "admin", "123", UserType.USER);
 	}
 	
 	@Test

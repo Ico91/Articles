@@ -11,6 +11,7 @@ import articles.model.Articles.Article;
  * @author Krasimir Atanasov
  * 
  */
+//TODO why this class is placed in package dto ? 
 public class ArticleValidator {
 
 	public ArticleValidator() {

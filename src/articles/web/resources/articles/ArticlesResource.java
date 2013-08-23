@@ -40,6 +40,8 @@ public class ArticlesResource {
 	@Context
 	HttpServletRequest servletRequest;
 
+	
+	//TODO potential thread issues here
 	private List<Article> articles;
 	private ArticlesDAO dao;
 	private ArticleValidator validator;
@@ -88,6 +90,7 @@ public class ArticlesResource {
 		}
 
 		try {
+			//TODO validate throws exception ?
 			validateArticle(article);
 			article = this.dao.addArticle(getUserId(), article);
 
@@ -198,6 +201,7 @@ public class ArticlesResource {
 	 * 
 	 * @throws ArticlesResourceException
 	 */
+	//TODO why is this called multiple times ?
 	private void initialize() {
 		this.validator = new ArticleValidator();
 		this.dao = new ArticlesDAO(articlesPath());

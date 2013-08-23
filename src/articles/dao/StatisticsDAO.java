@@ -23,7 +23,8 @@ public class StatisticsDAO {
 	 */
 	public List<UserStatisticsDTO> load(final int userId, final Date date) {
 
-		TransactionManager<List<UserStatisticsDTO>> manager = new TransactionManager<List<UserStatisticsDTO>>();
+		//TODO java 7 syntax for generics ?
+		TransactionManager<List<UserStatisticsDTO>> manager = new TransactionManager<>();
 		List<UserStatisticsDTO> res = (List<UserStatisticsDTO>) manager
 				.execute(new TransactionalTask<List<UserStatisticsDTO>>() {
 

@@ -6,6 +6,7 @@ import javax.persistence.Persistence;
 
 import articles.web.listener.ConfigurationListener;
 
+//TODO this name means ?
 public class PersistenceDAO {
 	protected static final EntityManagerFactory factory = Persistence
 			.createEntityManagerFactory(ConfigurationListener.PERSISTENCE_NAME);

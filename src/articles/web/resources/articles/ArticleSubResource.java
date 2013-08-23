@@ -103,8 +103,8 @@ public class ArticleSubResource {
 				logger.info("User with id = " + userId
 						+ " updated an article with id = " + id + ".");
 
-			return (result == true) ? Response.ok().build() : Response.status(
-					Status.NOT_MODIFIED).build();
+			return (result) ? Response.ok().build() : Response.status(
+					Status.NOT_MODIFIED).build(); //TODO NOT_MODIFIED ?
 
 		} catch (ArticlesDAOException e) {
 			logger.error("User with id = " + userId

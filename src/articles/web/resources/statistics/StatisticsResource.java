@@ -13,12 +13,14 @@ import javax.ws.rs.core.Response;
 import articles.dao.StatisticsDAO;
 import articles.statistics.dto.UserStatisticsDTO;
 
+//TODO some comment here ?
 @Path("")
 public class StatisticsResource {
 
 	@GET
 	@Path("{userid}")
 	@Produces("application/json")
+	//TODO global statistics for all users ?
 	public Response getUserStatistics(@PathParam("userid") int userId,
 			@QueryParam("date") DateAdapter dateInput) {
 
@@ -26,7 +28,7 @@ public class StatisticsResource {
 		if(dateInput != null) {
 			Date date = dateInput.getDate();
 			List<UserStatisticsDTO> userStatistics = statistics.load(userId, date);
-			return Response.ok().entity(userStatistics.toString()).build();
+			return Response.ok().entity(userStatistics).build(); //TODO toString() used as result ?
 		}
 		
 		return Response.status(400).entity("No date provided").build();

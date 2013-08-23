@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -30,24 +31,26 @@ public class User {
 	@Column(name="last_login")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date lastLogin;
-	private int type;
+	
+	//TODO why not use the UserType enum here ?
+	private UserType userType;
 	
 	public User() {
 	
 	}
 	
-	public User(int userId, String username, String password, int type) {
+	public User(int userId, String username, String password, UserType userType ) {
 		this.userId = userId;
 		this.username = username;
 		this.password = password;
-		this.type = type;
+		this.userType = userType;
 	}
 
 	@Override
 	public String toString() {
 		return "User [userId=" + userId + ", username=" + username
 				+ ", password=" + password + ", lastLogin=" + lastLogin
-				+ ", type=" + UserType.getType(type).toString() + "]";
+				+ ", type=" + userType+ "]";
 	}
 
 	@Override
@@ -101,12 +104,12 @@ public class User {
 		this.lastLogin = lastLogin;
 	}
 
-	public int getType() {
-		return type;
+	public UserType getUserType() {
+		return userType;
 	}
-	
-	public void setType(int type) {
-		this.type = type;
+
+	public void setUserType(UserType userType) {
+		this.userType = userType;
 	}
 	
 }

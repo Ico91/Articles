@@ -53,8 +53,11 @@ public class UsersResource {
 			@Context HttpServletRequest servletRequest) throws 
 			ServletException {
 		UserDAO userDAO = new UserDAO();
+		
 		User user = userDAO.getUser(loginRequest.getUsername(), loginRequest.getPassword(), UserActivity.LOGIN);
 		if (user != null) {
+			
+			//TODO this is additional transaction
 			userDAO.updateLastLogin(new Date(), user.getUserId());
 			
 			servletRequest.getSession().invalidate();

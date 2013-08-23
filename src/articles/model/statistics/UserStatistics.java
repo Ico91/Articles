@@ -36,6 +36,8 @@ public class UserStatistics {
 	@Column(name="event_date")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date eventDate;
+	
+	//TODO why this field is integer ?
 	private int event;
 	
 	public UserStatistics() {

@@ -25,6 +25,7 @@ public class AccessFilter implements Filter {
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpSession session = req.getSession(false);
 
+		//TODO use predefined user key here
 		if ( session != null && session.getAttribute("userId") != null ) {
 			chain.doFilter(req, resp);
 			return;	
