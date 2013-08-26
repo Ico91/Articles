@@ -10,7 +10,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import articles.dao.exceptions.StatisticsDAOException;
 import articles.model.statistics.UserActivity;
 import articles.statistics.dto.UserStatisticsDTO;
 
@@ -24,7 +23,7 @@ public class StatisticsDAOTest {
 	}
 	
 	@Test
-	public void testLoad() throws StatisticsDAOException {
+	public void testLoad() {
 		List<UserStatisticsDTO> expectedResult = new ArrayList<UserStatisticsDTO>();
 		expectedResult.add(new UserStatisticsDTO(new Date(Long.valueOf("1376399080000")), UserActivity.LOGIN));
 		expectedResult.add(new UserStatisticsDTO(new Date(Long.valueOf("1376399220000")), UserActivity.LOGIN));
