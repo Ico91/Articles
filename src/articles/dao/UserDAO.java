@@ -20,8 +20,7 @@ import articles.model.statistics.UserActivity;
  * @author Galina Hristova
  *
  */
-public class UserDAO extends DAOBase {
-	
+public class UserDAO extends DAOBase {	
 	private static final String LOGIN_QUERY = 
 			"SELECT u FROM User u WHERE u.username = :username AND u.password = :password";
 	private static final String UPDATE_QUERY = "UPDATE User u SET u.lastLogin = :lastLogin WHERE u.userId = :userId";
@@ -32,6 +31,10 @@ public class UserDAO extends DAOBase {
 	 * @param password
 	 * @return
 	 */
+	
+	public UserDAO() {
+		logger = Logger.getLogger(getClass());
+	}
 	
 	public User login(final String username, final String password, final UserActivity userActivity) {
 		
