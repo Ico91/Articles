@@ -5,7 +5,7 @@ import javax.persistence.RollbackException;
 
 import org.apache.log4j.Logger;
 
-import articles.dao.exceptions.PersistenceDAOException;
+import articles.dao.exceptions.DAOException;
 
 /**
  * Handles transactions for database requests.
@@ -33,7 +33,7 @@ public class TransactionManager extends PersistenceManager {
 			T result = (T) task.executeTask(entityManager);
 			entityTransaction.commit();
 			return result;
-		} catch (PersistenceDAOException | RollbackException e) {
+		} catch (DAOException | RollbackException e) {
 			logger.error(e.getMessage());
 			throw new TransactionException(e.getMessage());
 		} finally {
