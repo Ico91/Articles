@@ -3,13 +3,15 @@ package articles.web.resources.statistics;
 import java.util.Date;
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+
+import com.google.gson.Gson;
 
 import articles.dao.StatisticsDAO;
 import articles.statistics.dto.UserStatisticsDTO;
@@ -25,7 +27,8 @@ import articles.web.listener.ConfigurationListener;
 @Path("")
 public class StatisticsResource {
 	@Context
-	private HttpSession session;
+	private HttpServletRequest servletRequest;
+	private Gson gson = new Gson();
 
 	/**
 	 * Returns statistics information for the currently logged user.
@@ -46,8 +49,10 @@ public class StatisticsResource {
 		Date date = dateInput.getDate();
 		StatisticsDAO statistics = new StatisticsDAO();
 		List<UserStatisticsDTO> userStatistics = statistics.load(
-				(int) session.getAttribute(ConfigurationListener.USERID), date);
-		return Response.ok().entity(userStatistics).build();
+				(int) servletRequest.getSession(false).getAttribute(
+						ConfigurationListener.USERID), date);
+		
+		return Response.ok().entity(gson.toJson(userStatistics)).build();
 	}
 
 }

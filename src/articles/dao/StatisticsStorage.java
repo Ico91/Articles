@@ -74,7 +74,7 @@ class StatisticsStorage {
 
 		SimpleDateFormat databaseFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Query selectQuery = entityManager
-				.createNativeQuery("SELECT event, event_date FROM statistics WHERE DATE(event_date) = ?1 AND userid = ?2");
+				.createNativeQuery("SELECT user_activity, event_date FROM statistics WHERE DATE(event_date) = ?1 AND userid = ?2");
 		selectQuery.setParameter(1, databaseFormat.format(date));
 		selectQuery.setParameter(2, userId);
 		try {
@@ -82,7 +82,7 @@ class StatisticsStorage {
 			List<UserStatisticsDTO> statisticsList = new ArrayList<UserStatisticsDTO>();
 			for (Object[] result : resultList) {
 				statisticsList.add(new UserStatisticsDTO((Date) result[1],
-						UserActivity.values()[(int) result[0] - 1]));
+						UserActivity.values()[(int) result[0]]));
 			}
 			return statisticsList;
 		} catch (PersistenceException e) {
