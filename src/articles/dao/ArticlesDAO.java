@@ -11,15 +11,12 @@ import javax.xml.bind.Unmarshaller;
 
 import org.apache.log4j.Logger;
 
-import articles.dao.exceptions.ArticlesDAOException;
-import articles.database.transactions.TransactionManager;
+import articles.dao.exceptions.DAOException;
 import articles.database.transactions.TransactionalTask;
 import articles.model.Articles;
 import articles.model.Articles.Article;
-import articles.model.dto.validators.ArticleValidator;
-import articles.model.dto.validators.ErrorMessageBuilder;
-import articles.model.dto.validators.MessageKeys;
 import articles.model.statistics.UserActivity;
+import articles.validators.ArticleValidator;
 
 /**
  * Provides access to article files
@@ -27,10 +24,8 @@ import articles.model.statistics.UserActivity;
  * @author Krasimir Atanasov
  * 
  */
-public class ArticlesDAO {
+public class ArticlesDAO extends DAOBase {
 	private String articlesPath;
-	private ArticleValidator articleValidator;
-	private Logger logger = Logger.getLogger(getClass());
 
 	/**
 	 * Constructs new ArticlesDAO object
@@ -39,8 +34,8 @@ public class ArticlesDAO {
 	 *            Path to articles file
 	 */
 	public ArticlesDAO(String articlesPath) {
+		this.logger = Logger.getLogger(getClass());
 		this.articlesPath = articlesPath;
-		this.articleValidator = new ArticleValidator();
 	}
 
 	/**
@@ -49,31 +44,60 @@ public class ArticlesDAO {
 	 * @param userId
 	 *            User ID
 	 * @return List of articles
-	 * @throws ArticlesDAOException
+	 * @throws DAOException
+	 *             when articles file not found, or contains invalid xml
 	 */
-	public List<Article> loadArticles(int userId) throws ArticlesDAOException {
+	public List<Article> loadArticles(int userId) {
 		Articles articles;
 		try {
 			File file = new File(pathToArticlesFile(userId));
-			if (file.exists()) {
-				JAXBContext jaxbContext = JAXBContext
-						.newInstance(Articles.class);
 
-				Unmarshaller jaxbUnmarshaller = jaxbContext
-						.createUnmarshaller();
-				articles = (Articles) jaxbUnmarshaller.unmarshal(file);
-			} else {
-				logger.error("Articles file does not exist.");
-				throw new ArticlesDAOException("Articles file not found!");
+			if (!file.exists()) {
+				String message = "Articles file not found at: "
+						+ pathToArticlesFile(userId);
+				logger.error(message);
+				throw new DAOException(message);
 			}
+
+			JAXBContext jaxbContext = JAXBContext.newInstance(Articles.class);
+
+			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+			articles = (Articles) jaxbUnmarshaller.unmarshal(file);
+
+			return articles.getArticle();
 
 		} catch (JAXBException e) {
 			String message = "Invalid articles file format!";
 			logger.error(message);
-			throw new ArticlesDAOException(message);
+			throw new DAOException(message);
 		}
+	}
 
-		return articles.getArticle();
+	/**
+	 * Write list of articles in file
+	 * 
+	 * @param userId
+	 *            User ID
+	 * @param articlesList
+	 *            List of articles to write
+	 * @throws DAOException
+	 */
+	public void saveArticles(int userId, List<Article> articlesList) {
+		Articles article = new Articles();
+		article.setArticle(articlesList);
+		try {
+
+			File file = new File(pathToArticlesFile(userId));
+			JAXBContext jaxbContext = JAXBContext.newInstance(Articles.class);
+
+			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+			jaxbMarshaller.marshal(article, file);
+
+		} catch (JAXBException e) {
+			String message = "Failed to save articles to file!";
+			logger.error(message);
+			throw new DAOException(message);
+		}
 	}
 
 	/**
@@ -84,7 +108,6 @@ public class ArticlesDAO {
 	 * @param articleId
 	 *            ID of requested article
 	 * @return Requested article
-	 * @throws ArticlesDAOException
 	 */
 	public Article getArticleById(int userId, int articleId) {
 		List<Article> listOfArticles = loadArticles(userId);
@@ -105,27 +128,20 @@ public class ArticlesDAO {
 	 * @param article
 	 *            Article to add
 	 * @return Added article with his unique ID
-	 * @throws ArticlesDAOException
 	 */
 	public Article addArticle(final int userId, final Article article) {
 		final List<Article> articles = loadArticles(userId);
-		validateArticle(article);
+		validate(new ArticleValidator(article, articles));
 
-		if ( !this.articleValidator.uniqueTitle(article, articles) ) {
-			logger.error("User with id " + userId
-					+ " failed to add article. Reason: title not unique");
-			throw new ArticlesDAOException("Article title must be unique");
-		}
-
-		return transaction(new TransactionalTask<Articles.Article>() {
+		return manager.execute(new TransactionalTask<Articles.Article>() {
 
 			@Override
 			public Article executeTask(EntityManager entityManager) {
 				article.setId(generateArticleId(articles));
 				articles.add(article);
 
-				StatisticsStorage storage = new StatisticsStorage(entityManager);
-				storage.save(userId, UserActivity.CREATE_ARTICLE);
+				commit(userId, entityManager, articles,
+						UserActivity.CREATE_ARTICLE);
 
 				logger.info("User with id " + userId + " created new article.");
 				saveArticles(userId, articles);
@@ -143,29 +159,26 @@ public class ArticlesDAO {
 	 * @param article
 	 *            Article to update
 	 * @return True on success, false otherwise
-	 * @throws ArticlesDAOException
 	 */
 	public boolean updateArticle(final int userId, final Article article) {
 		final List<Article> articles = loadArticles(userId);
 
-		//TODO title unique check ?
-		
-		validateArticle(article);
-		return transaction(new TransactionalTask<Boolean>() {
+		validate(new ArticleValidator(article, articles));
+
+		return manager.execute(new TransactionalTask<Boolean>() {
 
 			@Override
 			public Boolean executeTask(EntityManager entityManager) {
 				for (int i = 0; i < articles.size(); i++) {
 					if (articles.get(i).getId() == article.getId()) {
-						articles.remove(i); //TODO possible ConcurrentModificationException ? [He]
+						articles.remove(i);
 						articles.add(i, article);
 
-						StatisticsStorage storage = new StatisticsStorage(
-								entityManager);
-						storage.save(userId, UserActivity.MODIFY_ARTICLE);
-
-						logger.info("User with id " + userId + " updated article with id " + articles.get(i).getId());
-						saveArticles(userId, articles);
+						commit(userId, entityManager, articles,
+								UserActivity.MODIFY_ARTICLE);
+						logger.info("User with id " + userId
+								+ " updated article with id "
+								+ articles.get(i).getId());
 
 						return true;
 					}
@@ -184,12 +197,11 @@ public class ArticlesDAO {
 	 * @param articleId
 	 *            Article ID
 	 * @return True on success, false otherwise
-	 * @throws ArticlesDAOException
 	 */
 	public boolean deleteArticle(final int userId, final int articleId) {
 		final List<Article> listOfArticles = loadArticles(userId);
 
-		return transaction(new TransactionalTask<Boolean>() {
+		return manager.execute(new TransactionalTask<Boolean>() {
 
 			@Override
 			public Boolean executeTask(EntityManager entityManager) {
@@ -197,13 +209,10 @@ public class ArticlesDAO {
 					if (listOfArticles.get(i).getId() == articleId) {
 						listOfArticles.remove(i);
 
-						StatisticsStorage storage = new StatisticsStorage(
-								entityManager);
-						storage.save(userId, UserActivity.DELETE_ARTICLE);
-
+						commit(userId, entityManager, listOfArticles,
+								UserActivity.DELETE_ARTICLE);
 						logger.info("User with id =" + userId
 								+ " deleted article with id = " + articleId);
-						saveArticles(userId, listOfArticles);
 
 						return true;
 					}
@@ -215,56 +224,6 @@ public class ArticlesDAO {
 		});
 	}
 
-	/**
-	 * Write list of articles in file
-	 * 
-	 * @param userId
-	 *            User ID
-	 * @param articlesList
-	 *            List of articles to write
-	 * @throws ArticlesDAOException
-	 */
-	public void saveArticles(int userId, List<Article> articlesList)
-			throws ArticlesDAOException {
-		Articles article = new Articles();
-		article.setArticle(articlesList);
-		try {
-
-			File file = new File(pathToArticlesFile(userId));
-			JAXBContext jaxbContext = JAXBContext.newInstance(Articles.class);
-
-			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-			jaxbMarshaller.marshal(article, file);
-
-		} catch (JAXBException e) {
-			String message = "Invalid articles file format.";
-			logger.error(message);
-			throw new ArticlesDAOException(message);
-		}
-	}
-
-	/**
-	 * Validate article format
-	 * 
-	 * @param article
-	 *            Article to validate
-	 */
-	private void validateArticle(Article article) {
-		List<MessageKeys> messageKeys = this.articleValidator.validate(article);
-
-		if (messageKeys.size() != 0) {
-			ErrorMessageBuilder builder = new ErrorMessageBuilder(messageKeys);
-			logger.error(builder.getMessage().getMessage());
-
-			throw new ArticlesDAOException(builder.getMessage().getMessage());
-		}
-	}
-	
-	private <T> T transaction(TransactionalTask<T> task) {
-		TransactionManager transactionManager = new TransactionManager();
-		return transactionManager.execute(task);
-	}
-	
 	/**
 	 * Generate unique article id
 	 * 
@@ -283,9 +242,7 @@ public class ArticlesDAO {
 
 		return ++max;
 	}
-	
-	
-	
+
 	/**
 	 * Returns path to articles file of the specified user
 	 * 
@@ -295,5 +252,12 @@ public class ArticlesDAO {
 	 */
 	private String pathToArticlesFile(int userId) {
 		return this.articlesPath + "/" + userId + ".xml";
+	}
+
+	// TODO: Better name
+	private void commit(int userId, EntityManager entityManager,
+			List<Article> listOfArticles, UserActivity activity) {
+		addToStatistics(userId, entityManager, activity);
+		saveArticles(userId, listOfArticles);
 	}
 }

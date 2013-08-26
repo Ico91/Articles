@@ -1,4 +1,4 @@
-package articles.model.dto.validators;
+package articles.validators;
 
 import java.util.List;
 
@@ -10,15 +10,15 @@ import articles.model.dto.ErrorMessage;
  *
  */
 public class ErrorMessageBuilder {
-	private List<MessageKeys> messageKeys;
+	private List<MessageKey> messageKeys;
 	
-	public ErrorMessageBuilder(List<MessageKeys> messageKeys) {
+	public ErrorMessageBuilder(List<MessageKey> messageKeys) {
 		this.messageKeys = messageKeys;
 	}
 	
 	public ErrorMessage getMessage() {
 		StringBuilder stringBuilder = new StringBuilder();
-		for(MessageKeys key : this.messageKeys) {
+		for(MessageKey key : this.messageKeys) {
 			stringBuilder.append(key.getValue());
 			stringBuilder.append(".");
 			stringBuilder.append(System.lineSeparator());

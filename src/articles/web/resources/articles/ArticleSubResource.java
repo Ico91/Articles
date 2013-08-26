@@ -1,7 +1,6 @@
 package articles.web.resources.articles;
 
-import java.util.List;
-
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -12,17 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.log4j.Logger;
-
-import articles.dao.ArticlesDAO;
-import articles.dao.exceptions.ArticlesDAOException;
 import articles.model.Articles.Article;
-import articles.model.dto.ErrorMessage;
-import articles.model.dto.validators.ArticleValidator;
-import articles.model.dto.validators.ErrorMessageBuilder;
-import articles.model.dto.validators.MessageKeys;
-import articles.web.resources.exception.ArticlesResourceException;
-import articles.web.resources.users.UsersResource;
 
 /**
  * Class used to process request to specified article
@@ -30,24 +19,10 @@ import articles.web.resources.users.UsersResource;
  * @author Krasimir Atanasov
  * 
  */
-public class ArticleSubResource {
-	private int userId;
-	private ArticlesDAO dao;
-	private ArticleValidator articleValidator;
-	static final Logger logger = Logger.getLogger(UsersResource.class);
-
-	/**
-	 * Constructs new ArticlesSubResource object
-	 * 
-	 * @param dao
-	 *            Articles data access object
-	 * @param userId
-	 *            ID of logged user
-	 */
-	public ArticleSubResource(ArticlesDAO dao, int userId) {
-		this.userId = userId;
-		this.dao = dao;
-		this.articleValidator = new ArticleValidator();
+public class ArticleSubResource extends ArticlesResourceBase {
+		
+	public ArticleSubResource(HttpServletRequest servletRequest) {
+		super(servletRequest);
 	}
 
 	/**
@@ -60,30 +35,24 @@ public class ArticleSubResource {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getArticle(@PathParam("id") int id) {
-		try {
-			Article article = this.dao.getArticleById(userId, id);
-			if (article != null) {
-				logger.info("User with id = " + userId
-						+ " opened an article with id = " + id + ".");
-				return Response.ok(article, MediaType.APPLICATION_JSON).build();
-			} else {
-				logger.info("User with id = " + userId
-						+ " request article that does not exist.");
-				return Response.status(Status.NOT_FOUND).build();
-			}
+	public Response getArticle(@PathParam("id") int id) {		
+		Article article = this.dao.getArticleById(userId, id);
 
-		} catch (ArticlesDAOException e) {
-			logger.error("User with id = " + userId
-					+ " failed to open an article with id = " + id + ".");
-			throw e;
+		if (article == null) {
+			logger.info("User with id = " + userId
+					+ " request article that does not exist.");
+			return Response.status(Status.NOT_FOUND).build();
+
 		}
+
+		logger.info("User with id = " + userId
+				+ " opened an article with id = " + id + ".");
+		return Response.ok(article, MediaType.APPLICATION_JSON).build();
 	}
 
 	/**
 	 * Update article with specified ID If article with specified ID is found -
-	 * response code 200, else response code 304. If article format is invalid -
-	 * response code 418
+	 * response code 200, else response code 404.
 	 * 
 	 * @param article
 	 *            Article with updated title and/or content
@@ -93,25 +62,33 @@ public class ArticleSubResource {
 	 */
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateArticle(Article article, @PathParam("id") int id) {
-		article.setId(id);
+		article.setId(id);		
 		
-		// TODO Validations
-		
-		boolean result = this.dao.updateArticle(this.userId, article);
-		if (result)
-			logger.info("User with id = " + userId
-					+ " updated an article with id = " + id + ".");
+		Response validationResponse = validationResponse(article);
 
-		return (result) ? Response.ok().build() : Response.status(
-				Status.BAD_REQUEST).build(); // TODO NOT_MODIFIED ?
+		if (validationResponse != null) {
+			logger.info("User with id = " + userId
+					+ " try to update invalid article");
+			return validationResponse;
+		}
+
+		if (!this.dao.updateArticle(this.userId, article)) {
+			logger.info("User with id = " + userId
+					+ " try to update article that does not exist");
+			Response.status(Status.BAD_REQUEST).build();
+		}
+
+		logger.info("User with id = " + userId
+				+ " updated an article with id = " + id + ".");
+		return Response.ok().build();
 
 	}
 
 	/**
 	 * Delete article with specified ID Returns response code 200 when article
-	 * was successfully deleted, response code 404 when article is not found and
-	 * response code 418 if any other error occur
+	 * was successfully deleted, response code 404 when article is not found
 	 * 
 	 * @param id
 	 *            Article ID
@@ -119,22 +96,16 @@ public class ArticleSubResource {
 	 */
 	@DELETE
 	public Response deleteArticle(@PathParam("id") int id) {
-		try {
-			boolean result = this.dao.deleteArticle(userId, id);
-			if (result) {
-				logger.info("User with id = " + userId
-						+ " deleted an article with id = " + id + ".");
 
-				return Response.ok().build();
-			} else {
-				return Response.status(Status.NOT_FOUND).build();
-			}
-
-		} catch (ArticlesDAOException e) {
-			logger.error("User with id = " + userId
-					+ " failed to delete an article with id = " + id + ".");
-			throw e;
+		if (!this.dao.deleteArticle(userId, id)) {
+			logger.info("User with id = " + userId
+					+ " failed to delete article with id " + id);
+			return Response.status(Status.NOT_FOUND).build();
 		}
-	}
 
+		logger.info("User with id = " + userId
+				+ " deleted an article with id = " + id + ".");
+
+		return Response.ok().build();
+	}
 }
