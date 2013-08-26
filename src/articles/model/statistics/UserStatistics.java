@@ -30,6 +30,7 @@ public class UserStatistics {
 	@Column(name="event_date")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date eventDate;
+	@Column(name="user_activity")
 	private UserActivity userActivity;
 	
 	@Override

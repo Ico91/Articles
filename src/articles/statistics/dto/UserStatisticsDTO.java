@@ -16,20 +16,20 @@ import articles.model.statistics.UserActivity;
 @XmlRootElement
 public class UserStatisticsDTO {
 	private Date eventDate;
-	private UserActivity event;
+	private UserActivity userActivity;
 	
 	public UserStatisticsDTO() { }
 
-	public UserStatisticsDTO(Date eventDate, UserActivity event) {
+	public UserStatisticsDTO(Date eventDate, UserActivity userActivity) {
 		this.eventDate = eventDate;
-		this.event = event;
+		this.userActivity = userActivity;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + event.hashCode();
+		result = prime * result + userActivity.hashCode();
 		result = prime * result + eventDate.hashCode();
 		return result;
 	}
@@ -43,7 +43,7 @@ public class UserStatisticsDTO {
 		if (!(obj instanceof UserStatisticsDTO))
 			return false;
 		UserStatisticsDTO other = (UserStatisticsDTO) obj;
-		if (event != other.event)
+		if (userActivity != other.userActivity)
 			return false;
 		if (!eventDate.equals(other.eventDate))
 			return false;
@@ -52,7 +52,7 @@ public class UserStatisticsDTO {
 
 	@Override
 	public String toString() {
-		return "UserStatisticsDTO [eventDate=" + eventDate + ", event=" + event
+		return "UserStatisticsDTO [eventDate=" + eventDate + ", userActivity=" + userActivity
 				+ "]";
 	}
 
@@ -64,11 +64,11 @@ public class UserStatisticsDTO {
 		this.eventDate = eventDate;
 	}
 
-	public UserActivity getEvent() {
-		return event;
+	public UserActivity getuserActivity() {
+		return userActivity;
 	}
 
-	public void setEvent(UserActivity event) {
-		this.event = event;
+	public void setuserActivity(UserActivity userActivity) {
+		this.userActivity = userActivity;
 	}
 }
