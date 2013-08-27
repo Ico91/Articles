@@ -6,13 +6,18 @@ import javax.persistence.Persistence;
 
 import articles.web.listener.ConfigurationListener;
 
-//TODO this name means ?
 public class PersistenceManager {
 	protected static final EntityManagerFactory factory = Persistence
 			.createEntityManagerFactory(ConfigurationListener.PERSISTENCE_NAME);
+	protected static final EntityManagerFactory testFactory = Persistence
+			.createEntityManagerFactory(ConfigurationListener.PERSISTENCE_NAME_TEST);
 	protected EntityManager entityManager;
-	
-	public PersistenceManager() {
+
+	public void initManager() {
 		entityManager = factory.createEntityManager();
+	}
+	
+	public void initTestManager() {
+		entityManager = testFactory.createEntityManager();
 	}
 }

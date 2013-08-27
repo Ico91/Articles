@@ -6,3 +6,4 @@ src/META-INF/persistence.xml
 .classpath
 bin/
 /src/log4j.properties
+derby.log

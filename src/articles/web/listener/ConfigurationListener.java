@@ -23,7 +23,7 @@ public class ConfigurationListener implements HttpSessionListener, ServletContex
 	private static final String CONFIGURATION_PATH = "WEB-INF/config.properties";
 	public static final String USERID = "userId";
 	public static final String PERSISTENCE_NAME = "UserPE";
-	public static final String PERSISTENCE_NAME_TEST = "UserPE";
+	public static final String PERSISTENCE_NAME_TEST = "TestPE";
 	private static String path = "";
 	private Logger logger = Logger.getLogger( getClass() );
 	
