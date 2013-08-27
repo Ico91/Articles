@@ -152,14 +152,40 @@ public class UserDAO extends DAOBase {
 				updateUserQuery.setParameter("password", user.getPassword());
 				updateUserQuery.setParameter("userType", user.getUserType());
 				updateUserQuery.setParameter("userId", userId);
-				try {
-					updateUserQuery.executeUpdate();
-					return true;
-				} catch (PersistenceException e) {
-					logger.error("Error while updating an user.");
-					throw new DAOException(TRANSACTION_ERROR);
+				User user = getUserById(userId);
+				if (user != null) {
+					try {
+						updateUserQuery.executeUpdate();
+						return true;
+					} catch (PersistenceException e) {
+						logger.error("Error while updating an user.");
+						throw new DAOException(TRANSACTION_ERROR);
+					}
+				} else {
+					return false;
 				}
-				
+			}
+		});
+	}
+	
+	public boolean deleteUser(final int userId) {
+		return manager.execute(new TransactionalTask<Boolean>() {
+			@Override
+			public Boolean executeTask(EntityManager entityManager) throws PersistenceException {
+				Query updateLastLoginQuery = entityManager.createQuery("DELETE FROM User u WHERE u.userId = :userId");
+				updateLastLoginQuery.setParameter("userId", userId);
+				User user = getUserById(userId);
+				if (user != null) {
+					try {
+						updateLastLoginQuery.executeUpdate();
+						return true;
+					} catch (PersistenceException e) {
+						logger.error("Error while deleting an user.");
+						throw new DAOException(TRANSACTION_ERROR);
+					}
+				} else {
+					return false;
+				}
 			}
 		});
 	}

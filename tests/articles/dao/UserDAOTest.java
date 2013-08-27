@@ -46,7 +46,7 @@ public class UserDAOTest {
 		});
 	}
 	
-	@Test
+	/*@Test
 	public void findTest() {
 		LoginRequest loginRequest = new LoginRequest();
 		loginRequest.setUsername("admin");
@@ -61,22 +61,29 @@ public class UserDAOTest {
 		NewUserRequest newUser = new NewUserRequest("guest", "122", UserType.USER);
 		userDAO.addUser(newUser);
 		System.out.println(userDAO.getUsers());
-	}
+	}*/
 	
 	
 	
 	@Test
 	public void updateUser() {
+		System.out.println(userDAO.getUserById(2));
 		User updateUser = new User(3, "admin", "222", UserType.ADMIN);
 		userDAO.updateUser(3, updateUser);
 		System.out.println(userDAO.getUserById(3) + " update");
 	}
 	
-	@Test
+	/*@Test
 	public void getUserByIdTest() {
 		System.out.println(userDAO.getUserById(3));
 	}
 	
+	@Test
+	public void deleteTest() {
+		userDAO.deleteUser(3);
+		System.out.println(userDAO.getUsers());
+	}
+	*/
 	@AfterClass
     public static void tearDown() throws Exception {
 		userDAO.manager.execute(new TransactionalTask<Boolean>() {
