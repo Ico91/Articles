@@ -23,7 +23,6 @@ public class DAOBase {
 	protected TransactionManager manager;
 	protected Logger logger;
 
-	// TODO: logger initialization ?
 	public DAOBase() {
 		this.manager = new TransactionManager();
 		this.manager.initManager();
@@ -54,6 +53,5 @@ public class DAOBase {
 
 			throw new DAOException(builder.getMessage().getMessage());
 		}
-		validator.validate();
 	}
 }
