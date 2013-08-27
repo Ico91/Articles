@@ -9,8 +9,7 @@ import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
 
-import articles.dao.exceptions.PersistenceDAOException;
-import articles.database.transactions.TransactionManager;
+import articles.dao.exceptions.DAOException;
 import articles.database.transactions.TransactionalTask;
 import articles.model.User;
 import articles.model.statistics.UserActivity;
@@ -24,9 +23,13 @@ public class UserDAO extends DAOBase {
 	private static final String LOGIN_QUERY = 
 			"SELECT u FROM User u WHERE u.username = :username AND u.password = :password";
 	private static final String UPDATE_QUERY = "UPDATE User u SET u.lastLogin = :lastLogin WHERE u.userId = :userId";
+	private static final String NOT_FOUND = "No user found";
+	private static final String MULTIPLE_RESULTS = "More than one users found for specified usernam";
+	private static final String TRANSACTION_ERROR = "Problem occurs in the transaction.";
 	
 	/**
-	 * Searches if a user with the entered username and password exists and returns it as a result. Otherwise returns as a result null.
+	 * Searches if a user with the entered username and password exists and returns it as a result.
+	 * Otherwise returns as a result null.
 	 * @param username
 	 * @param password
 	 * @return
@@ -51,34 +54,29 @@ public class UserDAO extends DAOBase {
 				List<User> users = (List<User>) selectUserQuery.getResultList();
 				
 				if (users.isEmpty()) {
-					logger.info( "No user found" );
+					logger.info(NOT_FOUND);
 					return null;
 				}
 				
-				//TODO re-factor in separate method
 				if ( users.size() > 1 ) {
-					throw new PersistenceDAOException( "More than one users found for specified username" );
+					logger.info(MULTIPLE_RESULTS);
+					throw new DAOException(MULTIPLE_RESULTS);
 				}
 				
 				User user = users.get(0);
 				
-				addStatistics(userActivity, entityManager, user);
+				addToStatistics(user.getUserId(), entityManager, userActivity);
 				
 				return user;
 			}
 
-			//TODO consider void addStatistics( User user, UserActivity userActivity ) {
-			
-			private void addStatistics(final UserActivity userActivity, EntityManager entityManager, User user) {
-				StatisticsStorage statisticsStorage = new StatisticsStorage(entityManager);
-				statisticsStorage.save( user.getUserId(), userActivity);
-			}
 		});
 		return user;
 	}
 	
 	/**
 	 * Updates the date when the user with the specific ID last logged in.
+	 * Returns true on success, otherwise throws an exception.
 	 * @param lastLogin
 	 * @param userId
 	 */
@@ -91,14 +89,14 @@ public class UserDAO extends DAOBase {
 				Query updateLastLoginQuery = entityManager.createQuery(UPDATE_QUERY);
 				updateLastLoginQuery.setParameter("lastLogin", lastLogin);
 				updateLastLoginQuery.setParameter("userId", userId);
+				
 				try {
 					updateLastLoginQuery.executeUpdate();
-					logger.info("Last login date for user with id = " + userId + " is updated.");
 					return true;
 				} catch (PersistenceException e) {
-					throw new PersistenceDAOException(
-							"Error while updating the last login date for user with user id = "
+					logger.error("Error while updating the last login date for user with user id = "
 									+ userId);
+					throw new DAOException(TRANSACTION_ERROR);
 				}
 			}
 
@@ -115,8 +113,9 @@ public class UserDAO extends DAOBase {
 				try {
 					statisticsStorage.save(userId, userActivity);
 					
-				} catch(Exception e) {
-					throw new PersistenceDAOException(e.getMessage());
+				} catch(PersistenceException e) {
+					logger.error("Error when user with id = " + userId + " logged out." );
+					throw new DAOException(TRANSACTION_ERROR);
 				}
 				
 				return true;
