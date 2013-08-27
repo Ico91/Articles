@@ -72,7 +72,7 @@ class StatisticsStorage {
 
 		SimpleDateFormat databaseFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Query selectQuery = entityManager
-				.createNativeQuery("SELECT user_activity, event_date FROM statistics WHERE DATE(event_date) = ?1 AND userid = ?2");
+				.createNativeQuery("SELECT user_activity, activity_date FROM statistics WHERE DATE(activity_date) = ?1 AND userid = ?2");
 		selectQuery.setParameter(1, databaseFormat.format(date));
 		selectQuery.setParameter(2, userId);
 		try {
