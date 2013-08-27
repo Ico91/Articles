@@ -21,10 +21,10 @@ import articles.model.statistics.UserActivity;
  */
 public class UserDAO extends DAOBase {	
 	private static final String LOGIN_QUERY = 
-			"SELECT u FROM User u WHERE u.username = :username AND u.password = :password";
-	private static final String UPDATE_QUERY = "UPDATE User u SET u.lastLogin = :lastLogin WHERE u.userId = :userId";
-	private static final String NOT_FOUND = "No user found";
-	private static final String MULTIPLE_RESULTS = "More than one users found for specified usernam";
+			"SELECT u FROM User u WHERE u.username = :username AND u.password = :password.";
+	private static final String UPDATE_QUERY = "UPDATE User u SET u.lastLogin = :lastLogin WHERE u.userId = :userId.";
+	private static final String NOT_FOUND = "No user found.";
+	private static final String MULTIPLE_RESULTS = "More than one users found for specified username.";
 	private static final String TRANSACTION_ERROR = "Problem occurs in the transaction.";
 	
 	/**
