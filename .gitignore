@@ -5,3 +5,4 @@
 bin/
 /src/META-INF/persistence.xml
 /src/log4j.properties
+src/META-INF/persistence.xml
