@@ -63,9 +63,17 @@ public class UserDAOTest {
 		System.out.println(userDAO.getUsers());
 	}
 	
+	
+	
+	@Test
+	public void updateUser() {
+		User updateUser = new User(3, "admin", "222", UserType.ADMIN);
+		userDAO.updateUser(3, updateUser);
+		System.out.println(userDAO.getUserById(3) + " update");
+	}
+	
 	@Test
 	public void getUserByIdTest() {
-		
 		System.out.println(userDAO.getUserById(3));
 	}
 	

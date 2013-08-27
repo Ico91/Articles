@@ -102,28 +102,6 @@ public class UserDAO extends DAOBase {
 		return user;
 	}
 	
-	/**
-	 * Updates the date when the user with the specific ID last logged in.
-	 * Returns true on success, otherwise throws an exception.
-	 * @param lastLogin
-	 * @param userId
-	 */
-	
-	private boolean updateLastLogin(final int userId, final Date loginDate, final EntityManager entityManager) {
-			Query updateLastLoginQuery = entityManager.createQuery(UPDATE_QUERY);
-			updateLastLoginQuery.setParameter("lastLogin", loginDate);
-			updateLastLoginQuery.setParameter("userId", userId);
-			
-			try {
-				updateLastLoginQuery.executeUpdate();
-				return true;
-			} catch (PersistenceException e) {
-				logger.error("Error while updating the last login date for user with user id = "
-								+ userId + ".");
-				throw new DAOException(TRANSACTION_ERROR);
-			}
-	}
-	
 	public List<User> getUsers() {
 		List<User> users = manager.execute(new TransactionalTask<List<User>>() {
 			@SuppressWarnings("unchecked")
@@ -165,18 +143,26 @@ public class UserDAO extends DAOBase {
 		});
 	}
 	
-	/*
-	 * public User getUserById(int userId) {
-		Query selectUserQuery = this.entityManager.createQuery("SELECT u FROM User u WHERE u.userId = :userId");
-		selectUserQuery.setParameter("userId", userId);
-		 try {
-			 User user = (User) selectUserQuery.getSingleResult();
-			 return user;
-		} catch (NoResultException nre) {
-			return null;
-		}
+	public boolean updateUser(final int userId, final User user) {
+		return manager.execute(new TransactionalTask<Boolean>() {
+			@Override
+			public Boolean executeTask(EntityManager entityManager) throws PersistenceException {
+				Query updateUserQuery = entityManager.createQuery("UPDATE User u SET u.username = :username, u.password = :password, u.userType = :userType WHERE u.userId = :userId");
+				updateUserQuery.setParameter("username", user.getUsername());
+				updateUserQuery.setParameter("password", user.getPassword());
+				updateUserQuery.setParameter("userType", user.getUserType());
+				updateUserQuery.setParameter("userId", userId);
+				try {
+					updateUserQuery.executeUpdate();
+					return true;
+				} catch (PersistenceException e) {
+					logger.error("Error while updating an user.");
+					throw new DAOException(TRANSACTION_ERROR);
+				}
+				
+			}
+		});
 	}
-	 */
 	
 	/**
 	 * Logs out a user with specific id and stores statistic information about the activity.
@@ -204,4 +190,25 @@ public class UserDAO extends DAOBase {
 		});
 	}
 
+	/**
+	 * Updates the date when the user with the specific ID last logged in.
+	 * Returns true on success, otherwise throws an exception.
+	 * @param lastLogin
+	 * @param userId
+	 */
+	
+	private boolean updateLastLogin(final int userId, final Date loginDate, final EntityManager entityManager) {
+			Query updateLastLoginQuery = entityManager.createQuery(UPDATE_QUERY);
+			updateLastLoginQuery.setParameter("lastLogin", loginDate);
+			updateLastLoginQuery.setParameter("userId", userId);
+			
+			try {
+				updateLastLoginQuery.executeUpdate();
+				return true;
+			} catch (PersistenceException e) {
+				logger.error("Error while updating the last login date for user with user id = "
+								+ userId + ".");
+				throw new DAOException(TRANSACTION_ERROR);
+			}
+	}
 }
