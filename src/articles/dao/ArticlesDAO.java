@@ -14,8 +14,8 @@ import org.apache.log4j.Logger;
 import articles.dao.exceptions.DAOException;
 import articles.database.transactions.TransactionalTask;
 import articles.model.Articles;
+import articles.model.UserActivity;
 import articles.model.Articles.Article;
-import articles.model.statistics.UserActivity;
 import articles.validators.ArticleValidator;
 
 /**

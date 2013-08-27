@@ -14,7 +14,7 @@ import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
 
 import articles.dao.StatisticsDAO;
-import articles.statistics.dto.UserStatisticsDTO;
+import articles.model.dto.UserStatisticsDTO;
 import articles.web.listener.ConfigurationListener;
 
 /**

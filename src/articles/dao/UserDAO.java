@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 import articles.dao.exceptions.DAOException;
 import articles.database.transactions.TransactionalTask;
 import articles.model.User;
-import articles.model.statistics.UserActivity;
+import articles.model.UserActivity;
 
 /**
  * Provides access for manipulation of users data.

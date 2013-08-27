@@ -1,4 +1,4 @@
-package articles.model.statistics;
+package articles.model;
 
 import java.util.Date;
 

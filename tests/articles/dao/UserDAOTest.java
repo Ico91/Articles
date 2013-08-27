@@ -13,9 +13,9 @@ import org.junit.Test;
 
 import articles.database.transactions.TransactionalTask;
 import articles.model.User;
+import articles.model.UserActivity;
 import articles.model.UserType;
 import articles.model.dto.LoginRequest;
-import articles.model.statistics.UserActivity;
 
 public class UserDAOTest {
 	private User actualUser;
