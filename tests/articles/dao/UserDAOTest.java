@@ -57,10 +57,16 @@ public class UserDAOTest {
 	}
 	
 	@Test
-	public void addUser() {
+	public void addUserTest() {
 		NewUserRequest newUser = new NewUserRequest("guest", "122", UserType.USER);
 		userDAO.addUser(newUser);
 		System.out.println(userDAO.getUsers());
+	}
+	
+	@Test
+	public void getUserByIdTest() {
+		
+		System.out.println(userDAO.getUserById(3));
 	}
 	
 	@AfterClass

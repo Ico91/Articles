@@ -77,6 +77,31 @@ public class UserDAO extends DAOBase {
 		return user;
 	}
 	
+	public User getUserById(final int userId) {
+		User user = manager.execute(new TransactionalTask<User>() {
+			
+			@SuppressWarnings("unchecked")
+			@Override
+			public User executeTask(EntityManager entityManager) throws PersistenceException {
+				Query selectUserQuery = entityManager.createQuery("SELECT u FROM User u WHERE u.userId = :userId");
+				selectUserQuery.setParameter("userId", userId);
+				
+				List<User> users = (List<User>) selectUserQuery.getResultList();
+				
+				if (users.isEmpty()) {
+					logger.info(NOT_FOUND);
+					return null;
+				}
+				
+				User user = users.get(0);
+				
+				return user;
+			}
+		});
+		
+		return user;
+	}
+	
 	/**
 	 * Updates the date when the user with the specific ID last logged in.
 	 * Returns true on success, otherwise throws an exception.
@@ -139,6 +164,19 @@ public class UserDAO extends DAOBase {
 			}
 		});
 	}
+	
+	/*
+	 * public User getUserById(int userId) {
+		Query selectUserQuery = this.entityManager.createQuery("SELECT u FROM User u WHERE u.userId = :userId");
+		selectUserQuery.setParameter("userId", userId);
+		 try {
+			 User user = (User) selectUserQuery.getSingleResult();
+			 return user;
+		} catch (NoResultException nre) {
+			return null;
+		}
+	}
+	 */
 	
 	/**
 	 * Logs out a user with specific id and stores statistic information about the activity.
