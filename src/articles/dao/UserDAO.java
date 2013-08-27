@@ -95,7 +95,7 @@ public class UserDAO extends DAOBase {
 					return true;
 				} catch (PersistenceException e) {
 					logger.error("Error while updating the last login date for user with user id = "
-									+ userId);
+									+ userId + ".");
 					throw new DAOException(TRANSACTION_ERROR);
 				}
 			}
@@ -114,7 +114,7 @@ public class UserDAO extends DAOBase {
 					statisticsStorage.save(userId, userActivity);
 					
 				} catch(PersistenceException e) {
-					logger.error("Error when user with id = " + userId + " logged out." );
+					logger.error("Error when user with id = " + userId + " logged out.");
 					throw new DAOException(TRANSACTION_ERROR);
 				}
 				
