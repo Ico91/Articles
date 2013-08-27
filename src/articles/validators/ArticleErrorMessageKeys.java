@@ -1,6 +1,6 @@
-package articles.model.dto.validators;
+package articles.validators;
 
-public enum MessageKeys {
+public enum ArticleErrorMessageKeys implements MessageKey{
 	
 	TITLE_IS_NULL("Article title is null"),
 	TITLE_IS_EMPTY("Article title is empty"),
@@ -10,10 +10,11 @@ public enum MessageKeys {
 	
 	private String value;
 	
-	private MessageKeys(String value) {
+	private ArticleErrorMessageKeys(String value) {
 		this.value = value;
 	}
 	
+	@Override
 	public String getValue() {
 		return this.value;
 	}

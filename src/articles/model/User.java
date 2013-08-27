@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -31,6 +32,7 @@ public class User {
 	@Column(name="last_login")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date lastLogin;
+	@Enumerated(EnumType.STRING)
 	private UserType userType;
 	
 	public User() {
@@ -48,7 +50,7 @@ public class User {
 	public String toString() {
 		return "User [userId=" + userId + ", username=" + username
 				+ ", password=" + password + ", lastLogin=" + lastLogin
-				+ ", type=" + userType+ "]";
+				+ ", type=" + userType + "]";
 	}
 
 	@Override

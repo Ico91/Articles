@@ -14,18 +14,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
-import org.apache.log4j.Logger;
-
-import articles.dao.ArticlesDAO;
 import articles.model.Articles.Article;
-import articles.model.dto.ErrorMessage;
-import articles.model.dto.validators.ArticleValidator;
-import articles.model.dto.validators.ErrorMessageBuilder;
-import articles.model.dto.validators.MessageKeys;
-import articles.web.listener.ConfigurationListener;
-import articles.web.resources.exception.ArticlesResourceException;
 
 /**
  * Class used to process article requests
@@ -34,20 +24,10 @@ import articles.web.resources.exception.ArticlesResourceException;
  * 
  */
 @Path("")
-public class ArticlesResource {
-	private static final Logger logger = Logger
-			.getLogger(ArticlesResource.class);
-	@Context
-	HttpServletRequest servletRequest;
-
-	// TODO potential thread issues here
-	private List<Article> articles;
-	private ArticlesDAO dao;
-	private ArticleValidator validator;
-
-	public ArticlesResource() {
-		this.validator = new ArticleValidator();
-		this.dao = new ArticlesDAO(articlesPath());
+public class ArticlesResource extends ArticlesResourceBase {
+	
+	public ArticlesResource(@Context HttpServletRequest serlvetRequest) {
+		super(serlvetRequest);
 	}
 
 	/**
@@ -61,8 +41,6 @@ public class ArticlesResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Article> getArticles(@QueryParam("search") String searchTerm) {
-		this.articles = this.dao.loadArticles(getUserId());
-
 		if (searchTerm == null) {
 			return this.articles;
 		} else {
@@ -77,33 +55,22 @@ public class ArticlesResource {
 	 * @param article
 	 *            Article to add
 	 * @return Added article with generated unique article ID
-	 * @throws ArticlesResourceException
 	 */
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response add(Article article) throws ArticlesResourceException {
-		List<MessageKeys> messageKeys = this.validator.validate(article);
-		if (!messageKeys.isEmpty()) {
-			logger.error("User with id = " + getUserId()
-					+ " failed to create an article.");
-			return Response.status(Status.BAD_REQUEST)
-					.entity(new ErrorMessageBuilder(messageKeys).getMessage())
-					.build();
+	public Response add(Article article) {
+		Response validationResponse = validationResponse(article);
+
+		if (validationResponse != null) {
+			logger.info("User with id = " + this.userId
+					+ " try to add invalid article");
+			return validationResponse;
 		}
 
-		if (!this.validator.uniqueTitle(article,
-				this.dao.loadArticles(getUserId()))) {
-			logger.error("User with id = " + getUserId()
-					+ " failed to create an article.");
-			return Response.status(Status.BAD_REQUEST)
-					.entity(new ErrorMessage("Article title must be unique"))
-					.build();
-		}
+		article = this.dao.addArticle(userId, article);
 
-		article = this.dao.addArticle(getUserId(), article);
-
-		logger.info("User with id = " + getUserId() + " created an article.");
+		logger.info("User with id = " + this.userId + " created an article.");
 		return Response.ok(article, MediaType.APPLICATION_JSON).build();
 	}
 
@@ -117,25 +84,7 @@ public class ArticlesResource {
 	 */
 	@Path("{id}")
 	public ArticleSubResource getArticle(@PathParam("id") int id) {
-		return new ArticleSubResource(this.dao, getUserId());
-	}
-
-	/**
-	 * Read the articles directory from configuration file
-	 * 
-	 * @return
-	 * @throws ArticlesResourceException
-	 */
-	private String articlesPath() {
-		String path = ConfigurationListener.getPath();
-
-		if (path == null) {
-			String message = "Cannot read articles file path.";
-			logger.error(message);
-			throw new RuntimeException(message);
-		}
-
-		return path;
+		return new ArticleSubResource(this.servletRequest);
 	}
 
 	/**
@@ -161,14 +110,5 @@ public class ArticlesResource {
 		}
 
 		return articlesToReturn;
-	}
-
-	/**
-	 * Get user ID from session
-	 * 
-	 * @return User ID
-	 */
-	private int getUserId() {
-		return (int) servletRequest.getSession().getAttribute("userId");
 	}
 }
