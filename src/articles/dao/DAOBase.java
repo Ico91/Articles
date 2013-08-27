@@ -23,7 +23,6 @@ public class DAOBase {
 	protected TransactionManager manager;
 	protected Logger logger;
 
-	// TODO: logger initialization ?
 	public DAOBase() {
 		this.manager = new TransactionManager();
 		this.logger = Logger.getLogger(getClass());
