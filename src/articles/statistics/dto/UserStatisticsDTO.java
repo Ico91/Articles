@@ -15,13 +15,13 @@ import articles.model.statistics.UserActivity;
  */
 @XmlRootElement
 public class UserStatisticsDTO {
-	private Date eventDate;
+	private Date activityDate;
 	private UserActivity userActivity;
 	
 	public UserStatisticsDTO() { }
 
-	public UserStatisticsDTO(Date eventDate, UserActivity userActivity) {
-		this.eventDate = eventDate;
+	public UserStatisticsDTO(Date activityDate, UserActivity userActivity) {
+		this.activityDate = activityDate;
 		this.userActivity = userActivity;
 	}
 
@@ -30,7 +30,7 @@ public class UserStatisticsDTO {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + userActivity.hashCode();
-		result = prime * result + eventDate.hashCode();
+		result = prime * result + activityDate.hashCode();
 		return result;
 	}
 
@@ -45,23 +45,23 @@ public class UserStatisticsDTO {
 		UserStatisticsDTO other = (UserStatisticsDTO) obj;
 		if (userActivity != other.userActivity)
 			return false;
-		if (!eventDate.equals(other.eventDate))
+		if (!activityDate.equals(other.activityDate))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "UserStatisticsDTO [eventDate=" + eventDate + ", userActivity=" + userActivity
+		return "UserStatisticsDTO [activityDate=" + activityDate + ", userActivity=" + userActivity
 				+ "]";
 	}
 
-	public Date getEventDate() {
-		return eventDate;
+	public Date getactivityDate() {
+		return activityDate;
 	}
 
-	public void setEventDate(Date eventDate) {
-		this.eventDate = eventDate;
+	public void setactivityDate(Date activityDate) {
+		this.activityDate = activityDate;
 	}
 
 	public UserActivity getuserActivity() {

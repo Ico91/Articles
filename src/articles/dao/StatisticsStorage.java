@@ -42,7 +42,7 @@ class StatisticsStorage {
 	public void save(final int userId, final UserActivity event)
 			throws PersistenceDAOException {
 		UserStatistics statistics = new UserStatistics();
-		statistics.setDate(new Date());
+		statistics.setActivityDate(new Date());
 		statistics.setUserActivity(event);
 		statistics.setUserId(userId);
 		try {

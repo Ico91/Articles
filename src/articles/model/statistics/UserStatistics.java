@@ -29,7 +29,7 @@ public class UserStatistics {
 	private int userId;
 	@Column(name="event_date")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date eventDate;
+	private Date activityDate;
 	@Column(name="user_activity")
 	private UserActivity userActivity;
 	
@@ -54,7 +54,7 @@ public class UserStatistics {
 
 	@Override
 	public String toString() {
-		return "Statistics [eventId=" + eventId + ", eventDate=" + eventDate + ", event="
+		return "Statistics [eventId=" + eventId + ", activityDate=" + activityDate + ", event="
 				+ userActivity + "]";
 	}
 
@@ -74,12 +74,12 @@ public class UserStatistics {
 		this.userId = userId;
 	}
 
-	public Date getDate() {
-		return eventDate;
+	public Date getActivityDate() {
+		return activityDate;
 	}
 
-	public void setDate(Date eventDate) {
-		this.eventDate = eventDate;
+	public void setActivityDate(Date activityDate) {
+		this.activityDate = activityDate;
 	}
 
 	public UserActivity getEvent() {
