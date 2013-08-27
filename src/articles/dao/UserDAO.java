@@ -1,5 +1,6 @@
 package articles.dao;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import org.apache.log4j.Logger;
 import articles.dao.exceptions.DAOException;
 import articles.database.transactions.TransactionalTask;
 import articles.model.User;
+import articles.model.dto.NewUserRequest;
 import articles.model.statistics.UserActivity;
 
 /**
@@ -28,11 +30,10 @@ public class UserDAO extends DAOBase {
 	private static final String TRANSACTION_ERROR = "Problem occurs in the transaction.";
 	
 	/**
-	 * Searches if a user with the entered username and password exists and returns it as a result.
-	 * Otherwise returns as a result null.
+	 * Searches if a user with the entered username and password exists.
 	 * @param username
 	 * @param password
-	 * @return
+	 * @return Existing user or null.
 	 */
 	
 	public UserDAO() {
@@ -98,6 +99,49 @@ public class UserDAO extends DAOBase {
 			}
 	}
 	
+	public List<User> getUsers() {
+		List<User> users = manager.execute(new TransactionalTask<List<User>>() {
+			@SuppressWarnings("unchecked")
+			@Override
+			public List<User> executeTask(EntityManager entityManager) throws PersistenceException {
+				List<User> users = new ArrayList<User>();
+				Query selectUsersQuery = entityManager.createQuery("SELECT u from User u");
+				users = (List<User>) selectUsersQuery.getResultList();
+				
+				if (users.isEmpty()) {
+					logger.info(NOT_FOUND);
+					return null;
+				}
+				
+				return users;
+			}
+		});
+		
+		return users;
+	}
+	
+	public boolean addUser(final NewUserRequest newUser) {
+		return manager.execute(new TransactionalTask<Boolean>() {
+			@Override
+			public Boolean executeTask(EntityManager entityManager) throws PersistenceException {
+				
+				try {
+					entityManager.persist(newUser);
+				} catch (PersistenceException e) {
+					logger.error("Error while adding a new user");
+					throw new DAOException(TRANSACTION_ERROR);
+				}
+				return true;
+			}
+		});
+	}
+	
+	/**
+	 * Logs out a user with specific id and stores statistic information about the activity.
+	 * @param userId
+	 * @param userActivity
+	 * @return true on success
+	 */
 	public boolean exitUser(final int userId, final UserActivity userActivity) {
 		return manager.execute(new TransactionalTask<Boolean>() {
 			
