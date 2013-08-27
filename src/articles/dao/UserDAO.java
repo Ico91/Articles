@@ -39,7 +39,7 @@ public class UserDAO extends DAOBase {
 		logger = Logger.getLogger(getClass());
 	}
 	
-	public User login(final String username, final String password, final UserActivity userActivity) {
+	public User login(final String username, final String password, final UserActivity userActivity,  final Date loginDate) {
 		
 		User user = manager.execute(new TransactionalTask<User>() {
 			
@@ -64,8 +64,10 @@ public class UserDAO extends DAOBase {
 				}
 				
 				User user = users.get(0);
+				int userId = user.getUserId();
 				
-				addToStatistics(user.getUserId(), entityManager, userActivity);
+				addToStatistics(userId, entityManager, userActivity);
+				updateLastLogin(userId, loginDate, entityManager);
 				
 				return user;
 			}
@@ -81,26 +83,19 @@ public class UserDAO extends DAOBase {
 	 * @param userId
 	 */
 	
-	public boolean updateLastLogin(final Date lastLogin, final int userId) {
-		return manager.execute(new TransactionalTask<Boolean>() {
-
-			@Override
-			public Boolean executeTask(EntityManager entityManager) {
-				Query updateLastLoginQuery = entityManager.createQuery(UPDATE_QUERY);
-				updateLastLoginQuery.setParameter("lastLogin", lastLogin);
-				updateLastLoginQuery.setParameter("userId", userId);
-				
-				try {
-					updateLastLoginQuery.executeUpdate();
-					return true;
-				} catch (PersistenceException e) {
-					logger.error("Error while updating the last login date for user with user id = "
-									+ userId + ".");
-					throw new DAOException(TRANSACTION_ERROR);
-				}
+	private boolean updateLastLogin(final int userId, final Date loginDate, final EntityManager entityManager) {
+			Query updateLastLoginQuery = entityManager.createQuery(UPDATE_QUERY);
+			updateLastLoginQuery.setParameter("lastLogin", loginDate);
+			updateLastLoginQuery.setParameter("userId", userId);
+			
+			try {
+				updateLastLoginQuery.executeUpdate();
+				return true;
+			} catch (PersistenceException e) {
+				logger.error("Error while updating the last login date for user with user id = "
+								+ userId + ".");
+				throw new DAOException(TRANSACTION_ERROR);
 			}
-
-		});
 	}
 	
 	public boolean exitUser(final int userId, final UserActivity userActivity) {

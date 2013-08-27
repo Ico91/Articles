@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import articles.web.listener.ConfigurationListener;
+
 public class AccessFilter implements Filter {
 
 	@Override
@@ -25,8 +27,7 @@ public class AccessFilter implements Filter {
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpSession session = req.getSession(false);
 
-		//TODO use predefined user key here
-		if ( session != null && session.getAttribute("userId") != null ) {
+		if ( session != null && session.getAttribute(ConfigurationListener.USERID) != null ) {
 			chain.doFilter(req, resp);
 			return;	
 		}
