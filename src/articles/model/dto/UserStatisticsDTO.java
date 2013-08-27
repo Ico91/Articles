@@ -1,10 +1,10 @@
-package articles.statistics.dto;
+package articles.model.dto;
 
 import java.util.Date;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import articles.model.statistics.UserActivity;
+import articles.model.UserActivity;
 
 /**
  * Transport object for the UserStatistics class, which contains only the event

@@ -19,9 +19,9 @@ import org.apache.log4j.Logger;
 
 import articles.dao.UserDAO;
 import articles.model.User;
+import articles.model.UserActivity;
 import articles.model.dto.LoginRequest;
 import articles.model.dto.UserDTO;
-import articles.model.statistics.UserActivity;
 import articles.web.listener.ConfigurationListener;
 
 /**Class for performing user requests

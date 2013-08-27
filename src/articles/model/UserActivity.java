@@ -1,4 +1,4 @@
-package articles.model.statistics;
+package articles.model;
 
 public enum UserActivity {
 	LOGIN(1), LOGOUT(2), CREATE_ARTICLE(3), MODIFY_ARTICLE(4), DELETE_ARTICLE(5);

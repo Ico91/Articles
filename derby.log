@@ -1,13 +1,26 @@
 ----------------------------------------------------------------
-Tue Aug 27 11:24:06 EEST 2013:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.1.1 - (1458268): instance a816c00e-0140-bedf-6474-00000146a6e0 
-on database directory /home/stinky/Desktop/TestDb with class loader sun.misc.Launcher$AppClassLoader@7e5284e9 
-Loaded from file:/opt/Derby/lib/derby.jar
+Tue Aug 27 14:47:09 EEST 2013:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.1.1 - (1458268): instance a816c00e-0140-bf99-4b23-00000342e148 
+on database directory D:\GitHub\Articles\userArticles with class loader sun.misc.Launcher$AppClassLoader@1b1f1f12 
+Loaded from file:/D:/GitHub/Articles/WebContent/WEB-INF/lib/derby.jar
 java.vendor=Oracle Corporation
-java.runtime.version=1.7.0_25-b30
-user.dir=/home/stinky/Desktop/Projects/Articles
-os.name=Linux
+java.runtime.version=1.7.0_17-b02
+user.dir=D:\GitHub\Articles
+os.name=Windows 8
 os.arch=amd64
-os.version=3.8.0-29-generic
+os.version=6.2
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
+----------------------------------------------------------------
+Tue Aug 27 14:47:10 EEST 2013:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.1.1 - (1458268): instance b8450018-0140-bf99-4b23-00000342e148 
+on database directory D:\GitHub\Articles\testArticles with class loader sun.misc.Launcher$AppClassLoader@1b1f1f12 
+Loaded from file:/D:/GitHub/Articles/WebContent/WEB-INF/lib/derby.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.7.0_17-b02
+user.dir=D:\GitHub\Articles
+os.name=Windows 8
+os.arch=amd64
+os.version=6.2
 derby.system.home=null
 Database Class Loader started - derby.database.classpath=''

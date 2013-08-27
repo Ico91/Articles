@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 
 import articles.dao.exceptions.DAOException;
 import articles.database.transactions.TransactionManager;
-import articles.model.statistics.UserActivity;
+import articles.model.UserActivity;
 import articles.validators.ErrorMessageBuilder;
 import articles.validators.MessageKey;
 import articles.validators.Validator;
