@@ -1,8 +1,8 @@
+/src/META-INF/persistence.xml
+src/META-INF/persistence.xml
 /.settings
 /build
 /WebContent/WEB-INF/config.properties
 .classpath
 bin/
-/src/META-INF/persistence.xml
 /src/log4j.properties
-src/META-INF/persistence.xml
