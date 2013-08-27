@@ -2,9 +2,9 @@ package articles.model;
 
 
 public enum UserType {
-	ADMIN, USER;
+	ADMIN(0), USER(1);
 	
-	/*private int value;
+	private int value;
 	
 	private UserType(int value) {
 		this.value = value;
@@ -12,6 +12,6 @@ public enum UserType {
 	
 	public int getValue() {
 		return value;
-	}*/
+	}
 	
 }

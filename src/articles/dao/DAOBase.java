@@ -26,6 +26,7 @@ public class DAOBase {
 	// TODO: logger initialization ?
 	public DAOBase() {
 		this.manager = new TransactionManager();
+		this.manager.initManager();
 		this.logger = Logger.getLogger(getClass());
 	}
 
