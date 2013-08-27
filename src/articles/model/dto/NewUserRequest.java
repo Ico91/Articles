@@ -5,27 +5,34 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import articles.model.UserType;
+
 @XmlRootElement(name = "request")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class NewUserRequest extends LoginRequest{
 	@XmlElement(required = true)
-	private int type;
+	private UserType userType;
 	
 	public NewUserRequest() {
 		
 	}
-
-	public int getType() {
-		return type;
+	
+	public NewUserRequest(String username, String password, UserType userType) {
+		super(username, password);
+		this.userType = userType;
 	}
 
-	public void setType(int type) {
-		this.type = type;
+	public UserType getType() {
+		return userType;
+	}
+
+	public void setType(UserType userType) {
+		this.userType = userType;
 	}
 
 	@Override
 	public String toString() {
-		return "NewUserRequest [type=" + type + "]";
+		return " [type=" + userType + "]";
 	}
-		
+
 }

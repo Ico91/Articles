@@ -126,7 +126,11 @@ public class UserDAO extends DAOBase {
 			public Boolean executeTask(EntityManager entityManager) throws PersistenceException {
 				
 				try {
-					entityManager.persist(newUser);
+					User user = new User();
+					user.setUsername(newUser.getUsername());
+					user.setPassword(newUser.getPassword());
+					user.setUserType(newUser.getType());
+					entityManager.persist(user);
 				} catch (PersistenceException e) {
 					logger.error("Error while adding a new user");
 					throw new DAOException(TRANSACTION_ERROR);

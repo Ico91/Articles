@@ -7,8 +7,8 @@ import java.util.Date;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import articles.database.transactions.TransactionalTask;
@@ -16,18 +16,18 @@ import articles.model.User;
 import articles.model.UserActivity;
 import articles.model.UserType;
 import articles.model.dto.LoginRequest;
+import articles.model.dto.NewUserRequest;
 
 public class UserDAOTest {
-	private User actualUser;
-	private LoginRequest loginRequest;
-	private UserDAO userDAO;
+	private static User actualUser;
+	private static UserDAO userDAO;
 	
-	@Before
-	public void setUp() {
+	@BeforeClass
+	public static void setUp() {
 		userDAO = new UserDAO();
 		userDAO.manager.initTestManager();
 		
-		actualUser = new User(1, "admin", "123", UserType.ADMIN);
+		actualUser = new User(3, "admin", "123", UserType.ADMIN);
 		
 		userDAO.manager.execute(new TransactionalTask<Boolean>() {
 
@@ -36,7 +36,7 @@ public class UserDAOTest {
 				User user = new User();
 				user.setUsername("admin");
 				user.setPassword("123");
-				user.setUserId(1);
+				user.setUserId(3);
 				user.setUserType(UserType.ADMIN);
 				entityManager.persist(user);
 
@@ -48,7 +48,7 @@ public class UserDAOTest {
 	
 	@Test
 	public void findTest() {
-		loginRequest = new LoginRequest();
+		LoginRequest loginRequest = new LoginRequest();
 		loginRequest.setUsername("admin");
 		loginRequest.setPassword("123");
 		
@@ -56,11 +56,19 @@ public class UserDAOTest {
 		assertEquals(actualUser, expectedUser);
 	}
 	
-	@After
-    public void tearDown() throws Exception {
+	@Test
+	public void addUser() {
+		NewUserRequest newUser = new NewUserRequest("guest", "122", UserType.USER);
+		userDAO.addUser(newUser);
+		System.out.println(userDAO.getUsers());
+	}
+	
+	@AfterClass
+    public static void tearDown() throws Exception {
 		userDAO.manager.execute(new TransactionalTask<Boolean>() {
 			@Override
 			public Boolean executeTask(EntityManager entityManager) {
+				
 				Query deleteQuery = entityManager
 						.createNativeQuery("DROP TABLE users");
 				deleteQuery.executeUpdate();

@@ -16,9 +16,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class LoginRequest{
 	@XmlElement(required = true)
-	private String username;
+	protected String username;
 	@XmlElement(required = true)
-	private String password;
+	protected String password;
 	
 	public LoginRequest() {
 		
