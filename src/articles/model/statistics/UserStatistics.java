@@ -23,11 +23,11 @@ import javax.persistence.TemporalType;
 @Table(name="statistics")
 public class UserStatistics {
 	@Id
-	@Column(name="event_id")
+	@Column(name="activity_id")
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int eventId;
+	private int activityId;
 	private int userId;
-	@Column(name="event_date")
+	@Column(name="activity_date")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date activityDate;
 	@Column(name="user_activity")
@@ -35,7 +35,7 @@ public class UserStatistics {
 	
 	@Override
 	public int hashCode() {
-		return eventId;
+		return activityId;
 	}
 
 	@Override
@@ -47,23 +47,23 @@ public class UserStatistics {
 		if (!(obj instanceof UserStatistics))
 			return false;
 		UserStatistics other = (UserStatistics) obj;
-		if (eventId != other.eventId)
+		if (activityId != other.activityId)
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "Statistics [eventId=" + eventId + ", activityDate=" + activityDate + ", event="
+		return "Statistics [activityId=" + activityId + ", activityDate=" + activityDate + ", event="
 				+ userActivity + "]";
 	}
 
-	public int getEventId() {
-		return eventId;
+	public int getActivityId() {
+		return activityId;
 	}
 
-	public void setEventId(int eventId) {
-		this.eventId = eventId;
+	public void setActivityId(int activityId) {
+		this.activityId = activityId;
 	}
 	
 	public int getUserId() {

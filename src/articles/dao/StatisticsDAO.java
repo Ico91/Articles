@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import articles.database.transactions.TransactionManager;
 import articles.database.transactions.TransactionalTask;
 import articles.statistics.dto.UserStatisticsDTO;
 
@@ -14,7 +13,7 @@ import articles.statistics.dto.UserStatisticsDTO;
  * 
  * @author Hristo
  */
-public class StatisticsDAO {
+public class StatisticsDAO extends DAOBase{
 
 	/**
 	 * Loads information about user activities for a specified date, given the
@@ -28,7 +27,6 @@ public class StatisticsDAO {
 	 */
 	public List<UserStatisticsDTO> load(final int userId, final Date date) {
 
-		TransactionManager manager = new TransactionManager();
 		List<UserStatisticsDTO> res = manager
 				.execute(new TransactionalTask<List<UserStatisticsDTO>>() {
 
