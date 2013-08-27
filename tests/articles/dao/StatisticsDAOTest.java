@@ -10,15 +10,16 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import articles.database.transactions.TransactionalTask;
 import articles.model.User;
+import articles.model.UserActivity;
+import articles.model.UserStatistics;
 import articles.model.UserType;
-import articles.model.statistics.UserActivity;
-import articles.model.statistics.UserStatistics;
-import articles.statistics.dto.UserStatisticsDTO;
+import articles.model.dto.UserStatisticsDTO;
 
 public class StatisticsDAOTest {
 
@@ -28,12 +29,13 @@ public class StatisticsDAOTest {
 	public void setUp() {
 		statisticsDAO = new StatisticsDAO();
 		statisticsDAO.manager.initTestManager();
+		initDB();
 	}
 
 	@Test
 	public void testLoad() {
-		initDB();
-
+		
+		
 		List<UserStatisticsDTO> expectedResult = new ArrayList<UserStatisticsDTO>();
 		expectedResult.add(new UserStatisticsDTO(new Date(Long
 				.valueOf("1376399080000")), UserActivity.LOGIN));
@@ -50,29 +52,17 @@ public class StatisticsDAOTest {
 
 		assertEquals("Returned result should be equal to actual",
 				expectedResult, actualResult);
-
+		
+	}
+	
+	@After
+	public void tearDown() {
 		destroyDB();
 	}
 
 	private void initDB() {
 
 		// TODO: Consider better approach
-		statisticsDAO.manager.execute(new TransactionalTask<Boolean>() {
-
-			@Override
-			public Boolean executeTask(EntityManager entityManager) {
-				User user = new User();
-				user.setUsername("admin");
-				user.setPassword("123");
-				user.setLastLogin(Calendar.getInstance().getTime());
-				user.setUserId(111);
-				user.setUserType(UserType.ADMIN);
-				entityManager.persist(user);
-
-				return true;
-			}
-
-		});
 		statisticsDAO.manager.execute(new TransactionalTask<Boolean>() {
 
 			@Override
@@ -116,6 +106,23 @@ public class StatisticsDAOTest {
 						.parseLong("1376427264000")));
 				statistics.setUserActivity(UserActivity.LOGOUT);
 				entityManager.persist(statistics);
+
+				return true;
+			}
+
+		});
+		
+		statisticsDAO.manager.execute(new TransactionalTask<Boolean>() {
+
+			@Override
+			public Boolean executeTask(EntityManager entityManager) {
+				User user = new User();
+				user.setUsername("admin");
+				user.setPassword("123");
+				user.setLastLogin(Calendar.getInstance().getTime());
+				user.setUserId(111);
+				user.setUserType(UserType.ADMIN);
+				entityManager.persist(user);
 
 				return true;
 			}

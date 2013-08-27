@@ -14,7 +14,7 @@ import articles.dao.exceptions.DAOException;
 import articles.database.transactions.TransactionalTask;
 import articles.model.User;
 import articles.model.dto.NewUserRequest;
-import articles.model.statistics.UserActivity;
+import articles.model.UserActivity;
 
 /**
  * Provides access for manipulation of users data.

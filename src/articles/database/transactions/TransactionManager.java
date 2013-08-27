@@ -22,11 +22,11 @@ public class TransactionManager extends PersistenceManager {
 	
 	/**
 	 * Executes the provided instance of the TransactionalTask interface in a single
-	 * database transaction. Throws PersistenceDAOException in case of commit failure.
+	 * database transaction. Throws RuntimeException in case of commit failure.
 	 * @param task - instance of the TransactionalTask interface.
 	 * @return
 	 */
-	public <T> T execute(TransactionalTask<T> task) throws TransactionException {
+	public <T> T execute(TransactionalTask<T> task) throws RuntimeException {
 		EntityTransaction entityTransaction = super.entityManager.getTransaction();
 		try {
 			entityTransaction.begin();
@@ -35,7 +35,7 @@ public class TransactionManager extends PersistenceManager {
 			return result;
 		} catch (DAOException | RollbackException e) {
 			logger.error(e.getMessage());
-			throw new TransactionException(e.getMessage());
+			throw new RuntimeException(e.getMessage());
 		} finally {
 			if(entityTransaction.isActive())
 			{
