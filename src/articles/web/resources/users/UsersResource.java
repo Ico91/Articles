@@ -53,7 +53,7 @@ public class UsersResource {
 			@Context HttpServletRequest servletRequest) throws 
 			ServletException {
 		UserDAO userDAO = new UserDAO();
-		
+		//TODO User validation!
 		User user = userDAO.login(loginRequest.getUsername(), loginRequest.getPassword(), UserActivity.LOGIN, new Date());
 		if (user != null) {
 			
