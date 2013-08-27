@@ -53,6 +53,5 @@ public class DAOBase {
 
 			throw new DAOException(builder.getMessage().getMessage());
 		}
-		validator.validate();
 	}
 }
