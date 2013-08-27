@@ -11,6 +11,7 @@ import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
 
+import articles.dao.exceptions.DAOException;
 import articles.model.statistics.UserActivity;
 import articles.model.statistics.UserStatistics;
 import articles.statistics.dto.UserStatisticsDTO;
@@ -47,8 +48,7 @@ class StatisticsStorage {
 		} catch (PersistenceException e) {
 			logger.error("Error while saving activity statistics "
 					+ event.toString() + ", for user with user id: " + userId);
-			// TODO: Not sure 
-			throw new RuntimeException(
+			throw new DAOException(
 					"Error while saving activity statistics "
 							+ event.toString() + ", for user with user id: "
 							+ userId);
@@ -84,8 +84,7 @@ class StatisticsStorage {
 			}
 			return statisticsList;
 		} catch (PersistenceException e) {
-			//	Not sure
-			throw new RuntimeException(
+			throw new DAOException(
 					"Error while loading statistics for user with user id: "
 							+ userId);
 		}
