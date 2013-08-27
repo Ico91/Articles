@@ -80,23 +80,11 @@ public class UserDAO extends DAOBase {
 	public User getUserById(final int userId) {
 		User user = manager.execute(new TransactionalTask<User>() {
 			
-			@SuppressWarnings("unchecked")
 			@Override
 			public User executeTask(EntityManager entityManager) throws PersistenceException {
-				Query selectUserQuery = entityManager.createQuery("SELECT u FROM User u WHERE u.userId = :userId");
-				selectUserQuery.setParameter("userId", userId);
-				
-				List<User> users = (List<User>) selectUserQuery.getResultList();
-				
-				if (users.isEmpty()) {
-					logger.info(NOT_FOUND);
-					return null;
-				}
-				
-				User user = users.get(0);
-				
-				return user;
+				return getUser(userId, entityManager);
 			}
+
 		});
 		
 		return user;
@@ -152,7 +140,7 @@ public class UserDAO extends DAOBase {
 				updateUserQuery.setParameter("password", user.getPassword());
 				updateUserQuery.setParameter("userType", user.getUserType());
 				updateUserQuery.setParameter("userId", userId);
-				User user = getUserById(userId);
+				User user = getUser(userId, entityManager);
 				if (user != null) {
 					try {
 						updateUserQuery.executeUpdate();
@@ -169,12 +157,13 @@ public class UserDAO extends DAOBase {
 	}
 	
 	public boolean deleteUser(final int userId) {
+		
 		return manager.execute(new TransactionalTask<Boolean>() {
 			@Override
 			public Boolean executeTask(EntityManager entityManager) throws PersistenceException {
 				Query updateLastLoginQuery = entityManager.createQuery("DELETE FROM User u WHERE u.userId = :userId");
 				updateLastLoginQuery.setParameter("userId", userId);
-				User user = getUserById(userId);
+				User user = getUser(userId, entityManager);
 				if (user != null) {
 					try {
 						updateLastLoginQuery.executeUpdate();
@@ -222,6 +211,23 @@ public class UserDAO extends DAOBase {
 	 * @param lastLogin
 	 * @param userId
 	 */
+	
+	@SuppressWarnings("unchecked")
+	private User getUser(final int userId, EntityManager entityManager) {
+		Query selectUserQuery = entityManager.createQuery("SELECT u FROM User u WHERE u.userId = :userId");
+		selectUserQuery.setParameter("userId", userId);
+		
+		List<User> users = (List<User>) selectUserQuery.getResultList();
+		
+		if (users.isEmpty()) {
+			logger.info(NOT_FOUND);
+			return null;
+		}
+		
+		User user = users.get(0);
+		
+		return user;
+	}
 	
 	private boolean updateLastLogin(final int userId, final Date loginDate, final EntityManager entityManager) {
 			Query updateLastLoginQuery = entityManager.createQuery(UPDATE_QUERY);
