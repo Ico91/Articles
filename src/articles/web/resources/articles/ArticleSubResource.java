@@ -77,7 +77,7 @@ public class ArticleSubResource extends ArticlesResourceBase {
 		if (!this.dao.updateArticle(this.userId, article)) {
 			logger.info("User with id = " + userId
 					+ " try to update article that does not exist");
-			Response.status(Status.BAD_REQUEST).build();
+			return Response.status(Status.NOT_FOUND).build();
 		}
 
 		logger.info("User with id = " + userId

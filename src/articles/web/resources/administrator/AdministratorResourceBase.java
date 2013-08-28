@@ -17,15 +17,14 @@ import articles.validators.UserValidator;
 public class AdministratorResourceBase {
 	protected UserDAO userDAO;
 	protected final Logger logger;
-	protected List<User> users;
 	
 	public AdministratorResourceBase() {
 		this.logger = Logger.getLogger(getClass());
 		this.userDAO = new UserDAO();
 	}
 	
-	protected Response validationResponse(NewUserRequest userToCheck) {
-		this.users = this.userDAO.getUsers();
+	protected Response validationResponse(NewUserRequest userToCheck, List<User> users) {
+		
 		UserValidator validator = new UserValidator(userToCheck, users);
 		List<MessageKey> messageKeys = validator.validate();
 		

@@ -1,5 +1,7 @@
 package articles.web.resources.administrator;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -56,7 +58,16 @@ public class AdministratorSubResource extends AdministratorResourceBase {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response update(@PathParam("id") int id, NewUserRequest user) {
-		Response validationResponse = validationResponse(user);
+		List<User> users = this.userDAO.getUsers();
+		
+		//	Remove user from list of all users
+		for(int i = 0; i < users.size(); i ++) {
+			if(users.get(i).getUserId() == id) {
+				users.remove(i);
+			}
+		}
+		
+		Response validationResponse = validationResponse(user, users);
 		
 		if(validationResponse != null) {
 			logger.info("Invalid request format");
@@ -65,7 +76,7 @@ public class AdministratorSubResource extends AdministratorResourceBase {
 		
 		if (!this.userDAO.updateUser(id, user)) {
 			logger.info("Failed to update user with id = " + id);
-			Response.status(Status.NOT_FOUND).build();
+			return Response.status(Status.NOT_FOUND).build();
 		}
 
 		logger.info("Updated user with id = " + id);
@@ -85,7 +96,7 @@ public class AdministratorSubResource extends AdministratorResourceBase {
 
 		if (!this.userDAO.deleteUser(id)) {
 			logger.info("Failed to delete user with id = " + id);
-			Response.status(Status.NOT_FOUND).build();
+			return Response.status(Status.NOT_FOUND).build();
 		}
 
 		//	Remove articles file of deleted user
