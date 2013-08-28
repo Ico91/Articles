@@ -94,7 +94,11 @@ class StatisticsStorage {
 		}
 
 	}
-
+	
+	/**
+	 * Loads all users' id from the statistics table.
+	 * @return Collection holding unique user identifications.
+	 */
 	@SuppressWarnings("unchecked")
 	public Set<Integer> getUsers() {
 		Query selectQuery = entityManager
