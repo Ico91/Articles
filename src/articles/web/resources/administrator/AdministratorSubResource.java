@@ -12,8 +12,10 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.log4j.Logger;
 
+import articles.dao.ArticlesDAO;
 import articles.dao.UserDAO;
 import articles.model.User;
+import articles.web.listener.ConfigurationListener;
 
 public class AdministratorSubResource {
 
@@ -61,12 +63,12 @@ public class AdministratorSubResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response update(@PathParam("id") int id, User user) {
 		// TODO: Validations
-		
-		if(!this.userDAO.updateUser(id, user)) {
+
+		if (!this.userDAO.updateUser(id, user)) {
 			logger.info("Failed to update user with id = " + id);
 			Response.status(Status.NOT_FOUND).build();
 		}
-		
+
 		logger.info("Updated user with id = " + id);
 		return Response.ok().build();
 	}
@@ -81,11 +83,15 @@ public class AdministratorSubResource {
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response delete(@PathParam("id") int id) {
-		
-		if(!this.userDAO.deleteUser(id)) {
+
+		if (!this.userDAO.deleteUser(id)) {
 			logger.info("Failed to delete user with id = " + id);
 			Response.status(Status.NOT_FOUND).build();
 		}
+
+		//	Remove articles file of deleted user
+		ArticlesDAO articlesDAO = new ArticlesDAO(ConfigurationListener.getPath());
+		articlesDAO.deleteUserArticlesFile(id);
 		
 		logger.info("Deleted user with id = " + id);
 		return Response.ok().build();

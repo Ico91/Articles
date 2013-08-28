@@ -1,6 +1,7 @@
 package articles.dao;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -17,6 +18,7 @@ import articles.model.Articles;
 import articles.model.UserActivity;
 import articles.model.Articles.Article;
 import articles.validators.ArticleValidator;
+import articles.web.listener.ConfigurationListener;
 
 /**
  * Provides access to article files
@@ -100,6 +102,32 @@ public class ArticlesDAO extends DAOBase {
 		}
 	}
 
+	/**
+	 * Create empty articles file for user with specified ID
+	 * 
+	 * @param userId
+	 *            User ID
+	 */
+	public void createUserArticlesFile(int userId) {
+		saveArticles(userId, new ArrayList<Article>());
+	}
+	
+	/**
+	 * Delete user articles file
+	 * 
+	 * @param id
+	 *            ID of the user
+	 */
+	public void deleteUserArticlesFile(int id) {
+		File articlesFile = new File(ConfigurationListener.getPath() + "/" + id
+				+ ".xml");
+
+		// Synchronization ?
+		if (articlesFile.exists()) {
+			articlesFile.delete();
+		}
+	}
+	
 	/**
 	 * Get article with specified ID. Returns null if article not exist
 	 * 

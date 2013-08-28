@@ -25,26 +25,27 @@ import articles.web.listener.ConfigurationListener;
 public class AdministratorFilter implements Filter {
 
 	public void destroy() {
-		
+
 	}
-	
+
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 		HttpServletResponse resp = (HttpServletResponse) response;
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpSession session = req.getSession(false);
-		
-		if ((UserType) session.getAttribute(ConfigurationListener.USERTYPE) == UserType.ADMIN) {
-			chain.doFilter(req, resp);
-			return;
+
+		if (session != null) {
+			if ((UserType) session.getAttribute(ConfigurationListener.USERTYPE) == UserType.ADMIN) {
+				chain.doFilter(req, resp);
+				return;
+			}
 		}
 
 		resp.sendError(403, "Unauthorized access");
 	}
 
-	
 	public void init(FilterConfig fConfig) throws ServletException {
-		
+
 	}
 
 }

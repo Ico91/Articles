@@ -1,6 +1,5 @@
 package articles.web.resources.administrator;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -16,7 +15,6 @@ import org.apache.log4j.Logger;
 
 import articles.dao.ArticlesDAO;
 import articles.dao.UserDAO;
-import articles.model.Articles.Article;
 import articles.model.User;
 import articles.model.dto.NewUserRequest;
 import articles.web.listener.ConfigurationListener;
@@ -69,7 +67,10 @@ public class AdministratorResource {
 			return Response.status(Status.BAD_REQUEST).build();
 		}
 
-		createUserArticlesFile(user.getUserId());
+		//	Create new articles file for user
+		ArticlesDAO articlesDAO = new ArticlesDAO(ConfigurationListener.getPath());
+		articlesDAO.createUserArticlesFile(user.getUserId());
+		
 		logger.info("Created user " + user.getUsername() + " with id = "
 				+ user.getUserId());
 		return Response.ok().build();
@@ -79,17 +80,5 @@ public class AdministratorResource {
 	@Path("{id}")
 	public AdministratorSubResource getAdministratorSubResource() {
 		return new AdministratorSubResource(this.userDAO);
-	}
-
-	/**
-	 * Create empty articles file for user with specified ID
-	 * 
-	 * @param userId
-	 *            User ID
-	 */
-	private void createUserArticlesFile(int userId) {
-		ArticlesDAO articlesDAO = new ArticlesDAO(
-				ConfigurationListener.getPath());
-		articlesDAO.saveArticles(userId, new ArrayList<Article>());
 	}
 }
