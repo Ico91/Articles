@@ -119,11 +119,11 @@ public class UserDAO extends DAOBase {
 	 * @param newUser
 	 * @return true on success
 	 */
-	public int addUser(final NewUserRequest newUser) {
-		int userId = manager.execute(new TransactionalTask<Integer>() {
+	public User addUser(final NewUserRequest newUser) {
+		User addedUser = manager.execute(new TransactionalTask<User>() {
 			@Override
-			public Integer executeTask(EntityManager entityManager) throws PersistenceException {
-				int userId = -1;
+			public User executeTask(EntityManager entityManager) throws PersistenceException {
+				User addedUser = null;
 				try {
 					User user = new User();
 					user.setUsername(newUser.getUsername());
@@ -131,17 +131,17 @@ public class UserDAO extends DAOBase {
 					user.setUserType(newUser.getType());
 					entityManager.persist(user);
 					
-					User addedUser = getUserByUsername(newUser.getUsername(), entityManager);
-					userId = addedUser.getUserId();
+					addedUser = getUserByUsername(newUser.getUsername(), entityManager);
+					
 				} catch (PersistenceException e) {
 					logger.error("Error while adding a new user");
 					throw new DAOException(TRANSACTION_ERROR);
 				}
-				return userId;
+				return addedUser;
 			}
 		});
 		
-		return userId;
+		return addedUser;
 	}
 	
 	/**
