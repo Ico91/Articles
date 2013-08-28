@@ -8,7 +8,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 
 import articles.database.transactions.TransactionalTask;
-import articles.model.User;
 import articles.model.dto.UserStatisticsDTO;
 
 /**
@@ -17,11 +16,6 @@ import articles.model.dto.UserStatisticsDTO;
  * @author Hristo
  */
 public class StatisticsDAO extends DAOBase {
-	private UserDAO userDAO;
-
-	public StatisticsDAO() {
-		userDAO = new UserDAO();
-	}
 
 	/**
 	 * Loads information about user activities for a specified date, given the
@@ -64,9 +58,9 @@ public class StatisticsDAO extends DAOBase {
 						StatisticsStorage statisticsStorage = new StatisticsStorage(
 								entityManager);
 						Map<Integer, List<UserStatisticsDTO>> result = new HashMap<Integer, List<UserStatisticsDTO>>();
-						for (User u : userDAO.getUsers()) {
-							result.put(u.getUserId(),
-									statisticsStorage.load(u.getUserId(), date));
+						for (int uId : statisticsStorage.getUsers()) {
+							result.put(uId,
+									statisticsStorage.load(uId, date));
 						}
 						return result;
 					}
