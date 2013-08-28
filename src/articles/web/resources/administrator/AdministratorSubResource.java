@@ -53,7 +53,7 @@ public class AdministratorSubResource extends AdministratorResourceBase {
 	 *            ID of the user to update
 	 * @param user
 	 *            New user information
-	 * @return Response with code 200 on success, 400 otherwise
+	 * @return Response with code 200 on success, 404 otherwise
 	 */
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
