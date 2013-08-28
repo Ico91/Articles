@@ -8,36 +8,43 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import articles.dao.UserDAO;
+import articles.model.User;
+import articles.model.UserType;
 import articles.web.listener.ConfigurationListener;
 
-public class AccessFilter implements Filter {
+/**
+ * Servlet Filter implementation class AdministratorFilter
+ */
+@WebFilter("/AdministratorFilter")
+public class AdministratorFilter implements Filter {
 
-	@Override
 	public void destroy() {
+		
 	}
-
-	@Override
+	
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 		HttpServletResponse resp = (HttpServletResponse) response;
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpSession session = req.getSession(false);
 		
-		if ( session != null && session.getAttribute(ConfigurationListener.USERID) != null ) {
+		if ((UserType) session.getAttribute(ConfigurationListener.USERTYPE) == UserType.ADMIN) {
 			chain.doFilter(req, resp);
-			return;	
+			return;
 		}
 
 		resp.sendError(403, "Unauthorized access");
 	}
 
-	@Override
-	public void init(FilterConfig arg0) throws ServletException {
-
+	
+	public void init(FilterConfig fConfig) throws ServletException {
+		
 	}
 
 }

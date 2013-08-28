@@ -14,6 +14,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.log4j.Logger;
 
@@ -50,16 +51,16 @@ public class UsersResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response login(LoginRequest loginRequest,
 			@Context HttpServletResponse servletResponse,
-			@Context HttpServletRequest servletRequest) throws 
+			@Context HttpServletRequest servletRequest, @Context UriInfo uriInfo) throws 
 			ServletException {
 		UserDAO userDAO = new UserDAO();
 		//TODO User validation!
 		User user = userDAO.login(loginRequest.getUsername(), loginRequest.getPassword(), UserActivity.LOGIN, new Date());
 		if (user != null) {
-			
 			servletRequest.getSession().invalidate();
 			HttpSession session = servletRequest.getSession();
 			session.setAttribute(ConfigurationListener.USERID, user.getUserId());
+			session.setAttribute(ConfigurationListener.USERTYPE, user.getUserType());
 			
 			logger.info("User with id = " + user.getUserId() + " logged in the system.");
 
@@ -89,7 +90,7 @@ public class UsersResource {
 			session.invalidate();
 			logger.info("User with id = " + userId + " logged out from the system.");
 	
-			userDAO.exitUser(userId, UserActivity.LOGOUT);
+			userDAO.logout(userId, UserActivity.LOGOUT);
 			
 			return Response.ok().build();
 		}

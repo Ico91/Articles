@@ -22,9 +22,15 @@ import articles.model.UserActivity;
  *
  */
 public class UserDAO extends DAOBase {	
+	
 	private static final String LOGIN_QUERY = 
 			"SELECT u FROM User u WHERE u.username = :username AND u.password = :password";
-	private static final String UPDATE_QUERY = "UPDATE User u SET u.lastLogin = :lastLogin WHERE u.userId = :userId";
+	private static final String UPDATE_USER_QUERY = 
+			"UPDATE User u SET u.username = :username, u.password = :password, u.userType = :userType WHERE u.userId = :userId";
+	private static final String SELECT_USER_BY_ID = "SELECT u FROM User u WHERE u.userId = :userId";
+	private static final String SELECT_USER_BY_USERNAME = "SELECT u FROM User u WHERE u.username = :username";
+	private static final String UPDATE_LASTLOGIN_QUERY = "UPDATE User u SET u.lastLogin = :lastLogin WHERE u.userId = :userId";
+	private static final String DELETE_QUERY = "DELETE FROM User u WHERE u.userId = :userId";
 	private static final String NOT_FOUND = "No user found.";
 	private static final String TRANSACTION_ERROR = "Problem occurs in the transaction.";
 	
@@ -99,6 +105,7 @@ public class UserDAO extends DAOBase {
 			@Override
 			public List<User> executeTask(EntityManager entityManager) throws PersistenceException {
 				List<User> users = new ArrayList<User>();
+				
 				Query selectUsersQuery = entityManager.createQuery("SELECT u from User u");
 				users = (List<User>) selectUsersQuery.getResultList();
 				
@@ -124,6 +131,7 @@ public class UserDAO extends DAOBase {
 			@Override
 			public User executeTask(EntityManager entityManager) throws PersistenceException {
 				User addedUser = null;
+				
 				try {
 					User user = new User();
 					user.setUsername(newUser.getUsername());
@@ -155,12 +163,15 @@ public class UserDAO extends DAOBase {
 		return manager.execute(new TransactionalTask<Boolean>() {
 			@Override
 			public Boolean executeTask(EntityManager entityManager) throws PersistenceException {
-				Query updateUserQuery = entityManager.createQuery("UPDATE User u SET u.username = :username, u.password = :password, u.userType = :userType WHERE u.userId = :userId");
+				
+				Query updateUserQuery = entityManager.createQuery(UPDATE_USER_QUERY);
 				updateUserQuery.setParameter("username", user.getUsername());
 				updateUserQuery.setParameter("password", user.getPassword());
 				updateUserQuery.setParameter("userType", user.getUserType());
 				updateUserQuery.setParameter("userId", userId);
+				
 				User user = getUser(userId, entityManager);
+				
 				if (user != null) {
 					try {
 						updateUserQuery.executeUpdate();
@@ -186,9 +197,12 @@ public class UserDAO extends DAOBase {
 		return manager.execute(new TransactionalTask<Boolean>() {
 			@Override
 			public Boolean executeTask(EntityManager entityManager) throws PersistenceException {
-				Query updateLastLoginQuery = entityManager.createQuery("DELETE FROM User u WHERE u.userId = :userId");
+				
+				Query updateLastLoginQuery = entityManager.createQuery(DELETE_QUERY);
 				updateLastLoginQuery.setParameter("userId", userId);
+				
 				User user = getUser(userId, entityManager);
+				
 				if (user != null) {
 					try {
 						updateLastLoginQuery.executeUpdate();
@@ -230,9 +244,10 @@ public class UserDAO extends DAOBase {
 		});
 	}
 
+	//TODO common things - consider common methdo
 	@SuppressWarnings("unchecked")
 	private User getUser(final int userId, EntityManager entityManager) {
-		Query selectUserQuery = entityManager.createQuery("SELECT u FROM User u WHERE u.userId = :userId");
+		Query selectUserQuery = entityManager.createQuery(SELECT_USER_BY_ID);
 		selectUserQuery.setParameter("userId", userId);
 		
 		List<User> users = (List<User>) selectUserQuery.getResultList();
@@ -249,7 +264,7 @@ public class UserDAO extends DAOBase {
 	
 	@SuppressWarnings("unchecked")
 	private User getUserByUsername(String username, EntityManager entityManager) {
-		Query selectUserQuery = entityManager.createQuery("SELECT u FROM User u WHERE u.username = :username");
+		Query selectUserQuery = entityManager.createQuery(SELECT_USER_BY_USERNAME);
 		selectUserQuery.setParameter("username", username);
 		List<User> users = (List<User>) selectUserQuery.getResultList();
 		
@@ -262,7 +277,7 @@ public class UserDAO extends DAOBase {
 	}
 	
 	private boolean updateLastLogin(final int userId, final Date loginDate, final EntityManager entityManager) {
-		Query updateLastLoginQuery = entityManager.createQuery(UPDATE_QUERY);
+		Query updateLastLoginQuery = entityManager.createQuery(UPDATE_LASTLOGIN_QUERY);
 		updateLastLoginQuery.setParameter("lastLogin", loginDate);
 		updateLastLoginQuery.setParameter("userId", userId);
 		
