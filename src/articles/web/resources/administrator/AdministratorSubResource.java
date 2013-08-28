@@ -17,8 +17,8 @@ public class AdministratorSubResource {
 
 	private UserDAO userDAO;
 
-	public AdministratorSubResource() {
-		this.userDAO = new UserDAO();
+	public AdministratorSubResource(UserDAO userDAO) {
+		this.userDAO = userDAO;
 	}
 
 	/**
