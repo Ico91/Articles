@@ -26,20 +26,19 @@ public class UserDAO extends DAOBase {
 			"SELECT u FROM User u WHERE u.username = :username AND u.password = :password";
 	private static final String UPDATE_QUERY = "UPDATE User u SET u.lastLogin = :lastLogin WHERE u.userId = :userId";
 	private static final String NOT_FOUND = "No user found.";
-	private static final String MULTIPLE_RESULTS = "More than one users found for specified username.";
 	private static final String TRANSACTION_ERROR = "Problem occurs in the transaction.";
-	
-	/**
-	 * Searches if a user with the entered username and password exists.
-	 * @param username
-	 * @param password
-	 * @return Existing user or null.
-	 */
 	
 	public UserDAO() {
 		logger = Logger.getLogger(getClass());
 	}
 	
+	/**
+	 * Searches if a user with the entered username and password exists.
+	 * Add statistic information about the user on success.
+	 * @param username
+	 * @param password
+	 * @return Existing user or null.
+	 */
 	public User login(final String username, final String password, final UserActivity userActivity,  final Date loginDate) {
 		
 		User user = manager.execute(new TransactionalTask<User>() {
@@ -59,11 +58,6 @@ public class UserDAO extends DAOBase {
 					return null;
 				}
 				
-				if ( users.size() > 1 ) {
-					logger.info(MULTIPLE_RESULTS);
-					throw new DAOException(MULTIPLE_RESULTS);
-				}
-				
 				User user = users.get(0);
 				int userId = user.getUserId();
 				
@@ -77,6 +71,11 @@ public class UserDAO extends DAOBase {
 		return user;
 	}
 	
+	/**
+	 * Find a user with specific ID.
+	 * @param userId
+	 * @return user on success, otherwise null
+	 */
 	public User getUserById(final int userId) {
 		User user = manager.execute(new TransactionalTask<User>() {
 			
@@ -90,6 +89,10 @@ public class UserDAO extends DAOBase {
 		return user;
 	}
 	
+	/**
+	 * Extract all users stored in the database.
+	 * @return list of users
+	 */
 	public List<User> getUsers() {
 		List<User> users = manager.execute(new TransactionalTask<List<User>>() {
 			@SuppressWarnings("unchecked")
@@ -111,26 +114,43 @@ public class UserDAO extends DAOBase {
 		return users;
 	}
 	
-	public boolean addUser(final NewUserRequest newUser) {
-		return manager.execute(new TransactionalTask<Boolean>() {
+	/**
+	 * Add new user in the database
+	 * @param newUser
+	 * @return true on success
+	 */
+	public int addUser(final NewUserRequest newUser) {
+		int userId = manager.execute(new TransactionalTask<Integer>() {
 			@Override
-			public Boolean executeTask(EntityManager entityManager) throws PersistenceException {
-				
+			public Integer executeTask(EntityManager entityManager) throws PersistenceException {
+				int userId = -1;
 				try {
 					User user = new User();
 					user.setUsername(newUser.getUsername());
 					user.setPassword(newUser.getPassword());
 					user.setUserType(newUser.getType());
 					entityManager.persist(user);
+					
+					User addedUser = getUserByUsername(newUser.getUsername(), entityManager);
+					userId = addedUser.getUserId();
 				} catch (PersistenceException e) {
 					logger.error("Error while adding a new user");
 					throw new DAOException(TRANSACTION_ERROR);
 				}
-				return true;
+				return userId;
 			}
 		});
+		
+		return userId;
 	}
 	
+	/**
+	 * Updates the information about an user with specific ID
+	 * if that user exists
+	 * @param userId
+	 * @param user
+	 * @return true on success, false if user with the ID does not exist
+	 */
 	public boolean updateUser(final int userId, final User user) {
 		return manager.execute(new TransactionalTask<Boolean>() {
 			@Override
@@ -156,6 +176,11 @@ public class UserDAO extends DAOBase {
 		});
 	}
 	
+	/**
+	 * Delete an user with specific ID if that user exists
+	 * @param userId
+	 * @return true on success or false if the user does not exist
+	 */
 	public boolean deleteUser(final int userId) {
 		
 		return manager.execute(new TransactionalTask<Boolean>() {
@@ -180,12 +205,12 @@ public class UserDAO extends DAOBase {
 	}
 	
 	/**
-	 * Logs out a user with specific id and stores statistic information about the activity.
+	 * Log out a user with specific id and stores statistic information about the activity.
 	 * @param userId
 	 * @param userActivity
 	 * @return true on success
 	 */
-	public boolean exitUser(final int userId, final UserActivity userActivity) {
+	public boolean logout(final int userId, final UserActivity userActivity) {
 		return manager.execute(new TransactionalTask<Boolean>() {
 			
 			@Override
@@ -205,13 +230,6 @@ public class UserDAO extends DAOBase {
 		});
 	}
 
-	/**
-	 * Updates the date when the user with the specific ID last logged in.
-	 * Returns true on success, otherwise throws an exception.
-	 * @param lastLogin
-	 * @param userId
-	 */
-	
 	@SuppressWarnings("unchecked")
 	private User getUser(final int userId, EntityManager entityManager) {
 		Query selectUserQuery = entityManager.createQuery("SELECT u FROM User u WHERE u.userId = :userId");
@@ -229,18 +247,33 @@ public class UserDAO extends DAOBase {
 		return user;
 	}
 	
-	private boolean updateLastLogin(final int userId, final Date loginDate, final EntityManager entityManager) {
-			Query updateLastLoginQuery = entityManager.createQuery(UPDATE_QUERY);
-			updateLastLoginQuery.setParameter("lastLogin", loginDate);
-			updateLastLoginQuery.setParameter("userId", userId);
-			
-			try {
-				updateLastLoginQuery.executeUpdate();
-				return true;
-			} catch (PersistenceException e) {
-				logger.error("Error while updating the last login date for user with user id = "
-								+ userId + ".");
-				throw new DAOException(TRANSACTION_ERROR);
-			}
+	@SuppressWarnings("unchecked")
+	private User getUserByUsername(String username, EntityManager entityManager) {
+		Query selectUserQuery = entityManager.createQuery("SELECT u FROM User u WHERE u.username = :username");
+		selectUserQuery.setParameter("username", username);
+		List<User> users = (List<User>) selectUserQuery.getResultList();
+		
+		if (users.isEmpty()) {
+			logger.info(NOT_FOUND);
+			return null;
+		}
+		
+		return users.get(0);
 	}
+	
+	private boolean updateLastLogin(final int userId, final Date loginDate, final EntityManager entityManager) {
+		Query updateLastLoginQuery = entityManager.createQuery(UPDATE_QUERY);
+		updateLastLoginQuery.setParameter("lastLogin", loginDate);
+		updateLastLoginQuery.setParameter("userId", userId);
+		
+		try {
+			updateLastLoginQuery.executeUpdate();
+			return true;
+		} catch (PersistenceException e) {
+			logger.error("Error while updating the last login date for user with user id = "
+							+ userId + ".");
+			throw new DAOException(TRANSACTION_ERROR);
+		}
+	}
+	
 }
