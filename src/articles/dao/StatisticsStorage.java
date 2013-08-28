@@ -3,7 +3,9 @@ package articles.dao;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
@@ -25,6 +27,7 @@ import articles.model.dto.UserStatisticsDTO;
 class StatisticsStorage {
 	private static final String LOAD_USER_STATISTICS = "SELECT user_activity, activity_date "
 			+ "FROM statistics WHERE DATE(activity_date) = ?1 AND userid = ?2";
+	private static final String LOAD_USER_IDS = "SELECT userid FROM statistics";
 
 	private EntityManager entityManager;
 	private Logger logger = Logger.getLogger(getClass());
@@ -90,5 +93,19 @@ class StatisticsStorage {
 							+ userId);
 		}
 
+	}
+
+	@SuppressWarnings("unchecked")
+	public Set<Integer> getUsers() {
+		Query selectQuery = entityManager
+				.createNativeQuery(LOAD_USER_IDS);
+		try {
+			Set<Integer> resultList = new HashSet<Integer>();
+			resultList.addAll(selectQuery.getResultList());
+			return resultList;
+		} catch (PersistenceException e) {
+			throw new DAOException(
+					"Error while loading user ids from statistics table");
+		}
 	}
 }
