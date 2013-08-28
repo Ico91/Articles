@@ -159,7 +159,7 @@ public class UserDAO extends DAOBase {
 	 * @param user
 	 * @return true on success, false if user with the ID does not exist
 	 */
-	public boolean updateUser(final int userId, final User user) {
+	public boolean updateUser(final int userId, final NewUserRequest user) {
 		return manager.execute(new TransactionalTask<Boolean>() {
 			@Override
 			public Boolean executeTask(EntityManager entityManager) throws PersistenceException {
@@ -167,7 +167,7 @@ public class UserDAO extends DAOBase {
 				Query updateUserQuery = entityManager.createQuery(UPDATE_USER_QUERY);
 				updateUserQuery.setParameter("username", user.getUsername());
 				updateUserQuery.setParameter("password", user.getPassword());
-				updateUserQuery.setParameter("userType", user.getUserType());
+				updateUserQuery.setParameter("userType", user.getType());
 				updateUserQuery.setParameter("userId", userId);
 				
 				User user = getUser(userId, entityManager);

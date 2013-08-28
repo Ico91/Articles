@@ -11,10 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.log4j.Logger;
-
 import articles.dao.ArticlesDAO;
-import articles.dao.UserDAO;
 import articles.model.User;
 import articles.model.dto.NewUserRequest;
 import articles.web.listener.ConfigurationListener;
@@ -26,14 +23,10 @@ import articles.web.listener.ConfigurationListener;
  * 
  */
 @Path("")
-public class AdministratorResource {
-
-	private UserDAO userDAO;
-	private final Logger logger;
+public class AdministratorResource extends AdministratorResourceBase {
 
 	public AdministratorResource() {
-		this.userDAO = new UserDAO();
-		logger = Logger.getLogger(getClass());
+		super();
 	}
 
 	/**
@@ -58,8 +51,12 @@ public class AdministratorResource {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response addUser(NewUserRequest userToAdd) {
+		Response validationResponse = validationResponse(userToAdd);
 
-		// TODO: Validations, unique username
+		if (validationResponse != null) {
+			logger.info("Invalid request format");
+			return validationResponse;
+		}
 
 		User user = this.userDAO.addUser(userToAdd);
 		if (user == null) {
@@ -67,10 +64,11 @@ public class AdministratorResource {
 			return Response.status(Status.BAD_REQUEST).build();
 		}
 
-		//	Create new articles file for user
-		ArticlesDAO articlesDAO = new ArticlesDAO(ConfigurationListener.getPath());
+		// Create new articles file for user
+		ArticlesDAO articlesDAO = new ArticlesDAO(
+				ConfigurationListener.getPath());
 		articlesDAO.createUserArticlesFile(user.getUserId());
-		
+
 		logger.info("Created user " + user.getUsername() + " with id = "
 				+ user.getUserId());
 		return Response.ok().build();
@@ -79,6 +77,6 @@ public class AdministratorResource {
 
 	@Path("{id}")
 	public AdministratorSubResource getAdministratorSubResource() {
-		return new AdministratorSubResource(this.userDAO);
+		return new AdministratorSubResource();
 	}
 }

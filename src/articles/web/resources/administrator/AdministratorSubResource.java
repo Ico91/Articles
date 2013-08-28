@@ -10,21 +10,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.log4j.Logger;
-
 import articles.dao.ArticlesDAO;
-import articles.dao.UserDAO;
 import articles.model.User;
+import articles.model.dto.NewUserRequest;
 import articles.web.listener.ConfigurationListener;
 
-public class AdministratorSubResource {
+public class AdministratorSubResource extends AdministratorResourceBase {
 
-	private UserDAO userDAO;
-	private final Logger logger;
-
-	public AdministratorSubResource(UserDAO userDAO) {
-		this.userDAO = userDAO;
-		this.logger = Logger.getLogger(getClass());
+	public AdministratorSubResource() {
+		super();
 	}
 
 	/**
@@ -61,9 +55,14 @@ public class AdministratorSubResource {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response update(@PathParam("id") int id, User user) {
-		// TODO: Validations
-
+	public Response update(@PathParam("id") int id, NewUserRequest user) {
+		Response validationResponse = validationResponse(user);
+		
+		if(validationResponse != null) {
+			logger.info("Invalid request format");
+			return validationResponse;
+		}
+		
 		if (!this.userDAO.updateUser(id, user)) {
 			logger.info("Failed to update user with id = " + id);
 			Response.status(Status.NOT_FOUND).build();
