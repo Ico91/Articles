@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import articles.dao.ArticlesDAO;
+import articles.dao.UserDAO;
 import articles.model.User;
 import articles.model.dto.NewUserRequest;
 import articles.web.listener.ConfigurationListener;
@@ -51,30 +52,28 @@ public class AdministratorResource extends AdministratorResourceBase {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response addUser(NewUserRequest userToAdd) {
-		//	TODO: Duplicated code [AdministratorSubResource]
-		Response validationResponse = validationResponse(userToAdd, this.userDAO.getUsers());
+	public Response addUser(final NewUserRequest userToAdd) {
+		return validateAndExecute(userToAdd, this.userDAO.getUsers(),
+				new Executable() {
 
-		if (validationResponse != null) {
-			logger.info("Invalid request format");
-			return validationResponse;
-		}
+					@Override
+					public Response execute(UserDAO userDAO) {
+						User user = userDAO.addUser(userToAdd);
+						if (user == null) {
+							logger.info("Failed to create user");
+							return Response.status(Status.BAD_REQUEST).build();
+						}
 
-		User user = this.userDAO.addUser(userToAdd);
-		if (user == null) {
-			logger.info("Failed to create user");
-			return Response.status(Status.BAD_REQUEST).build();
-		}
+						// Create new articles file for user
+						ArticlesDAO articlesDAO = new ArticlesDAO(
+								ConfigurationListener.getPath());
+						articlesDAO.createUserArticlesFile(user.getUserId());
 
-		// Create new articles file for user
-		ArticlesDAO articlesDAO = new ArticlesDAO(
-				ConfigurationListener.getPath());
-		articlesDAO.createUserArticlesFile(user.getUserId());
-
-		logger.info("Created user " + user.getUsername() + " with id = "
-				+ user.getUserId());
-		return Response.ok().build();
-
+						logger.info("Created user " + user.getUsername()
+								+ " with id = " + user.getUserId());
+						return Response.ok().build();
+					}
+				});
 	}
 
 	@Path("{id}")

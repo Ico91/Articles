@@ -17,17 +17,18 @@ import articles.validators.UserValidator;
 public class AdministratorResourceBase {
 	protected UserDAO userDAO;
 	protected final Logger logger;
-	
+
 	public AdministratorResourceBase() {
 		this.logger = Logger.getLogger(getClass());
 		this.userDAO = new UserDAO();
 	}
-	
-	protected Response validationResponse(NewUserRequest userToCheck, List<User> users) {
-		
+
+	protected Response validationResponse(NewUserRequest userToCheck,
+			List<User> users) {
+
 		UserValidator validator = new UserValidator(userToCheck, users);
 		List<MessageKey> messageKeys = validator.validate();
-		
+
 		if (!messageKeys.isEmpty()) {
 			return Response.status(Status.BAD_REQUEST)
 					.entity(new ErrorMessageBuilder(messageKeys).getMessage())
@@ -35,5 +36,22 @@ public class AdministratorResourceBase {
 		}
 
 		return null;
+	}
+
+	protected interface Executable {
+		Response execute(UserDAO userDAO);
+	}
+
+	protected Response validateAndExecute(final NewUserRequest request,
+			List<User> users, Executable executable) {
+
+		Response validationResponse = validationResponse(request, users);
+
+		if (validationResponse != null) {
+			logger.info("Invalid request format");
+			return validationResponse;
+		}
+
+		return executable.execute(this.userDAO);
 	}
 }
