@@ -33,7 +33,7 @@ public abstract class ArticlesResourceBase {
 
 	public ArticlesResourceBase(@Context HttpServletRequest servletRequest) {
 		this.servletRequest = servletRequest;
-		this.dao = new ArticlesDAO(articlesPath());
+		this.dao = new ArticlesDAO(ConfigurationListener.getPath());
 		this.userId = getUserId();
 		this.articles = this.dao.loadArticles(this.userId);
 	}
@@ -56,23 +56,6 @@ public abstract class ArticlesResourceBase {
 		}
 
 		return null;
-	}
-
-	/**
-	 * Read the articles directory from configuration file
-	 * 
-	 * @return
-	 */
-	private String articlesPath() {
-		String path = ConfigurationListener.getPath();
-
-		if (path == null) {
-			String message = "Cannot read articles file path.";
-			logger.error(message);
-			throw new RuntimeException(message);
-		}
-
-		return path;
 	}
 
 	/**

@@ -32,6 +32,10 @@ public class ConfigurationListener implements HttpSessionListener, ServletContex
 	ServletContext context;
 
 	public static String getPath() {
+		if (path == null) {
+			throw new RuntimeException("Cannot read articles directory path!");
+		}
+
 		return path;
 	}
 	@Override

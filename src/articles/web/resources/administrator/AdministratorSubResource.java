@@ -10,15 +10,19 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.log4j.Logger;
+
 import articles.dao.UserDAO;
 import articles.model.User;
 
 public class AdministratorSubResource {
 
 	private UserDAO userDAO;
+	private final Logger logger;
 
 	public AdministratorSubResource(UserDAO userDAO) {
 		this.userDAO = userDAO;
+		this.logger = Logger.getLogger(getClass());
 	}
 
 	/**
@@ -33,9 +37,14 @@ public class AdministratorSubResource {
 	public Response getUserById(@PathParam("id") int id) {
 		User userToReturn = this.userDAO.getUserById(id);
 
-		return (userToReturn != null) ? Response.ok(userToReturn,
-				MediaType.APPLICATION_JSON).build() : Response.status(
-				Status.NOT_FOUND).build();
+		if (userToReturn == null) {
+			logger.info("User with id = " + id + " not found");
+			return Response.status(Status.NOT_FOUND).build();
+		}
+
+		logger.info("Administrator successfully view information "
+				+ "for user with id = " + id);
+		return Response.ok(userToReturn, MediaType.APPLICATION_JSON).build();
 	}
 
 	/**
@@ -52,9 +61,14 @@ public class AdministratorSubResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response update(@PathParam("id") int id, User user) {
 		// TODO: Validations
-
-		return (this.userDAO.updateUser(id, user)) ? Response.ok().build()
-				: Response.status(Status.NOT_FOUND).build();
+		
+		if(!this.userDAO.updateUser(id, user)) {
+			logger.info("Failed to update user with id = " + id);
+			Response.status(Status.NOT_FOUND).build();
+		}
+		
+		logger.info("Updated user with id = " + id);
+		return Response.ok().build();
 	}
 
 	/**
@@ -67,7 +81,13 @@ public class AdministratorSubResource {
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response delete(@PathParam("id") int id) {
-		return (this.userDAO.deleteUser(id)) ? Response.ok().build() : Response
-				.status(Status.NOT_FOUND).build();
+		
+		if(!this.userDAO.deleteUser(id)) {
+			logger.info("Failed to delete user with id = " + id);
+			Response.status(Status.NOT_FOUND).build();
+		}
+		
+		logger.info("Deleted user with id = " + id);
+		return Response.ok().build();
 	}
 }

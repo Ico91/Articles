@@ -46,7 +46,7 @@ public class AdministratorResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<User> getUsers() {
-		logger.info("Administrator get list of all users");
+		logger.info("Administrator readed all users info");
 		return this.userDAO.getUsers();
 	}
 
@@ -63,11 +63,17 @@ public class AdministratorResource {
 
 		// TODO: Validations, unique username
 
-		// TODO: Change to correct ID
-		createUserArticlesFile(0);
+		User user = this.userDAO.addUser(userToAdd);
+		if (user == null) {
+			logger.info("Failed to create user");
+			return Response.status(Status.BAD_REQUEST).build();
+		}
 
-		return (this.userDAO.addUser(userToAdd)) ? Response.ok().build()
-				: Response.status(Status.BAD_REQUEST).build();
+		createUserArticlesFile(user.getUserId());
+		logger.info("Created user " + user.getUsername() + " with id = "
+				+ user.getUserId());
+		return Response.ok().build();
+
 	}
 
 	@Path("{id}")
@@ -82,19 +88,8 @@ public class AdministratorResource {
 	 *            User ID
 	 */
 	private void createUserArticlesFile(int userId) {
-		String path = ConfigurationListener.getPath();
-
-		// TODO: Duplicated [ArticlesResourceBase - getArticlesPath]
-		// FIXME: Move to Configuration Listener
-		if (path == null) {
-			String message = "Cannot read articles file path.";
-			throw new RuntimeException(message);
-		}
-
-		ArticlesDAO articlesDAO = new ArticlesDAO(path);
+		ArticlesDAO articlesDAO = new ArticlesDAO(
+				ConfigurationListener.getPath());
 		articlesDAO.saveArticles(userId, new ArrayList<Article>());
-
-		logger.info("Administrator created new articles file for user with id = "
-				+ userId + " at " + path);
 	}
 }
