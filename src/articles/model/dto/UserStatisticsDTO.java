@@ -21,7 +21,7 @@ public class UserStatisticsDTO {
 	public UserStatisticsDTO() { }
 
 	public UserStatisticsDTO(Date activityDate, UserActivity userActivity) {
-		this.activityDate = activityDate;
+		this.activityDate = new Date(activityDate.getTime());
 		this.userActivity = userActivity;
 	}
 
@@ -57,11 +57,11 @@ public class UserStatisticsDTO {
 	}
 
 	public Date getactivityDate() {
-		return activityDate;
+		return new Date(activityDate.getTime());
 	}
 
 	public void setactivityDate(Date activityDate) {
-		this.activityDate = activityDate;
+		this.activityDate = new Date(activityDate.getTime());
 	}
 
 	public UserActivity getuserActivity() {

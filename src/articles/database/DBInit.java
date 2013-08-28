@@ -13,7 +13,7 @@ import articles.web.listener.ConfigurationListener;
 public class DBInit {
 	protected static final EntityManagerFactory factory = Persistence
 			.createEntityManagerFactory(ConfigurationListener.PERSISTENCE_NAME);
-	protected static EntityManager entityManager =  factory.createEntityManager();
+	protected static final EntityManager entityManager =  factory.createEntityManager();
 
 	public static void main(String[] args) {
 		entityManager.getTransaction().begin();
@@ -23,6 +23,18 @@ public class DBInit {
 		user.setLastLogin(Calendar.getInstance().getTime());
 		user.setUserId(111);
 		user.setUserType(UserType.ADMIN);
+
+		entityManager.persist(user);
+		entityManager.getTransaction().commit();
+
+		
+		entityManager.getTransaction().begin();
+		user = new User();
+		user.setUsername("user");
+		user.setPassword("321");
+		user.setLastLogin(Calendar.getInstance().getTime());
+		user.setUserId(112);
+		user.setUserType(UserType.USER);
 
 		entityManager.persist(user);
 		entityManager.getTransaction().commit();
