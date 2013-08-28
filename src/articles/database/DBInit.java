@@ -27,6 +27,18 @@ public class DBInit {
 		entityManager.persist(user);
 		entityManager.getTransaction().commit();
 
+		
+		entityManager.getTransaction().begin();
+		user = new User();
+		user.setUsername("user");
+		user.setPassword("321");
+		user.setLastLogin(Calendar.getInstance().getTime());
+		user.setUserId(112);
+		user.setUserType(UserType.USER);
+
+		entityManager.persist(user);
+		entityManager.getTransaction().commit();
+
 		entityManager.close();
 	}
 }
