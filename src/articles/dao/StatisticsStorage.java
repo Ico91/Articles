@@ -23,6 +23,9 @@ import articles.model.dto.UserStatisticsDTO;
  * 
  */
 class StatisticsStorage {
+	private static final String LOAD_USER_STATISTICS = "SELECT user_activity, activity_date "
+			+ "FROM statistics WHERE DATE(activity_date) = ?1 AND userid = ?2";
+
 	private EntityManager entityManager;
 	private Logger logger = Logger.getLogger(getClass());
 
@@ -48,10 +51,8 @@ class StatisticsStorage {
 		} catch (PersistenceException e) {
 			logger.error("Error while saving activity statistics "
 					+ event.toString() + ", for user with user id: " + userId);
-			throw new DAOException(
-					"Error while saving activity statistics "
-							+ event.toString() + ", for user with user id: "
-							+ userId);
+			throw new DAOException("Error while saving activity statistics "
+					+ event.toString() + ", for user with user id: " + userId);
 		}
 	}
 
@@ -72,7 +73,7 @@ class StatisticsStorage {
 
 		SimpleDateFormat databaseFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Query selectQuery = entityManager
-				.createNativeQuery("SELECT user_activity, activity_date FROM statistics WHERE DATE(activity_date) = ?1 AND userid = ?2");
+				.createNativeQuery(LOAD_USER_STATISTICS);
 		selectQuery.setParameter(1, databaseFormat.format(date));
 		selectQuery.setParameter(2, userId);
 		try {
