@@ -23,7 +23,7 @@ import articles.model.dto.UserStatisticsDTO;
  * 
  */
 class StatisticsStorage {
-	private final String LOAD_USER_STATISTICS = "SELECT user_activity, activity_date "
+	private static final String LOAD_USER_STATISTICS = "SELECT user_activity, activity_date "
 			+ "FROM statistics WHERE DATE(activity_date) = ?1 AND userid = ?2";
 
 	private EntityManager entityManager;

@@ -26,6 +26,6 @@ public class DateAdapter {
 	}
 
 	public Date getDate() {
-		return date;
+		return new Date(date.getTime());
 	}
 }

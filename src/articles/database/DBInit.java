@@ -13,7 +13,7 @@ import articles.web.listener.ConfigurationListener;
 public class DBInit {
 	protected static final EntityManagerFactory factory = Persistence
 			.createEntityManagerFactory(ConfigurationListener.PERSISTENCE_NAME);
-	protected static EntityManager entityManager =  factory.createEntityManager();
+	protected static final EntityManager entityManager =  factory.createEntityManager();
 
 	public static void main(String[] args) {
 		entityManager.getTransaction().begin();

@@ -75,11 +75,11 @@ public class UserStatistics {
 	}
 
 	public Date getActivityDate() {
-		return activityDate;
+		return new Date(activityDate.getTime());
 	}
 
 	public void setActivityDate(Date activityDate) {
-		this.activityDate = activityDate;
+		this.activityDate = new Date(activityDate.getTime());
 	}
 
 	public UserActivity getEvent() {
