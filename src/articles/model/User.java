@@ -25,11 +25,14 @@ public class User {
 	@Column(name="userId")
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private int userId;
+	@Column(unique = true, nullable = false)
 	private String username;
+	@Column(nullable = false)
 	private String password;
 	@Column(name="last_login")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date lastLogin;
+	@Column(nullable = false)
 	private UserType userType;
 	
 	public User() {

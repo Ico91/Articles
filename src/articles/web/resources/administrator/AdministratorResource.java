@@ -52,6 +52,10 @@ public class AdministratorResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response addUser(NewUserRequest userToAdd) {
 		// TODO: Validations, unique username
+		
+		// TODO: Create articles file
+		
+		
 		return (this.userDAO.addUser(userToAdd)) ? Response.ok().build()
 				: Response.status(Status.BAD_REQUEST).build();
 	}
