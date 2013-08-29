@@ -14,6 +14,12 @@ import articles.validators.ErrorMessageBuilder;
 import articles.validators.MessageKey;
 import articles.validators.UserValidator;
 
+/**
+ * Base class for administrator resources
+ * 
+ * @author Krasimir Atanasov
+ * 
+ */
 public class AdministratorResourceBase {
 	protected UserDAO userDAO;
 	protected final Logger logger;
@@ -23,6 +29,13 @@ public class AdministratorResourceBase {
 		this.userDAO = new UserDAO();
 	}
 
+	/**
+	 * Validate user and return appropriate response
+	 * 
+	 * @param userToCheck
+	 * @param users
+	 * @return null if the user is correct otherwise Response
+	 */
 	protected Response validationResponse(NewUserRequest userToCheck,
 			List<User> users) {
 
@@ -30,9 +43,10 @@ public class AdministratorResourceBase {
 		List<MessageKey> messageKeys = validator.validate();
 
 		if (!messageKeys.isEmpty()) {
-			return Response.status(Status.BAD_REQUEST)
-					.entity(new ErrorMessageBuilder(messageKeys).getMessage())
-					.build();
+			return Response
+					.status(Status.BAD_REQUEST)
+					.entity(new ErrorMessageBuilder(messageKeys)
+							.getErrorMessage()).build();
 		}
 
 		return null;

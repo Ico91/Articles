@@ -6,6 +6,12 @@ import java.util.List;
 import articles.model.User;
 import articles.model.dto.NewUserRequest;
 
+/**
+ * Validate users
+ * 
+ * @author Galina Hristova
+ *
+ */
 public class UserValidator implements Validator {
 	private NewUserRequest userToCheck;
 	private List<User> users;
@@ -15,6 +21,11 @@ public class UserValidator implements Validator {
 		this.users = users;
 	}
 	
+	/**
+	 * Validate username, password and user type
+	 * 
+	 *  @return List of MessageKeys
+	 */
 	@Override
 	public List<MessageKey> validate() {
 		List<MessageKey> listOfMessageKeys = new ArrayList<MessageKey>();
@@ -38,6 +49,11 @@ public class UserValidator implements Validator {
 		return listOfMessageKeys;
 	}
 	
+	/**
+	 * Check if username is unique
+	 * 
+	 * @return true if the username is unique, otherwise false
+	 */
 	private boolean isUsernameUnique() {
 		for (User u : users) {
 			if (u.getUsername().equals(userToCheck.getUsername())) {

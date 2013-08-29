@@ -44,14 +44,19 @@ public class DAOBase {
 		storage.save(userId, activity);
 	}
 
+	/**
+	 * Defines if any errors have occurred
+	 * 
+	 * @param validator
+	 */
 	public void validate(Validator validator) {
 		List<MessageKey> messageKeys = validator.validate();
 
 		if (messageKeys.size() != 0) {
 			ErrorMessageBuilder builder = new ErrorMessageBuilder(messageKeys);
-			logger.error(builder.getMessage().getMessage());
+			logger.error(builder.getErrorMessage().getMessage());
 
-			throw new DAOException(builder.getMessage().getMessage());
+			throw new DAOException(builder.getErrorMessage().getMessage());
 		}
 	}
 }

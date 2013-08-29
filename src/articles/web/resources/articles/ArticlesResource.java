@@ -25,7 +25,7 @@ import articles.model.Articles.Article;
  */
 @Path("")
 public class ArticlesResource extends ArticlesResourceBase {
-	
+
 	public ArticlesResource(@Context HttpServletRequest serlvetRequest) {
 		super(serlvetRequest);
 	}
@@ -60,7 +60,7 @@ public class ArticlesResource extends ArticlesResourceBase {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response add(Article article) {
-		//	TODO: Duplicated code with ArticlesSubResource
+		// TODO: Duplicated code with ArticlesSubResource
 		Response validationResponse = validationResponse(article);
 
 		if (validationResponse != null) {

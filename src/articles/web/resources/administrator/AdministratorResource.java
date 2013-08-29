@@ -55,7 +55,6 @@ public class AdministratorResource extends AdministratorResourceBase {
 	public Response addUser(final NewUserRequest userToAdd) {
 		return validateAndExecute(userToAdd, this.userDAO.getUsers(),
 				new Executable() {
-
 					@Override
 					public Response execute(UserDAO userDAO) {
 						User user = userDAO.addUser(userToAdd);

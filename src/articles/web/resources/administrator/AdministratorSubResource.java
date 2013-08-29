@@ -61,16 +61,16 @@ public class AdministratorSubResource extends AdministratorResourceBase {
 	public Response update(@PathParam("id") int id, final NewUserRequest user) {
 		List<User> users = this.userDAO.getUsers();
 		final int userId = id;
-		
-		//	Remove user from list of all users
-		for(int i = 0; i < users.size(); i ++) {
-			if(users.get(i).getUserId() == id) {
+
+		// Remove user from list of all users
+		for (int i = 0; i < users.size(); i++) {
+			if (users.get(i).getUserId() == id) {
 				users.remove(i);
 			}
 		}
-		
+
 		return validateAndExecute(user, users, new Executable() {
-			
+
 			@Override
 			public Response execute(UserDAO userDAO) {
 				if (!userDAO.updateUser(userId, user)) {
@@ -100,10 +100,11 @@ public class AdministratorSubResource extends AdministratorResourceBase {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 
-		//	Remove articles file of deleted user
-		ArticlesDAO articlesDAO = new ArticlesDAO(ConfigurationListener.getPath());
+		// Remove articles file of deleted user
+		ArticlesDAO articlesDAO = new ArticlesDAO(
+				ConfigurationListener.getPath());
 		articlesDAO.deleteUserArticlesFile(id);
-		
+
 		logger.info("Deleted user with id = " + id);
 		return Response.ok().build();
 	}

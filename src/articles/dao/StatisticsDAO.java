@@ -46,7 +46,8 @@ public class StatisticsDAO extends DAOBase {
 	 * specified date.
 	 * 
 	 * @param date
-	 * @return Map of user id as keys and list of {@link articles.model.dto.UserStatisticsDTO} as values
+	 * @return Map of user id as keys and list of
+	 *         {@link articles.model.dto.UserStatisticsDTO} as values
 	 */
 	public Map<Integer, List<UserStatisticsDTO>> load(final Date date) {
 		return manager
@@ -59,8 +60,7 @@ public class StatisticsDAO extends DAOBase {
 								entityManager);
 						Map<Integer, List<UserStatisticsDTO>> result = new HashMap<Integer, List<UserStatisticsDTO>>();
 						for (int uId : statisticsStorage.getUsers()) {
-							result.put(uId,
-									statisticsStorage.load(uId, date));
+							result.put(uId, statisticsStorage.load(uId, date));
 						}
 						return result;
 					}

@@ -12,34 +12,35 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-/** Stores data for users in the system.
- * Each user has an unique username.
+/**
+ * Stores data for users in the system. Each user has an unique username.
+ * 
  * @author Galina Hristova
- *
+ * 
  */
 @Entity
-@Table(name="users")
+@Table(name = "users")
 @XmlRootElement
 public class User {
 	@Id
-	@Column(name="userId")
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@Column(name = "userId")
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int userId;
 	@Column(unique = true, nullable = false)
 	private String username;
 	@Column(nullable = false)
 	private String password;
-	@Column(name="last_login")
+	@Column(name = "last_login")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date lastLogin;
 	@Column(nullable = false)
 	private UserType userType;
-	
+
 	public User() {
-	
+
 	}
-	
-	public User(int userId, String username, String password, UserType userType ) {
+
+	public User(int userId, String username, String password, UserType userType) {
 		this.userId = userId;
 		this.username = username;
 		this.password = password;
@@ -71,7 +72,7 @@ public class User {
 			return false;
 		return true;
 	}
-	
+
 	public int getUserId() {
 		return userId;
 	}
@@ -99,7 +100,7 @@ public class User {
 	public Date getLastLogin() {
 		return lastLogin;
 	}
-	
+
 	public void setLastLogin(Date lastLogin) {
 		this.lastLogin = lastLogin;
 	}
@@ -111,5 +112,5 @@ public class User {
 	public void setUserType(UserType userType) {
 		this.userType = userType;
 	}
-	
+
 }

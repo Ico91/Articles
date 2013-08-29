@@ -20,7 +20,7 @@ import articles.model.Articles.Article;
  * 
  */
 public class ArticleSubResource extends ArticlesResourceBase {
-		
+
 	public ArticleSubResource(HttpServletRequest servletRequest) {
 		super(servletRequest);
 	}
@@ -35,7 +35,7 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getArticle(@PathParam("id") int id) {		
+	public Response getArticle(@PathParam("id") int id) {
 		Article article = this.dao.getArticleById(userId, id);
 
 		if (article == null) {
@@ -64,8 +64,8 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateArticle(Article article, @PathParam("id") int id) {
-		article.setId(id);		
-		
+		article.setId(id);
+
 		Response validationResponse = validationResponse(article);
 
 		if (validationResponse != null) {
