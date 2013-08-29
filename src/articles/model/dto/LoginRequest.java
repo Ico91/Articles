@@ -5,26 +5,27 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-/**Contains the entered username and password.
+/**
+ * Contains the entered username and password.
+ * 
  * @author Galina Hristova
- *
+ * 
  */
-//TODO why this class is in this package
-//TODO why this package exists at all
+// TODO why this class is in this package
+// TODO why this package exists at all
 
 @XmlRootElement(name = "request")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class LoginRequest{
+public class LoginRequest {
 	@XmlElement(required = true)
 	protected String username;
 	@XmlElement(required = true)
 	protected String password;
-	
+
 	public LoginRequest() {
-		
+
 	}
-	
-	
+
 	@Override
 	public int hashCode() {
 		return username.hashCode();
@@ -49,7 +50,7 @@ public class LoginRequest{
 		return "LoginRequest [username=" + username + ", password=" + password
 				+ "]";
 	}
-	
+
 	public String getUsername() {
 		return username;
 	}

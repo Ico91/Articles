@@ -25,20 +25,23 @@ import articles.model.dto.LoginRequest;
 import articles.model.dto.UserDTO;
 import articles.web.listener.ConfigurationListener;
 
-/**Class for performing user requests
+/**
+ * Class for performing user requests
+ * 
  * @author Galina Hristova
- *
+ * 
  */
 @Path("")
-
 public class UsersResource {
 	static final Logger logger = Logger.getLogger(UsersResource.class);
 	@Context
 	ServletContext context;
-	
+
 	/**
-	 * If a user with the username and password, entered by a client, exists returns a response for success,
-	 * otherwise returns response the the client is not authorized. On success a new session is created.
+	 * If a user with the username and password, entered by a client, exists
+	 * returns a response for success, otherwise returns response the the client
+	 * is not authorized. On success a new session is created.
+	 * 
 	 * @param loginRequest
 	 * @param servletResponse
 	 * @param servletRequest
@@ -47,33 +50,38 @@ public class UsersResource {
 	 */
 	@POST
 	@Path("login")
-	@Consumes({"application/xml, application/json"})
+	@Consumes({ "application/xml, application/json" })
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response login(LoginRequest loginRequest,
 			@Context HttpServletResponse servletResponse,
-			@Context HttpServletRequest servletRequest, @Context UriInfo uriInfo) throws 
-			ServletException {
-		UserDAO userDAO = new UserDAO();
-		//TODO User validation!
-		User user = userDAO.login(loginRequest.getUsername(), loginRequest.getPassword(), UserActivity.LOGIN, new Date());
-		if (user != null) {
-			servletRequest.getSession().invalidate();
-			HttpSession session = servletRequest.getSession();
-			session.setAttribute(ConfigurationListener.USERID, user.getUserId());
-			session.setAttribute(ConfigurationListener.USERTYPE, user.getUserType());
-			
-			logger.info("User with id = " + user.getUserId() + " logged in the system.");
+			@Context HttpServletRequest servletRequest, @Context UriInfo uriInfo)
+			throws ServletException {
 
-			
-			return Response.ok(new UserDTO(user)).build();
-		} else {
+		UserDAO userDAO = new UserDAO();
+		User user = userDAO.login(loginRequest.getUsername(),
+				loginRequest.getPassword(), UserActivity.LOGIN, new Date());
+		
+		if (user == null) {
 			logger.error("Unauthorized user tried to log in.");
 			return Response.status(Response.Status.UNAUTHORIZED).build();
 		}
+		
+		servletRequest.getSession().invalidate();
+		HttpSession session = servletRequest.getSession();
+		session.setAttribute(ConfigurationListener.USERID, user.getUserId());
+		session.setAttribute(ConfigurationListener.USERTYPE,
+				user.getUserType());
+
+		logger.info("User with id = " + user.getUserId()
+				+ " logged in the system.");
+
+		return Response.ok(new UserDTO(user)).build();
+		
 	}
 
 	/**
 	 * On success a user session is destroyed.
+	 * 
 	 * @param servletResponse
 	 * @param servletRequest
 	 * @return
@@ -83,18 +91,25 @@ public class UsersResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response logout(@Context HttpServletResponse servletResponse,
 			@Context HttpServletRequest servletRequest) {
+		
 		HttpSession session = servletRequest.getSession(false);
 		UserDAO userDAO = new UserDAO();
-		if (session != null) {
-			int userId = (int)session.getAttribute(ConfigurationListener.USERID);
-			session.invalidate();
-			logger.info("User with id = " + userId + " logged out from the system.");
-	
-			userDAO.logout(userId, UserActivity.LOGOUT);
-			
-			return Response.ok().build();
+		
+		if (session == null) {
+			logger.error("Unauthorized user tried to log out.");
+			return Response.status(Response.Status.UNAUTHORIZED).build();
 		}
-		logger.error("Unauthorized user tried to log out.");
-		return Response.status(Response.Status.UNAUTHORIZED).build();
+		
+		int userId = (int) session
+				.getAttribute(ConfigurationListener.USERID);
+		session.invalidate();
+		userDAO.logout(userId, UserActivity.LOGOUT);
+		
+		logger.info("User with id = " + userId
+				+ " logged out from the system.");
+
+		return Response.ok().build();
+		
+		
 	}
 }

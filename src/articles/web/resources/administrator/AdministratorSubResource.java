@@ -59,21 +59,21 @@ public class AdministratorSubResource extends AdministratorResourceBase {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response update(@PathParam("id") int id, NewUserRequest user) {
 		List<User> users = this.userDAO.getUsers();
-		
-		//	Remove user from list of all users
-		for(int i = 0; i < users.size(); i ++) {
-			if(users.get(i).getUserId() == id) {
+
+		// Remove user from list of all users
+		for (int i = 0; i < users.size(); i++) {
+			if (users.get(i).getUserId() == id) {
 				users.remove(i);
 			}
 		}
-		
+
 		Response validationResponse = validationResponse(user, users);
-		
-		if(validationResponse != null) {
+
+		if (validationResponse != null) {
 			logger.info("Invalid request format");
 			return validationResponse;
 		}
-		
+
 		if (!this.userDAO.updateUser(id, user)) {
 			logger.info("Failed to update user with id = " + id);
 			return Response.status(Status.NOT_FOUND).build();
@@ -99,10 +99,11 @@ public class AdministratorSubResource extends AdministratorResourceBase {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 
-		//	Remove articles file of deleted user
-		ArticlesDAO articlesDAO = new ArticlesDAO(ConfigurationListener.getPath());
+		// Remove articles file of deleted user
+		ArticlesDAO articlesDAO = new ArticlesDAO(
+				ConfigurationListener.getPath());
 		articlesDAO.deleteUserArticlesFile(id);
-		
+
 		logger.info("Deleted user with id = " + id);
 		return Response.ok().build();
 	}

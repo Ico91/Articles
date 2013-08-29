@@ -50,9 +50,10 @@ public abstract class ArticlesResourceBase {
 		List<MessageKey> messageKeys = validator.validate();
 
 		if (!messageKeys.isEmpty()) {
-			return Response.status(Status.BAD_REQUEST)
-					.entity(new ErrorMessageBuilder(messageKeys).getMessage())
-					.build();
+			return Response
+					.status(Status.BAD_REQUEST)
+					.entity(new ErrorMessageBuilder(messageKeys)
+							.getErrorMessage()).build();
 		}
 
 		return null;

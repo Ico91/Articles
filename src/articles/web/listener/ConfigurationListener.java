@@ -13,21 +13,23 @@ import javax.ws.rs.core.Context;
 
 import org.apache.log4j.Logger;
 
-/**Generate the path from a property file which defines where the articles to be stored.
- * Application Lifecycle Listener implementation class SessionAttributesConfigurationListener
- *
- *@author Galina Hristova
+/**
+ * Generate after login the path from a property file which defines where the articles to be
+ * stored.
+ * 
+ * @author Galina Hristova
  */
 @WebListener
-public class ConfigurationListener implements HttpSessionListener, ServletContextListener {
+public class ConfigurationListener implements HttpSessionListener,
+		ServletContextListener {
 	private static final String CONFIGURATION_PATH = "WEB-INF/config.properties";
 	public static final String USERID = "userId";
 	public static final String USERTYPE = "userType";
 	public static final String PERSISTENCE_NAME = "UserPE";
 	public static final String PERSISTENCE_NAME_TEST = "TestPE";
 	private static String path = "";
-	private Logger logger = Logger.getLogger( getClass() );
-	
+	private Logger logger = Logger.getLogger(getClass());
+
 	@Context
 	ServletContext context;
 
@@ -38,9 +40,10 @@ public class ConfigurationListener implements HttpSessionListener, ServletContex
 
 		return path;
 	}
+
 	@Override
 	public void contextDestroyed(ServletContextEvent event) {
-		
+
 	}
 
 	@Override
@@ -50,18 +53,20 @@ public class ConfigurationListener implements HttpSessionListener, ServletContex
 
 	@Override
 	public void sessionDestroyed(HttpSessionEvent arg0) {
-		
+
 	}
+
 	@Override
 	public void sessionCreated(HttpSessionEvent arg0) {
-		try { 
+		try {
 			Properties properties = new Properties();
-			properties.load(this.context.getResourceAsStream(CONFIGURATION_PATH));
+			properties.load(this.context
+					.getResourceAsStream(CONFIGURATION_PATH));
 			path = properties.getProperty("path") + "/";
-		} catch ( IOException e ) {
+		} catch (IOException e) {
 			logger.error("Error while configuring the path.");
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 }

@@ -12,27 +12,26 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 /**
- * Holds statistics for the specified user, based on his
- * activities. The statistics contains the event itself,
- * the time it happened and the user's id.
+ * Holds statistics for the specified user, based on his activities. The
+ * statistics contains the event itself, the time it happened and the user's id.
  * 
  * @author Hristo
- *
+ * 
  */
 @Entity
-@Table(name="statistics")
+@Table(name = "statistics")
 public class UserStatistics {
 	@Id
-	@Column(name="activity_id")
+	@Column(name = "activity_id")
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int activityId;
 	private int userId;
-	@Column(name="activity_date")
+	@Column(name = "activity_date")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date activityDate;
-	@Column(name="user_activity")
+	@Column(name = "user_activity")
 	private UserActivity userActivity;
-	
+
 	@Override
 	public int hashCode() {
 		return activityId;
@@ -54,8 +53,8 @@ public class UserStatistics {
 
 	@Override
 	public String toString() {
-		return "Statistics [activityId=" + activityId + ", activityDate=" + activityDate + ", event="
-				+ userActivity + "]";
+		return "Statistics [activityId=" + activityId + ", activityDate="
+				+ activityDate + ", event=" + userActivity + "]";
 	}
 
 	public int getActivityId() {
@@ -65,7 +64,7 @@ public class UserStatistics {
 	public void setActivityId(int activityId) {
 		this.activityId = activityId;
 	}
-	
+
 	public int getUserId() {
 		return userId;
 	}
@@ -89,5 +88,5 @@ public class UserStatistics {
 	public void setUserActivity(UserActivity userActivity) {
 		this.userActivity = userActivity;
 	}
-	
+
 }

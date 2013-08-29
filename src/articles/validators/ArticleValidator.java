@@ -11,10 +11,10 @@ import articles.model.Articles.Article;
  * @author Krasimir Atanasov
  * 
  */
-public class ArticleValidator implements Validator{
+public class ArticleValidator implements Validator {
 	private Article article;
 	private List<Article> articles;
-	
+
 	public ArticleValidator(Article article, List<Article> articles) {
 		this.article = article;
 		this.articles = articles;
@@ -23,8 +23,6 @@ public class ArticleValidator implements Validator{
 	/**
 	 * Validate article content and title
 	 * 
-	 * @param article
-	 *            Article to validate
 	 * @return List of MessageKeys
 	 */
 	@Override
@@ -50,9 +48,6 @@ public class ArticleValidator implements Validator{
 	/**
 	 * Check if article title is unique
 	 * 
-	 * @param article
-	 *            Article to check
-	 * @param listOfArticles
 	 * @return True if article title is unique, false otherwise
 	 */
 	private boolean uniqueTitle() {

@@ -111,7 +111,7 @@ public class ArticlesDAO extends DAOBase {
 	public void createUserArticlesFile(int userId) {
 		saveArticles(userId, new ArrayList<Article>());
 	}
-	
+
 	/**
 	 * Delete user articles file
 	 * 
@@ -127,7 +127,7 @@ public class ArticlesDAO extends DAOBase {
 			articlesFile.delete();
 		}
 	}
-	
+
 	/**
 	 * Get article with specified ID. Returns null if article not exist
 	 * 
@@ -247,7 +247,6 @@ public class ArticlesDAO extends DAOBase {
 				}
 
 				return false;
-
 			}
 		});
 	}

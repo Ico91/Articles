@@ -6,11 +6,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class ErrorMessage {
 	private String message;
-	
+
 	public ErrorMessage() {
-		
+
 	}
-	
+
 	public ErrorMessage(String message) {
 		this.setMessage(message);
 	}
@@ -18,11 +18,10 @@ public class ErrorMessage {
 	public String getMessage() {
 		return message;
 	}
-	
+
 	@XmlElement
 	public void setMessage(String message) {
 		this.message = message;
 	}
-	
-	
+
 }

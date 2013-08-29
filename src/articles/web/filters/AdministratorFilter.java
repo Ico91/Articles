@@ -13,13 +13,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import articles.dao.UserDAO;
-import articles.model.User;
 import articles.model.UserType;
 import articles.web.listener.ConfigurationListener;
 
 /**
- * Servlet Filter implementation class AdministratorFilter
+ * Filter that provides access to the administration panel for users of type
+ * ADMIN only
+ * 
+ * @author Galina Hristova
+ * 
  */
 @WebFilter("/AdministratorFilter")
 public class AdministratorFilter implements Filter {

@@ -6,9 +6,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import articles.model.User;
 
-/**A transport object for class User that does not contain information about the password.
+/**
+ * A transport object for class User that does not contain information about the
+ * password.
+ * 
  * @author Galina Hristova
- *
+ * 
  */
 @XmlRootElement
 public class UserDTO {
@@ -50,7 +53,7 @@ public class UserDTO {
 		return "UserDTO [userId=" + userId + ", username=" + username
 				+ ", lastLogin=" + lastLogin + "]";
 	}
-	
+
 	public int getUserId() {
 		return userId;
 	}

@@ -17,8 +17,9 @@ import articles.model.UserActivity;
 public class UserStatisticsDTO {
 	private Date activityDate;
 	private UserActivity userActivity;
-	
-	public UserStatisticsDTO() { }
+
+	public UserStatisticsDTO() {
+	}
 
 	public UserStatisticsDTO(Date activityDate, UserActivity userActivity) {
 		this.activityDate = new Date(activityDate.getTime());
@@ -52,8 +53,8 @@ public class UserStatisticsDTO {
 
 	@Override
 	public String toString() {
-		return "UserStatisticsDTO [activityDate=" + activityDate + ", userActivity=" + userActivity
-				+ "]";
+		return "UserStatisticsDTO [activityDate=" + activityDate
+				+ ", userActivity=" + userActivity + "]";
 	}
 
 	public Date getactivityDate() {

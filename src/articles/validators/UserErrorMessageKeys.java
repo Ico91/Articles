@@ -1,5 +1,11 @@
 package articles.validators;
 
+/**
+ * Defines the error messages used while validating an user
+ * 
+ * @author Galina Hristova
+ *
+ */
 public enum UserErrorMessageKeys implements MessageKey {
 	USERNAME_IS_NULL("Username is null"),
 	USERNAME_IS_EMPTY("Username is empty"),
@@ -9,9 +15,11 @@ public enum UserErrorMessageKeys implements MessageKey {
 	NOT_UNIQUE_USERNAME("Username is not unique");
 	
 	private String value;
+	
 	private UserErrorMessageKeys(String value) {
 		this.value = value;
 	}
+	
 	
 	@Override
 	public String getValue() {

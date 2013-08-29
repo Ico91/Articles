@@ -28,7 +28,6 @@ class StatisticsStorage {
 	private static final String LOAD_USER_STATISTICS = "SELECT user_activity, activity_date "
 			+ "FROM statistics WHERE DATE(activity_date) = ?1 AND userid = ?2";
 	private static final String LOAD_USER_IDS = "SELECT userid FROM statistics";
-
 	private EntityManager entityManager;
 	private Logger logger = Logger.getLogger(getClass());
 
@@ -94,15 +93,15 @@ class StatisticsStorage {
 		}
 
 	}
-	
+
 	/**
 	 * Loads all users' id from the statistics table.
+	 * 
 	 * @return Collection holding unique user identifications.
 	 */
 	@SuppressWarnings("unchecked")
 	public Set<Integer> getUsers() {
-		Query selectQuery = entityManager
-				.createNativeQuery(LOAD_USER_IDS);
+		Query selectQuery = entityManager.createNativeQuery(LOAD_USER_IDS);
 		try {
 			Set<Integer> resultList = new HashSet<Integer>();
 			resultList.addAll(selectQuery.getResultList());

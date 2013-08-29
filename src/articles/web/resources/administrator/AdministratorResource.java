@@ -52,8 +52,9 @@ public class AdministratorResource extends AdministratorResourceBase {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addUser(NewUserRequest userToAdd) {
-		//	TODO: Duplicated code [AdministratorSubResource]
-		Response validationResponse = validationResponse(userToAdd, this.userDAO.getUsers());
+		// TODO: Duplicated code [AdministratorSubResource]
+		Response validationResponse = validationResponse(userToAdd,
+				this.userDAO.getUsers());
 
 		if (validationResponse != null) {
 			logger.info("Invalid request format");
