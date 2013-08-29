@@ -51,4 +51,21 @@ public class AdministratorResourceBase {
 
 		return null;
 	}
+
+	protected interface Executable {
+		Response execute(UserDAO userDAO);
+	}
+
+	protected Response validateAndExecute(final NewUserRequest request,
+			List<User> users, Executable executable) {
+
+		Response validationResponse = validationResponse(request, users);
+
+		if (validationResponse != null) {
+			logger.info("Invalid request format");
+			return validationResponse;
+		}
+
+		return executable.execute(this.userDAO);
+	}
 }

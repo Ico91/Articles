@@ -13,6 +13,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import articles.dao.ArticlesDAO;
+import articles.dao.UserDAO;
 import articles.model.User;
 import articles.model.dto.NewUserRequest;
 import articles.web.listener.ConfigurationListener;
@@ -52,13 +53,14 @@ public class AdministratorSubResource extends AdministratorResourceBase {
 	 *            ID of the user to update
 	 * @param user
 	 *            New user information
-	 * @return Response with code 200 on success, 400 otherwise
+	 * @return Response with code 200 on success, 404 otherwise
 	 */
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response update(@PathParam("id") int id, NewUserRequest user) {
+	public Response update(@PathParam("id") int id, final NewUserRequest user) {
 		List<User> users = this.userDAO.getUsers();
+		final int userId = id;
 
 		// Remove user from list of all users
 		for (int i = 0; i < users.size(); i++) {
@@ -67,20 +69,19 @@ public class AdministratorSubResource extends AdministratorResourceBase {
 			}
 		}
 
-		Response validationResponse = validationResponse(user, users);
+		return validateAndExecute(user, users, new Executable() {
 
-		if (validationResponse != null) {
-			logger.info("Invalid request format");
-			return validationResponse;
-		}
+			@Override
+			public Response execute(UserDAO userDAO) {
+				if (!userDAO.updateUser(userId, user)) {
+					logger.info("Failed to update user with id = " + userId);
+					return Response.status(Status.NOT_FOUND).build();
+				}
 
-		if (!this.userDAO.updateUser(id, user)) {
-			logger.info("Failed to update user with id = " + id);
-			return Response.status(Status.NOT_FOUND).build();
-		}
-
-		logger.info("Updated user with id = " + id);
-		return Response.ok().build();
+				logger.info("Updated user with id = " + userId);
+				return Response.ok().build();
+			}
+		});
 	}
 
 	/**
