@@ -2,7 +2,7 @@ package articles.validators;
 
 import java.util.List;
 
-import articles.model.dto.ErrorMessage;
+import articles.model.dto.MessageDTO;
 
 /**
  * Class used to build message from list of message keys
@@ -10,14 +10,14 @@ import articles.model.dto.ErrorMessage;
  * @author Krasimir Atanasov
  * 
  */
-public class ErrorMessageBuilder {
+public class MessageBuilder {
 	private List<MessageKey> messageKeys;
 
-	public ErrorMessageBuilder(List<MessageKey> messageKeys) {
+	public MessageBuilder(List<MessageKey> messageKeys) {
 		this.messageKeys = messageKeys;
 	}
 
-	public ErrorMessage getErrorMessage() {
+	public MessageDTO getErrorMessage() {
 		StringBuilder stringBuilder = new StringBuilder();
 		for (MessageKey key : this.messageKeys) {
 			stringBuilder.append(key.getValue());
@@ -25,6 +25,6 @@ public class ErrorMessageBuilder {
 			stringBuilder.append(System.lineSeparator());
 		}
 
-		return new ErrorMessage(stringBuilder.toString());
+		return new MessageDTO(stringBuilder.toString());
 	}
 }

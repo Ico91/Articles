@@ -6,7 +6,7 @@ package articles.validators;
  * @author Galina Hristova
  *
  */
-public enum UserErrorMessageKeys implements MessageKey {
+public enum UserMessageKeys implements MessageKey {
 	USERNAME_IS_NULL("Username is null"),
 	USERNAME_IS_EMPTY("Username is empty"),
 	PASSWORD_IS_NULL("Password is null"),
@@ -16,7 +16,7 @@ public enum UserErrorMessageKeys implements MessageKey {
 	
 	private String value;
 	
-	private UserErrorMessageKeys(String value) {
+	private UserMessageKeys(String value) {
 		this.value = value;
 	}
 	

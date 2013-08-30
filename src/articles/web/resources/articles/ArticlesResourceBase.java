@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 import articles.dao.ArticlesDAO;
 import articles.model.Articles.Article;
 import articles.validators.ArticleValidator;
-import articles.validators.ErrorMessageBuilder;
+import articles.validators.MessageBuilder;
 import articles.validators.MessageKey;
 import articles.web.listener.ConfigurationListener;
 
@@ -52,7 +52,7 @@ public abstract class ArticlesResourceBase {
 		if (!messageKeys.isEmpty()) {
 			return Response
 					.status(Status.BAD_REQUEST)
-					.entity(new ErrorMessageBuilder(messageKeys)
+					.entity(new MessageBuilder(messageKeys)
 							.getErrorMessage()).build();
 		}
 

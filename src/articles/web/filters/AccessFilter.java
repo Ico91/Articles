@@ -27,6 +27,10 @@ public class AccessFilter implements Filter {
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpSession session = req.getSession(false);
 		
+		if(req.getMethod().equals("OPTIONS")) {
+			return;
+		}
+		
 		if ( session != null && session.getAttribute(ConfigurationListener.USERID) != null ) {
 			chain.doFilter(req, resp);
 			return;	

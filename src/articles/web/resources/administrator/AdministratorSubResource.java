@@ -2,6 +2,7 @@ package articles.web.resources.administrator;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -15,13 +16,14 @@ import javax.ws.rs.core.Response.Status;
 import articles.dao.ArticlesDAO;
 import articles.dao.UserDAO;
 import articles.model.User;
-import articles.model.dto.NewUserRequest;
+import articles.model.dto.MessageDTO;
+import articles.model.dto.UserDetails;
 import articles.web.listener.ConfigurationListener;
 
 public class AdministratorSubResource extends AdministratorResourceBase {
 
-	public AdministratorSubResource() {
-		super();
+	public AdministratorSubResource(HttpServletRequest request) {
+		super(request);
 	}
 
 	/**
@@ -53,12 +55,12 @@ public class AdministratorSubResource extends AdministratorResourceBase {
 	 *            ID of the user to update
 	 * @param user
 	 *            New user information
-	 * @return Response with code 200 on success, 404 otherwise
+	 * @return Response with code 204 on success, 404 otherwise
 	 */
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response update(@PathParam("id") int id, final NewUserRequest user) {
+	public Response update(@PathParam("id") int id, final UserDetails user) {
 		List<User> users = this.userDAO.getUsers();
 		final int userId = id;
 
@@ -79,7 +81,7 @@ public class AdministratorSubResource extends AdministratorResourceBase {
 				}
 
 				logger.info("Updated user with id = " + userId);
-				return Response.ok().build();
+				return Response.noContent().build();
 			}
 		});
 	}
@@ -89,11 +91,17 @@ public class AdministratorSubResource extends AdministratorResourceBase {
 	 * 
 	 * @param id
 	 *            ID of the user to delete
-	 * @return Response with code 200 on success, 400 otherwise
+	 * @return Response with code 204 on success, 400 if specified ID is ID of
+	 *         the current administrator, 404 if user not found
 	 */
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response delete(@PathParam("id") int id) {
+		if (isCurrentAdmint(id)) {
+			logger.info("Admin whii id = " + id + " try to delete himself");
+			return Response.status(Status.BAD_REQUEST)
+					.entity(new MessageDTO("Cannot delete yourself")).build();
+		}
 
 		if (!this.userDAO.deleteUser(id)) {
 			logger.info("Failed to delete user with id = " + id);
@@ -106,6 +114,17 @@ public class AdministratorSubResource extends AdministratorResourceBase {
 		articlesDAO.deleteUserArticlesFile(id);
 
 		logger.info("Deleted user with id = " + id);
-		return Response.ok().build();
+		return Response.noContent().build();
+	}
+
+	/**
+	 * Check if passed ID is current admin ID
+	 * @param id ID to check
+	 * @return True if id is same as current admin
+	 */
+	private boolean isCurrentAdmint(int id) {
+		int currentAdminId = Integer.parseInt(this.request.getSession()
+				.getAttribute(ConfigurationListener.USERID).toString());
+		return (id == currentAdminId) ? true : false;
 	}
 }

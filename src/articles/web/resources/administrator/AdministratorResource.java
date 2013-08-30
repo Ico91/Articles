@@ -2,11 +2,13 @@ package articles.web.resources.administrator;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -14,7 +16,7 @@ import javax.ws.rs.core.Response.Status;
 import articles.dao.ArticlesDAO;
 import articles.dao.UserDAO;
 import articles.model.User;
-import articles.model.dto.NewUserRequest;
+import articles.model.dto.UserDetails;
 import articles.web.listener.ConfigurationListener;
 
 /**
@@ -26,8 +28,8 @@ import articles.web.listener.ConfigurationListener;
 @Path("")
 public class AdministratorResource extends AdministratorResourceBase {
 
-	public AdministratorResource() {
-		super();
+	public AdministratorResource(@Context HttpServletRequest request) {
+		super(request);
 	}
 
 	/**
@@ -47,12 +49,12 @@ public class AdministratorResource extends AdministratorResourceBase {
 	 * 
 	 * @param userToAdd
 	 *            User to create
-	 * @return Response with status code 200 on success, 400 on error
+	 * @return Response with status code 204 on success, 400 on error
 	 */
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response addUser(final NewUserRequest userToAdd) {
+	public Response addUser(final UserDetails userToAdd) {
 		return validateAndExecute(userToAdd, this.userDAO.getUsers(),
 				new Executable() {
 					@Override
@@ -70,13 +72,13 @@ public class AdministratorResource extends AdministratorResourceBase {
 
 						logger.info("Created user " + user.getUsername()
 								+ " with id = " + user.getUserId());
-						return Response.ok().build();
+						return Response.noContent().build();
 					}
 				});
 	}
 
 	@Path("{id}")
 	public AdministratorSubResource getAdministratorSubResource() {
-		return new AdministratorSubResource();
+		return new AdministratorSubResource(request);
 	}
 }

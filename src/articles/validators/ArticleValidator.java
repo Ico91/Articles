@@ -30,17 +30,17 @@ public class ArticleValidator implements Validator {
 		List<MessageKey> listOfMessageKeys = new ArrayList<MessageKey>();
 
 		if (this.article.getTitle() == null)
-			listOfMessageKeys.add(ArticleErrorMessageKeys.TITLE_IS_NULL);
+			listOfMessageKeys.add(ArticleMessageKeys.TITLE_IS_NULL);
 		else if (this.article.getTitle().length() == 0)
-			listOfMessageKeys.add(ArticleErrorMessageKeys.TITLE_IS_EMPTY);
+			listOfMessageKeys.add(ArticleMessageKeys.TITLE_IS_EMPTY);
 
 		if (this.article.getContent() == null)
-			listOfMessageKeys.add(ArticleErrorMessageKeys.CONTENT_IS_NULL);
+			listOfMessageKeys.add(ArticleMessageKeys.CONTENT_IS_NULL);
 		else if (this.article.getContent().length() == 0)
-			listOfMessageKeys.add(ArticleErrorMessageKeys.CONTENT_IS_EMPTY);
+			listOfMessageKeys.add(ArticleMessageKeys.CONTENT_IS_EMPTY);
 
 		if (!uniqueTitle())
-			listOfMessageKeys.add(ArticleErrorMessageKeys.NOT_UNIQUE_TITLE);
+			listOfMessageKeys.add(ArticleMessageKeys.NOT_UNIQUE_TITLE);
 
 		return listOfMessageKeys;
 	}

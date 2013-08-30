@@ -52,7 +52,7 @@ public class ArticleSubResource extends ArticlesResourceBase {
 
 	/**
 	 * Update article with specified ID If article with specified ID is found -
-	 * response code 200, else response code 404.
+	 * response code 204, else response code 404.
 	 * 
 	 * @param article
 	 *            Article with updated title and/or content
@@ -82,12 +82,12 @@ public class ArticleSubResource extends ArticlesResourceBase {
 
 		logger.info("User with id = " + userId
 				+ " updated an article with id = " + id + ".");
-		return Response.ok().build();
+		return Response.noContent().build();
 
 	}
 
 	/**
-	 * Delete article with specified ID Returns response code 200 when article
+	 * Delete article with specified ID Returns response code 204 when article
 	 * was successfully deleted, response code 404 when article is not found
 	 * 
 	 * @param id
@@ -106,6 +106,6 @@ public class ArticleSubResource extends ArticlesResourceBase {
 		logger.info("User with id = " + userId
 				+ " deleted an article with id = " + id + ".");
 
-		return Response.ok().build();
+		return Response.noContent().build();
 	}
 }

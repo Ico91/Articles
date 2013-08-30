@@ -15,15 +15,16 @@ import articles.model.UserType;
  */
 @XmlRootElement(name = "request")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class NewUserRequest extends LoginRequest {
+//	TODO: Rename
+public class UserDetails extends LoginRequest {
 	@XmlElement(required = true)
 	private UserType userType;
 
-	public NewUserRequest() {
+	public UserDetails() {
 
 	}
 
-	public NewUserRequest(String username, String password, UserType userType) {
+	public UserDetails(String username, String password, UserType userType) {
 		super(username, password);
 		this.userType = userType;
 	}

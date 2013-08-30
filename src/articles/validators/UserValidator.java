@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import articles.model.User;
-import articles.model.dto.NewUserRequest;
+import articles.model.dto.UserDetails;
 
 /**
  * Validate users
@@ -13,10 +13,10 @@ import articles.model.dto.NewUserRequest;
  *
  */
 public class UserValidator implements Validator {
-	private NewUserRequest userToCheck;
+	private UserDetails userToCheck;
 	private List<User> users;
 	
-	public UserValidator(NewUserRequest userToCheck, List<User> users) {
+	public UserValidator(UserDetails userToCheck, List<User> users) {
 		this.userToCheck = userToCheck;
 		this.users = users;
 	}
@@ -31,20 +31,20 @@ public class UserValidator implements Validator {
 		List<MessageKey> listOfMessageKeys = new ArrayList<MessageKey>();
 		
 		if (userToCheck.getUsername() == null)
-			listOfMessageKeys.add(UserErrorMessageKeys.USERNAME_IS_NULL);
+			listOfMessageKeys.add(UserMessageKeys.USERNAME_IS_NULL);
 		else if (userToCheck.getUsername().isEmpty())
-			listOfMessageKeys.add(UserErrorMessageKeys.USERNAME_IS_EMPTY);
+			listOfMessageKeys.add(UserMessageKeys.USERNAME_IS_EMPTY);
 		
 		if (userToCheck.getPassword() == null)
-			listOfMessageKeys.add(UserErrorMessageKeys.PASSWORD_IS_NULL);
+			listOfMessageKeys.add(UserMessageKeys.PASSWORD_IS_NULL);
 		else if (userToCheck.getPassword().isEmpty())
-			listOfMessageKeys.add(UserErrorMessageKeys.PASSWORD_IS_EMPTY);
+			listOfMessageKeys.add(UserMessageKeys.PASSWORD_IS_EMPTY);
 		
 		if (userToCheck.getType() == null)
-			listOfMessageKeys.add(UserErrorMessageKeys.USERTYPE_IS_NULL);
+			listOfMessageKeys.add(UserMessageKeys.USERTYPE_IS_NULL);
 		
 		if (!isUsernameUnique())
-			listOfMessageKeys.add(UserErrorMessageKeys.NOT_UNIQUE_USERNAME);
+			listOfMessageKeys.add(UserMessageKeys.NOT_UNIQUE_USERNAME);
 		
 		return listOfMessageKeys;
 	}

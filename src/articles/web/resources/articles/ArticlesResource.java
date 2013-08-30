@@ -43,9 +43,9 @@ public class ArticlesResource extends ArticlesResourceBase {
 	public List<Article> getArticles(@QueryParam("search") String searchTerm) {
 		if (searchTerm == null) {
 			return this.articles;
-		} else {
-			return search(searchTerm, this.articles);
 		}
+		
+		return search(searchTerm, this.articles);
 	}
 
 	/**

@@ -1,6 +1,6 @@
 package articles.validators;
 
-public enum ArticleErrorMessageKeys implements MessageKey{
+public enum ArticleMessageKeys implements MessageKey{
 	
 	TITLE_IS_NULL("Article title is null"),
 	TITLE_IS_EMPTY("Article title is empty"),
@@ -10,7 +10,7 @@ public enum ArticleErrorMessageKeys implements MessageKey{
 	
 	private String value;
 	
-	private ArticleErrorMessageKeys(String value) {
+	private ArticleMessageKeys(String value) {
 		this.value = value;
 	}
 	

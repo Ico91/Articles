@@ -4,14 +4,14 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class ErrorMessage {
+public class MessageDTO {
 	private String message;
 
-	public ErrorMessage() {
+	public MessageDTO() {
 
 	}
 
-	public ErrorMessage(String message) {
+	public MessageDTO(String message) {
 		this.setMessage(message);
 	}
 

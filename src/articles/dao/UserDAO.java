@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 import articles.dao.exceptions.DAOException;
 import articles.database.transactions.TransactionalTask;
 import articles.model.User;
-import articles.model.dto.NewUserRequest;
+import articles.model.dto.UserDetails;
 import articles.model.UserActivity;
 
 /**
@@ -137,7 +137,7 @@ public class UserDAO extends DAOBase {
 	 * @param newUser
 	 * @return true on success
 	 */
-	public User addUser(final NewUserRequest newUser) {
+	public User addUser(final UserDetails newUser) {
 		User addedUser = manager.execute(new TransactionalTask<User>() {
 			@Override
 			public User executeTask(EntityManager entityManager)
@@ -173,7 +173,7 @@ public class UserDAO extends DAOBase {
 	 * @param user
 	 * @return true on success, false if user with the ID does not exist
 	 */
-	public boolean updateUser(final int userId, final NewUserRequest user) {
+	public boolean updateUser(final int userId, final UserDetails user) {
 		return manager.execute(new TransactionalTask<Boolean>() {
 			@Override
 			public Boolean executeTask(EntityManager entityManager)

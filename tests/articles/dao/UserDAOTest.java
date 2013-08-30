@@ -16,7 +16,7 @@ import articles.model.User;
 import articles.model.UserActivity;
 import articles.model.UserType;
 import articles.model.dto.LoginRequest;
-import articles.model.dto.NewUserRequest;
+import articles.model.dto.UserDetails;
 
 public class UserDAOTest {
 	private static User actualUser;
@@ -58,7 +58,7 @@ public class UserDAOTest {
 	
 	@Test
 	public void addUserTest() {
-		NewUserRequest newUser = new NewUserRequest("guest", "122", UserType.USER);
+		UserDetails newUser = new UserDetails("guest", "122", UserType.USER);
 		User user = userDAO.addUser(newUser);
 		System.out.println(user);
 	}
@@ -67,7 +67,7 @@ public class UserDAOTest {
 	
 	@Test
 	public void updateUser() {
-		NewUserRequest updateUser = new NewUserRequest("admin", "222", UserType.ADMIN);
+		UserDetails updateUser = new UserDetails("admin", "222", UserType.ADMIN);
 		userDAO.updateUser(3, updateUser);
 		System.out.println(userDAO.getUserById(3) + " update");
 	}

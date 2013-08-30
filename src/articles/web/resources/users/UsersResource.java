@@ -108,7 +108,7 @@ public class UsersResource {
 		logger.info("User with id = " + userId
 				+ " logged out from the system.");
 
-		return Response.ok().build();
+		return Response.noContent().build();
 		
 		
 	}
