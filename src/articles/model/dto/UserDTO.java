@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import articles.model.User;
+import articles.model.UserType;
 
 /**
  * A transport object for class User that does not contain information about the
@@ -17,6 +18,7 @@ import articles.model.User;
 public class UserDTO {
 	private int userId;
 	private String username;
+	private UserType usertype;
 	private Date lastLogin;
 
 	public UserDTO() {
@@ -26,6 +28,7 @@ public class UserDTO {
 	public UserDTO(User user) {
 		this.userId = user.getUserId();
 		this.username = user.getUsername();
+		this.usertype = user.getUserType();
 		this.lastLogin = user.getLastLogin();
 	}
 
@@ -72,6 +75,14 @@ public class UserDTO {
 
 	public Date getLastLogin() {
 		return lastLogin;
+	}
+
+	public UserType getUsertype() {
+		return usertype;
+	}
+
+	public void setUsertype(UserType usertype) {
+		this.usertype = usertype;
 	}
 
 	public void setLastLogin(Date lastLogin) {
