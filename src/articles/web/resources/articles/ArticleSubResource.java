@@ -1,5 +1,7 @@
 package articles.web.resources.articles;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -12,6 +14,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import articles.model.Articles.Article;
+import articles.validators.ArticleValidator;
+import articles.web.resources.ResourceRequest;
 
 /**
  * Class used to process request to specified article
@@ -63,26 +67,25 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateArticle(Article article, @PathParam("id") int id) {
+	public Response updateArticle(final Article article, @PathParam("id") final int id) {
 		article.setId(id);
 
-		Response validationResponse = validationResponse(article);
+		return new ResourceRequest<Article, Article>() {
 
-		if (validationResponse != null) {
-			logger.info("User with id = " + userId
-					+ " try to update invalid article");
-			return validationResponse;
-		}
+			@Override
+			public Response doProcess(Article objectToValidate,
+					List<Article> listOfObjects) {
+				if (!dao.updateArticle(userId, article)) {
+					logger.info("User with id = " + userId
+							+ " try to update article that does not exist");
+					return Response.status(Status.NOT_FOUND).build();
+				}
 
-		if (!this.dao.updateArticle(this.userId, article)) {
-			logger.info("User with id = " + userId
-					+ " try to update article that does not exist");
-			return Response.status(Status.NOT_FOUND).build();
-		}
-
-		logger.info("User with id = " + userId
-				+ " updated an article with id = " + id + ".");
-		return Response.noContent().build();
+				logger.info("User with id = " + userId
+						+ " updated an article with id = " + id + ".");
+				return Response.noContent().build();
+			}
+		}.process(article, this.articles, new ArticleValidator(article, articles));
 
 	}
 

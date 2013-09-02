@@ -14,11 +14,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import articles.dao.ArticlesDAO;
-import articles.dao.UserDAO;
 import articles.model.User;
 import articles.model.dto.MessageDTO;
 import articles.model.dto.UserDetails;
+import articles.validators.UserValidator;
 import articles.web.listener.ConfigurationListener;
+import articles.web.resources.ResourceRequest;
 
 public class AdministratorSubResource extends AdministratorResourceBase {
 
@@ -71,10 +72,11 @@ public class AdministratorSubResource extends AdministratorResourceBase {
 			}
 		}
 
-		return validateAndExecute(user, users, new Executable() {
+		return new ResourceRequest<UserDetails, User>() {
 
 			@Override
-			public Response execute(UserDAO userDAO) {
+			public Response doProcess(UserDetails objectToValidate,
+					List<User> listOfObjects) {
 				if (!userDAO.updateUser(userId, user)) {
 					logger.info("Failed to update user with id = " + userId);
 					return Response.status(Status.NOT_FOUND).build();
@@ -83,7 +85,7 @@ public class AdministratorSubResource extends AdministratorResourceBase {
 				logger.info("Updated user with id = " + userId);
 				return Response.noContent().build();
 			}
-		});
+		}.process(user, users, new UserValidator(user, users));
 	}
 
 	/**

@@ -18,10 +18,11 @@ import javax.ws.rs.core.Response.Status;
 
 import articles.dao.ArticlesDAO;
 import articles.dao.StatisticsDAO;
-import articles.dao.UserDAO;
 import articles.model.User;
 import articles.model.dto.UserDetails;
+import articles.validators.UserValidator;
 import articles.web.listener.ConfigurationListener;
+import articles.web.resources.ResourceRequest;
 import articles.web.resources.statistics.DateAdapter;
 import articles.web.resources.statistics.StatisticsRequest;
 
@@ -117,26 +118,29 @@ public class AdministratorResource extends AdministratorResourceBase {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addUser(final UserDetails userToAdd) {
-		return validateAndExecute(userToAdd, this.userDAO.getUsers(),
-				new Executable() {
-					@Override
-					public Response execute(UserDAO userDAO) {
-						User user = userDAO.addUser(userToAdd);
-						if (user == null) {
-							logger.info("Failed to create user");
-							return Response.status(Status.BAD_REQUEST).build();
-						}
+		List<User> users = this.getUsers();
+		
+		return new ResourceRequest<UserDetails, User>() {
 
-						// Create new articles file for user
-						ArticlesDAO articlesDAO = new ArticlesDAO(
-								ConfigurationListener.getPath());
-						articlesDAO.createUserArticlesFile(user.getUserId());
+			@Override
+			public Response doProcess(UserDetails objectToValidate,
+					List<User> listOfObjects) {
+				User user = userDAO.addUser(userToAdd);
+				if (user == null) {
+					logger.info("Failed to create user");
+					return Response.status(Status.BAD_REQUEST).build();
+				}
 
-						logger.info("Created user " + user.getUsername()
-								+ " with id = " + user.getUserId());
-						return Response.noContent().build();
-					}
-				});
+				// Create new articles file for user
+				ArticlesDAO articlesDAO = new ArticlesDAO(
+						ConfigurationListener.getPath());
+				articlesDAO.createUserArticlesFile(user.getUserId());
+
+				logger.info("Created user " + user.getUsername()
+						+ " with id = " + user.getUserId());
+				return Response.noContent().build();
+			}
+		}.process(userToAdd, users, new UserValidator(userToAdd, users));
 	}
 
 	@Path("{id}")

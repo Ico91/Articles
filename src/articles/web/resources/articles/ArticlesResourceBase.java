@@ -39,27 +39,6 @@ public abstract class ArticlesResourceBase {
 	}
 
 	/**
-	 * Validate article format and return appropriate response If article format
-	 * is valid return null
-	 * 
-	 * @param article
-	 * @return Response 404 with information about validation errors
-	 */
-	public Response validationResponse(Article article) {
-		ArticleValidator validator = new ArticleValidator(article, articles);
-		List<MessageKey> messageKeys = validator.validate();
-
-		if (!messageKeys.isEmpty()) {
-			return Response
-					.status(Status.BAD_REQUEST)
-					.entity(new MessageBuilder(messageKeys)
-							.getErrorMessage()).build();
-		}
-
-		return null;
-	}
-
-	/**
 	 * Get user ID from session
 	 * 
 	 * @return User ID
