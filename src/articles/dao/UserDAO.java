@@ -11,10 +11,11 @@ import javax.persistence.Query;
 import org.apache.log4j.Logger;
 
 import articles.dao.exceptions.DAOException;
+import articles.database.transactions.TransactionManager;
 import articles.database.transactions.TransactionalTask;
 import articles.model.User;
-import articles.model.dto.UserDetails;
 import articles.model.UserActivity;
+import articles.model.dto.UserDetails;
 
 /**
  * Provides access for manipulation of users data.
@@ -38,6 +39,10 @@ public class UserDAO extends DAOBase {
 
 	public UserDAO() {
 		logger = Logger.getLogger(getClass());
+	}
+	
+	public UserDAO(TransactionManager transactionManager) {
+		super(transactionManager);
 	}
 
 	/**

@@ -16,6 +16,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import articles.database.transactions.TransactionManager;
 import articles.database.transactions.TransactionalTask;
 import articles.model.User;
 import articles.model.UserActivity;
@@ -24,12 +25,13 @@ import articles.model.UserType;
 import articles.model.dto.UserStatisticsDTO;
 
 public class StatisticsDAOTest {
-
-	private static StatisticsDAO statisticsDAO = new StatisticsDAO();
+	private static TransactionManager manager = new TransactionManager();
+	private static StatisticsDAO statisticsDAO;
 	
 	@BeforeClass
 	public static void init() {
-		statisticsDAO.manager.initTestManager();
+		manager.initTestManager();
+		statisticsDAO = new StatisticsDAO(manager);
 		initDB();
 	}
 

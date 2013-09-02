@@ -18,12 +18,9 @@ public class PersistenceManager {
 	protected static final EntityManagerFactory testFactory = Persistence
 			.createEntityManagerFactory(ConfigurationListener.PERSISTENCE_NAME_TEST);
 	protected EntityManager entityManager;
-
-	/**
-	 * Initiate entityManager that manages transactions in the system
-	 */
-	public void initManager() {
-		entityManager = factory.createEntityManager();
+	
+	public PersistenceManager() {
+		this.entityManager = factory.createEntityManager();
 	}
 
 	/**

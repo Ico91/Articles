@@ -27,8 +27,8 @@ import articles.model.UserActivity;
 import articles.model.dto.LoginRequest;
 import articles.model.dto.UserDTO;
 import articles.web.listener.ConfigurationListener;
-import articles.web.resources.statistics.DateAdapter;
-import articles.web.resources.statistics.StatisticsRequest;
+import articles.web.resources.DateAdapter;
+import articles.web.resources.StatisticsRequest;
 
 import com.google.gson.Gson;
 

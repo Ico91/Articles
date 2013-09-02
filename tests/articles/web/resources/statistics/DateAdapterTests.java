@@ -8,6 +8,8 @@ import javax.ws.rs.WebApplicationException;
 
 import org.junit.Test;
 
+import articles.web.resources.DateAdapter;
+
 public class DateAdapterTests {
 
 	DateAdapter actualDate;

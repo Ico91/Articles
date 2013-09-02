@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 
+import articles.database.transactions.TransactionManager;
 import articles.database.transactions.TransactionalTask;
 import articles.model.dto.UserStatisticsDTO;
 
@@ -17,6 +18,14 @@ import articles.model.dto.UserStatisticsDTO;
  */
 public class StatisticsDAO extends DAOBase {
 
+	public StatisticsDAO() {
+		super();
+	}
+	
+	public StatisticsDAO(TransactionManager transactionManager) {
+		super(transactionManager);
+	}
+	
 	/**
 	 * Loads information about user activities for a specified date, given the
 	 * user id.

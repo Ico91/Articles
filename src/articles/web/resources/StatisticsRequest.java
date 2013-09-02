@@ -1,4 +1,4 @@
-package articles.web.resources.statistics;
+package articles.web.resources;
 
 import java.util.Date;
 
