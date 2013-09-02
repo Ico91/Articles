@@ -18,11 +18,11 @@ import org.junit.Test;
 
 import articles.database.transactions.TransactionManager;
 import articles.database.transactions.TransactionalTask;
+import articles.dto.UserStatisticsDTO;
 import articles.model.User;
 import articles.model.UserActivity;
 import articles.model.UserStatistics;
 import articles.model.UserType;
-import articles.model.dto.UserStatisticsDTO;
 
 public class StatisticsDAOTest {
 	private static TransactionManager manager = new TransactionManager();

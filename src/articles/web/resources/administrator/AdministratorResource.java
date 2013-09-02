@@ -18,8 +18,8 @@ import javax.ws.rs.core.Response.Status;
 
 import articles.dao.ArticlesDAO;
 import articles.dao.StatisticsDAO;
+import articles.dto.UserDetails;
 import articles.model.User;
-import articles.model.dto.UserDetails;
 import articles.validators.UserValidator;
 import articles.web.listener.ConfigurationListener;
 import articles.web.resources.DateAdapter;

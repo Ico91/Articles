@@ -14,9 +14,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import articles.dao.ArticlesDAO;
+import articles.dto.MessageDTO;
+import articles.dto.UserDetails;
 import articles.model.User;
-import articles.model.dto.MessageDTO;
-import articles.model.dto.UserDetails;
 import articles.validators.UserValidator;
 import articles.web.listener.ConfigurationListener;
 import articles.web.resources.ResourceRequest;

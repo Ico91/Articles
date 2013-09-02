@@ -2,7 +2,7 @@ package articles.validators;
 
 import java.util.List;
 
-import articles.model.dto.MessageDTO;
+import articles.dto.MessageDTO;
 
 /**
  * Class used to build message from list of message keys

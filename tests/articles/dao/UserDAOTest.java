@@ -13,11 +13,11 @@ import org.junit.Test;
 
 import articles.database.transactions.TransactionManager;
 import articles.database.transactions.TransactionalTask;
+import articles.dto.LoginRequest;
+import articles.dto.UserDetails;
 import articles.model.User;
 import articles.model.UserActivity;
 import articles.model.UserType;
-import articles.model.dto.LoginRequest;
-import articles.model.dto.UserDetails;
 
 public class UserDAOTest {
 	private static User actualUser;

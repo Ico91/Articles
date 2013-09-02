@@ -14,9 +14,9 @@ import javax.persistence.Query;
 import org.apache.log4j.Logger;
 
 import articles.dao.exceptions.DAOException;
+import articles.dto.UserStatisticsDTO;
 import articles.model.UserActivity;
 import articles.model.UserStatistics;
-import articles.model.dto.UserStatisticsDTO;
 
 /**
  * Provides methods saving and loading statistics from the database

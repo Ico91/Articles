@@ -3,8 +3,8 @@ package articles.validators;
 import java.util.ArrayList;
 import java.util.List;
 
+import articles.dto.UserDetails;
 import articles.model.User;
-import articles.model.dto.UserDetails;
 
 /**
  * Validate users

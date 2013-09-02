@@ -22,10 +22,10 @@ import org.apache.log4j.Logger;
 
 import articles.dao.StatisticsDAO;
 import articles.dao.UserDAO;
+import articles.dto.LoginRequest;
+import articles.dto.UserDTO;
 import articles.model.User;
 import articles.model.UserActivity;
-import articles.model.dto.LoginRequest;
-import articles.model.dto.UserDTO;
 import articles.web.listener.ConfigurationListener;
 import articles.web.resources.DateAdapter;
 import articles.web.resources.StatisticsRequest;

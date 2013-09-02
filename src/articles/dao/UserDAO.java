@@ -10,12 +10,11 @@ import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
 
-import articles.dao.exceptions.DAOException;
 import articles.database.transactions.TransactionManager;
 import articles.database.transactions.TransactionalTask;
+import articles.dto.UserDetails;
 import articles.model.User;
 import articles.model.UserActivity;
-import articles.model.dto.UserDetails;
 
 /**
  * Provides access for manipulation of users data.
@@ -25,22 +24,18 @@ import articles.model.dto.UserDetails;
  */
 public class UserDAO extends DAOBase {
 
-	private static final String LOGIN_QUERY = 
-			"SELECT u FROM User u WHERE u.username = :username AND u.password = :password";
-	private static final String UPDATE_USER_QUERY = 
-			"UPDATE User u SET u.username = :username, u.password = :password, u.userType = :userType WHERE u.userId = :userId";
-	private static final String UPDATE_LASTLOGIN_QUERY = 
-			"UPDATE User u SET u.lastLogin = :lastLogin WHERE u.userId = :userId";
+	private static final String LOGIN_QUERY = "SELECT u FROM User u WHERE u.username = :username AND u.password = :password";
+	private static final String UPDATE_USER_QUERY = "UPDATE User u SET u.username = :username, u.password = :password, u.userType = :userType WHERE u.userId = :userId";
+	private static final String UPDATE_LASTLOGIN_QUERY = "UPDATE User u SET u.lastLogin = :lastLogin WHERE u.userId = :userId";
 	private static final String SELECT_USER_BY_USERNAME = "SELECT u FROM User u WHERE u.username = :username";
 	private static final String SELECT_USER_BY_ID = "SELECT u FROM User u WHERE u.userId = :userId";
 	private static final String DELETE_QUERY = "DELETE FROM User u WHERE u.userId = :userId";
 	private static final String NOT_FOUND = "No user found.";
-	private static final String TRANSACTION_ERROR = "Problem occurs in the transaction.";
 
 	public UserDAO() {
 		logger = Logger.getLogger(getClass());
 	}
-	
+
 	public UserDAO(TransactionManager transactionManager) {
 		super(transactionManager);
 	}
@@ -149,20 +144,15 @@ public class UserDAO extends DAOBase {
 					throws PersistenceException {
 				User addedUser = null;
 
-				try {
-					User user = new User();
-					user.setUsername(newUser.getUsername());
-					user.setPassword(newUser.getPassword());
-					user.setUserType(newUser.getType());
-					entityManager.persist(user);
+				User user = new User();
+				user.setUsername(newUser.getUsername());
+				user.setPassword(newUser.getPassword());
+				user.setUserType(newUser.getType());
+				entityManager.persist(user);
 
-					addedUser = getUserByUsername(newUser.getUsername(),
-							entityManager);
+				addedUser = getUserByUsername(newUser.getUsername(),
+						entityManager);
 
-				} catch (PersistenceException e) {
-					logger.error("Error while adding a new user");
-					throw new DAOException(TRANSACTION_ERROR);
-				}
 				return addedUser;
 			}
 		});
@@ -194,13 +184,8 @@ public class UserDAO extends DAOBase {
 				User user = getUser(userId, entityManager);
 
 				if (user != null) {
-					try {
-						updateUserQuery.executeUpdate();
-						return true;
-					} catch (PersistenceException e) {
-						logger.error("Error while updating an user.");
-						throw new DAOException(TRANSACTION_ERROR);
-					}
+					updateUserQuery.executeUpdate();
+					return true;
 				} else {
 					return false;
 				}
@@ -228,13 +213,8 @@ public class UserDAO extends DAOBase {
 				User user = getUser(userId, entityManager);
 
 				if (user != null) {
-					try {
-						updateLastLoginQuery.executeUpdate();
-						return true;
-					} catch (PersistenceException e) {
-						logger.error("Error while deleting an user.");
-						throw new DAOException(TRANSACTION_ERROR);
-					}
+					updateLastLoginQuery.executeUpdate();
+					return true;
 				} else {
 					return false;
 				}
@@ -259,14 +239,7 @@ public class UserDAO extends DAOBase {
 
 				StatisticsStorage statisticsStorage = new StatisticsStorage(
 						entityManager);
-				try {
-					statisticsStorage.save(userId, userActivity);
-
-				} catch (PersistenceException e) {
-					logger.error("Error when user with id = " + userId
-							+ " logged out.");
-					throw new DAOException(TRANSACTION_ERROR);
-				}
+				statisticsStorage.save(userId, userActivity);
 
 				return true;
 			}
@@ -313,14 +286,8 @@ public class UserDAO extends DAOBase {
 		updateLastLoginQuery.setParameter("lastLogin", loginDate);
 		updateLastLoginQuery.setParameter("userId", userId);
 
-		try {
-			updateLastLoginQuery.executeUpdate();
-			return true;
-		} catch (PersistenceException e) {
-			logger.error("Error while updating the last login date for user with user id = "
-					+ userId + ".");
-			throw new DAOException(TRANSACTION_ERROR);
-		}
+		updateLastLoginQuery.executeUpdate();
+		return true;
 	}
 
 }

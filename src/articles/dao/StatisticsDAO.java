@@ -9,7 +9,7 @@ import javax.persistence.EntityManager;
 
 import articles.database.transactions.TransactionManager;
 import articles.database.transactions.TransactionalTask;
-import articles.model.dto.UserStatisticsDTO;
+import articles.dto.UserStatisticsDTO;
 
 /**
  * Provides methods for accessing statistics information from database

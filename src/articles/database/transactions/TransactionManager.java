@@ -1,7 +1,7 @@
 package articles.database.transactions;
 
 import javax.persistence.EntityTransaction;
-import javax.persistence.RollbackException;
+import javax.persistence.PersistenceException;
 
 import org.apache.log4j.Logger;
 
@@ -15,6 +15,7 @@ import articles.dao.exceptions.DAOException;
  * @param <T>
  */
 public class TransactionManager extends PersistenceManager {
+	private static final String TRANSACTION_ERROR = "Problem occurs in the transaction.";
 	private Logger logger = Logger.getLogger(getClass());
 
 	public TransactionManager() {
@@ -38,9 +39,9 @@ public class TransactionManager extends PersistenceManager {
 			T result = (T) task.executeTask(entityManager);
 			entityTransaction.commit();
 			return result;
-		} catch (DAOException | RollbackException e) {
+		} catch (PersistenceException e) {
 			logger.error(e.getMessage());
-			throw new RuntimeException(e.getMessage());
+			throw new DAOException(TRANSACTION_ERROR);
 		} finally {
 			if (entityTransaction.isActive()) {
 				entityTransaction.rollback();
