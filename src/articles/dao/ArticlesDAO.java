@@ -49,11 +49,10 @@ public class ArticlesDAO extends DAOBase {
 	 * @throws DAOException
 	 *             when articles file not found, or contains invalid xml
 	 */
-	public List<Article> loadArticles(int userId) {
+	public synchronized List<Article> loadArticles(int userId) {
 		Articles articles;
 		try {
 			File file = new File(pathToArticlesFile(userId));
-
 			if (!file.exists()) {
 				String message = "Articles file not found at: "
 						+ pathToArticlesFile(userId);
@@ -84,7 +83,7 @@ public class ArticlesDAO extends DAOBase {
 	 *            List of articles to write
 	 * @throws DAOException
 	 */
-	public void saveArticles(int userId, List<Article> articlesList) {
+	public synchronized void saveArticles(int userId, List<Article> articlesList) {
 		Articles article = new Articles();
 		article.setArticle(articlesList);
 		try {

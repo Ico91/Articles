@@ -16,6 +16,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import articles.model.Articles.Article;
+import articles.validators.ArticleValidator;
+import articles.web.resources.ResourceRequest;
 
 /**
  * Class used to process article requests
@@ -44,7 +46,7 @@ public class ArticlesResource extends ArticlesResourceBase {
 		if (searchTerm == null) {
 			return this.articles;
 		}
-		
+
 		return search(searchTerm, this.articles);
 	}
 
@@ -60,19 +62,17 @@ public class ArticlesResource extends ArticlesResourceBase {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response add(Article article) {
-		// TODO: Duplicated code with ArticlesSubResource
-		Response validationResponse = validationResponse(article);
+		return new ResourceRequest<Article, Article>() {
 
-		if (validationResponse != null) {
-			logger.info("User with id = " + this.userId
-					+ " try to add invalid article");
-			return validationResponse;
-		}
+			@Override
+			public Response doProcess(Article article, List<Article> listOfArticles) {
+				article = dao.addArticle(userId, article);
 
-		article = this.dao.addArticle(userId, article);
+				logger.info("User with id = " + userId + " created an article.");
+				return Response.ok(article, MediaType.APPLICATION_JSON).build();
+			}
+		}.process(article, this.articles, new ArticleValidator(article, articles));
 
-		logger.info("User with id = " + this.userId + " created an article.");
-		return Response.ok(article, MediaType.APPLICATION_JSON).build();
 	}
 
 	/**
