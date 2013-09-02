@@ -70,15 +70,6 @@
 			<param-value>articles.web.resources.articles</param-value>
 		</init-param>
 	</servlet>
-	<servlet>
-		<display-name>Statistics</display-name>
-		<servlet-name>Statistics</servlet-name>
-		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-		<init-param>
-			<param-name>com.sun.jersey.config.property.packages</param-name>
-			<param-value>articles.web.resources.statistics</param-value>
-		</init-param>
-	</servlet>
 	<servlet-mapping>
 		<servlet-name>User Authorization</servlet-name>
 		<url-pattern>/users/*</url-pattern>
@@ -86,9 +77,5 @@
 	<servlet-mapping>
 		<servlet-name>Articles Service</servlet-name>
 		<url-pattern>/articles/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>Statistics</servlet-name>
-		<url-pattern>/statistics/*</url-pattern>
 	</servlet-mapping>
 </web-app>

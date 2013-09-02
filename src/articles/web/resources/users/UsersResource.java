@@ -8,9 +8,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -18,12 +20,17 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.log4j.Logger;
 
+import articles.dao.StatisticsDAO;
 import articles.dao.UserDAO;
 import articles.model.User;
 import articles.model.UserActivity;
 import articles.model.dto.LoginRequest;
 import articles.model.dto.UserDTO;
 import articles.web.listener.ConfigurationListener;
+import articles.web.resources.statistics.DateAdapter;
+import articles.web.resources.statistics.StatisticsRequest;
+
+import com.google.gson.Gson;
 
 /**
  * Class for performing user requests
@@ -60,23 +67,22 @@ public class UsersResource {
 		UserDAO userDAO = new UserDAO();
 		User user = userDAO.login(loginRequest.getUsername(),
 				loginRequest.getPassword(), UserActivity.LOGIN, new Date());
-		
+
 		if (user == null) {
 			logger.error("Unauthorized user tried to log in.");
 			return Response.status(Response.Status.UNAUTHORIZED).build();
 		}
-		
+
 		servletRequest.getSession().invalidate();
 		HttpSession session = servletRequest.getSession();
 		session.setAttribute(ConfigurationListener.USERID, user.getUserId());
-		session.setAttribute(ConfigurationListener.USERTYPE,
-				user.getUserType());
+		session.setAttribute(ConfigurationListener.USERTYPE, user.getUserType());
 
 		logger.info("User with id = " + user.getUserId()
 				+ " logged in the system.");
 
 		return Response.ok(new UserDTO(user)).build();
-		
+
 	}
 
 	/**
@@ -91,25 +97,56 @@ public class UsersResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response logout(@Context HttpServletResponse servletResponse,
 			@Context HttpServletRequest servletRequest) {
-		
+
 		HttpSession session = servletRequest.getSession(false);
 		UserDAO userDAO = new UserDAO();
-		
+
 		if (session == null) {
 			logger.error("Unauthorized user tried to log out.");
 			return Response.status(Response.Status.UNAUTHORIZED).build();
 		}
-		
-		int userId = (int) session
-				.getAttribute(ConfigurationListener.USERID);
+
+		int userId = (int) session.getAttribute(ConfigurationListener.USERID);
 		session.invalidate();
 		userDAO.logout(userId, UserActivity.LOGOUT);
-		
-		logger.info("User with id = " + userId
-				+ " logged out from the system.");
+
+		logger.info("User with id = " + userId + " logged out from the system.");
 
 		return Response.noContent().build();
-		
-		
+
+	}
+
+	/**
+	 * Returns statistics information for the currently logged user.
+	 * 
+	 * @param dateInput
+	 *            - date to load the statistics for. The specified date is
+	 *            required in the ISO format (yyyy/mm/dd)
+	 * @return If successful returns List of
+	 *         {@link articles.model.dto.UserStatisticsDTO }, otherwise returns
+	 *         status code 400 (Bad request).
+	 */
+	@GET
+	@Path("statistics")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getStatistics(@QueryParam("date") DateAdapter dateInput,
+			@Context final HttpServletRequest servletRequest) {
+
+		return new StatisticsRequest() {
+
+			@Override
+			public Response execute(Date dateInput) {
+				Gson gson = new Gson();
+				StatisticsDAO statisticsDAO = new StatisticsDAO();
+				return Response
+						.ok()
+						.entity(gson.toJson(statisticsDAO.load(
+								(int) servletRequest.getSession(false)
+										.getAttribute(
+												ConfigurationListener.USERID),
+								dateInput))).build();
+			}
+
+		}.getStatistics(dateInput);
 	}
 }

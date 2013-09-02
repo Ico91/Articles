@@ -119,7 +119,9 @@ public class AdministratorSubResource extends AdministratorResourceBase {
 
 	/**
 	 * Check if passed ID is current admin ID
-	 * @param id ID to check
+	 * 
+	 * @param id
+	 *            ID to check
 	 * @return True if id is same as current admin
 	 */
 	private boolean isCurrentAdmint(int id) {
