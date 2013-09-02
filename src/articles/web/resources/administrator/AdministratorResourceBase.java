@@ -1,20 +1,11 @@
 package articles.web.resources.administrator;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.apache.log4j.Logger;
 
 import articles.dao.UserDAO;
-import articles.model.User;
-import articles.model.dto.UserDetails;
-import articles.validators.MessageBuilder;
-import articles.validators.MessageKey;
-import articles.validators.UserValidator;
 
 /**
  * Base class for administrator resources
