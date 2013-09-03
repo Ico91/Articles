@@ -1,0 +1,239 @@
+package articles.dao;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import articles.dao.exceptions.DAOException;
+import articles.model.Articles.Article;
+
+public class ArticlesDAOTest {
+
+	private static String path = "/home/stinky/Desktop/Test/";
+	private static final int userId = 12;
+
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
+		List<Article> listOfArticles = new ArrayList<Article>();
+		for (int i = 1; i < 10; i++) {
+			Article article = new Article();
+			article.setId(i);
+			article.setContent("This is content for article " + i);
+			article.setTitle("Title of article " + i);
+
+			listOfArticles.add(article);
+		}
+
+		ArticlesDAO dao = new ArticlesDAO(path);
+		dao.saveArticles(userId, listOfArticles);
+	}
+
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+		ArticlesDAO dao = new ArticlesDAO(path);
+		dao.deleteUserArticlesFile(userId);
+	}
+
+	@Test
+	public void testLoadArticles() {
+		ArticlesDAO dao = new ArticlesDAO(path);
+		List<Article> listOfArticles = dao.loadArticles(userId);
+
+		Assert.assertNotNull(listOfArticles);
+		Assert.assertFalse(listOfArticles.isEmpty());
+	}
+
+	@Test
+	public void testSaveArticles() {
+		ArticlesDAO dao = new ArticlesDAO(path);
+		List<Article> listOfArticles = dao.loadArticles(userId);
+		int expected = listOfArticles.size();
+
+		dao.saveArticles(userId + 1, listOfArticles);
+		listOfArticles = dao.loadArticles(userId + 1);
+		dao.deleteUserArticlesFile(userId + 1);
+
+		Assert.assertTrue(expected == listOfArticles.size());
+	}
+
+	@Test
+	public void testCreateUserArticlesFile() {
+		ArticlesDAO dao = new ArticlesDAO(path);
+		dao.createUserArticlesFile(500);
+		File checkFile = new File(path + "/" + 500 + ".xml");
+
+		if (!checkFile.exists()) {
+			Assert.fail("File does not exist");
+		}
+
+		checkFile.delete();
+	}
+
+	@Test
+	public void testGetArticleById() {
+		ArticlesDAO dao = new ArticlesDAO(path);
+		Article article = dao.getArticleById(userId, 3);
+
+		Assert.assertTrue(article.getId() == 3);
+		Assert.assertTrue(article.getTitle().equals("Title of article 3"));
+	}
+
+	@Test
+	public void testAddArticle() {
+		ArticlesDAO dao = new ArticlesDAO(path);
+		Article articleToAdd = new Article();
+		articleToAdd.setContent("Some article");
+		articleToAdd.setTitle("Some title");
+
+		Article expected = dao.addArticle(userId, articleToAdd);
+		Article actual = dao.getArticleById(userId, expected.getId());
+
+		Assert.assertTrue(actual.getTitle().equals(expected.getTitle())
+				&& actual.getContent().equals(expected.getContent()));
+	}
+
+	@Test
+	public void testUpdateArticle() {
+		ArticlesDAO dao = new ArticlesDAO(path);
+		Article expected = new Article();
+		expected.setId(1);
+		expected.setContent("Updated content");
+		expected.setTitle("Updated title");
+
+		dao.updateArticle(userId, expected);
+
+		Article actual = dao.getArticleById(userId, 1);
+
+		Assert.assertTrue(actual.getTitle().equals(expected.getTitle())
+				&& actual.getContent().equals(expected.getContent()));
+	}
+
+	@Test
+	public void testDeleteArticle() {
+		ArticlesDAO dao = new ArticlesDAO(path);
+		
+		if(!dao.deleteArticle(userId, 5)) {
+			Assert.fail("Failed to delete article");
+		}
+		
+		Article result = dao.getArticleById(userId, 5);
+		Assert.assertTrue(result == null);
+	}
+
+	@Test(expected = DAOException.class)
+	public void testAddDuplicatedArticleTitle() {
+		ArticlesDAO dao = new ArticlesDAO(path);
+		Article invalid = new Article();
+		invalid.setContent("Test");
+		invalid.setTitle("Title of article 3");
+		
+		dao.addArticle(userId, invalid);
+	}
+	
+	@Test(expected = DAOException.class)
+	public void testAddNullTitle() {
+		ArticlesDAO dao = new ArticlesDAO(path);
+		Article invalid = new Article();
+		invalid.setContent("Test");
+		
+		dao.addArticle(userId, invalid);
+	}
+	
+	@Test(expected = DAOException.class)
+	public void testAddEmptyTitle() {
+		ArticlesDAO dao = new ArticlesDAO(path);
+		Article invalid = new Article();
+		invalid.setContent("Test");
+		invalid.setTitle("");
+		
+		dao.addArticle(userId, invalid);
+	}
+	
+	@Test(expected = DAOException.class)
+	public void testAddEmptyContent() {
+		ArticlesDAO dao = new ArticlesDAO(path);
+		Article invalid = new Article();
+		invalid.setContent("");
+		invalid.setTitle("Test");
+		
+		dao.addArticle(userId, invalid);
+	}
+	
+	@Test(expected = DAOException.class)
+	public void testAddENullContent() {
+		ArticlesDAO dao = new ArticlesDAO(path);
+		Article invalid = new Article();
+		invalid.setTitle("Test");
+		
+		dao.addArticle(userId, invalid);
+	}
+	
+	@Test
+	public void getInvalidArticleId() {
+		ArticlesDAO dao = new ArticlesDAO(path);
+		Article expected = dao.getArticleById(userId, -3);
+		Assert.assertTrue(expected == null);
+	}
+	
+	@Test
+	public void deleteInvalidArticleId() {
+		ArticlesDAO dao = new ArticlesDAO(path);
+		Assert.assertFalse(dao.deleteArticle(userId, -3));
+	}
+	
+	@Test(expected = DAOException.class)
+	public void updateWithInvalidId() {
+		ArticlesDAO dao = new ArticlesDAO(path);
+		Article invalid = new Article();
+		invalid.setTitle("Testing title");
+		invalid.setTitle("Some test title");
+		dao.updateArticle(userId, invalid);
+	}
+	
+	@Test(expected = DAOException.class)
+	public void updateWithNullContent() {
+		ArticlesDAO dao = new ArticlesDAO(path);
+		Article invalid = new Article();
+		
+		invalid.setTitle("Some test title");
+		invalid.setId(3);
+		dao.updateArticle(userId, invalid);
+	}
+	
+	@Test(expected = DAOException.class)
+	public void updateWithEmptyContent() {
+		ArticlesDAO dao = new ArticlesDAO(path);
+		Article invalid = new Article();
+		
+		invalid.setTitle("Some test title");
+		invalid.setContent("");
+		invalid.setId(3);
+		dao.updateArticle(userId, invalid);
+	}
+	
+	@Test(expected = DAOException.class)
+	public void updateWithEmptyTitle() {
+		ArticlesDAO dao = new ArticlesDAO(path);
+		Article invalid = new Article();
+		
+		invalid.setTitle("");
+		invalid.setContent("Test content");
+		invalid.setId(3);
+		dao.updateArticle(userId, invalid);
+	}
+	
+	@Test(expected = DAOException.class)
+	public void updateWithNullTitle() {
+		ArticlesDAO dao = new ArticlesDAO(path);
+		Article invalid = new Article();
+		
+		invalid.setContent("Test content");
+		invalid.setId(3);
+		dao.updateArticle(userId, invalid);
+	}
+}

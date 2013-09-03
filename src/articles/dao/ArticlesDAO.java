@@ -15,10 +15,9 @@ import org.apache.log4j.Logger;
 import articles.dao.exceptions.DAOException;
 import articles.database.transactions.TransactionalTask;
 import articles.model.Articles;
-import articles.model.UserActivity;
 import articles.model.Articles.Article;
+import articles.model.UserActivity;
 import articles.validators.ArticleValidator;
-import articles.web.listener.ConfigurationListener;
 
 /**
  * Provides access to article files
@@ -118,7 +117,7 @@ public class ArticlesDAO extends DAOBase {
 	 *            ID of the user
 	 */
 	public void deleteUserArticlesFile(int id) {
-		File articlesFile = new File(ConfigurationListener.getPath() + "/" + id
+		File articlesFile = new File(this.articlesPath + "/" + id
 				+ ".xml");
 
 		// Synchronization ?
@@ -189,7 +188,10 @@ public class ArticlesDAO extends DAOBase {
 	 */
 	public boolean updateArticle(final int userId, final Article article) {
 		final List<Article> articles = loadArticles(userId);
-
+		
+		if(article.getId() < 1) {
+			throw new DAOException("Invalid article id");
+		}
 		validate(new ArticleValidator(article, articles));
 
 		return manager.execute(new TransactionalTask<Boolean>() {
