@@ -3,6 +3,7 @@ package articles.dao;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -49,7 +50,7 @@ public class UserDAOTest {
 	}
 	
 	@Test
-	public void findTest() {
+	public void loginTest() {
 		LoginRequest loginRequest = new LoginRequest();
 		loginRequest.setUsername("admin");
 		loginRequest.setPassword("123");
@@ -62,7 +63,15 @@ public class UserDAOTest {
 	public void addUserTest() {
 		UserDetails newUser = new UserDetails("guest", "122", UserType.USER);
 		User user = userDAO.addUser(newUser);
-		System.out.println(user);
+		List<User> users = userDAO.getUsers();
+		String expectedUsername = null;
+		for (User u : users) {
+			if (u.getUsername().equals(user.getUsername())) {
+				expectedUsername = u.getUsername();
+			}
+		}
+		
+		assert(expectedUsername.equals(user.getUsername()));
 	}
 	
 	
@@ -71,6 +80,9 @@ public class UserDAOTest {
 	public void updateUser() {
 		UserDetails updateUser = new UserDetails("admin", "222", UserType.ADMIN);
 		userDAO.updateUser(3, updateUser);
+		User expected = userDAO.getUserById(3);
+		
+		assert(expected.getPassword().equals(updateUser.getPassword()));
 		System.out.println(userDAO.getUserById(3) + " update");
 	}
 	
@@ -82,6 +94,8 @@ public class UserDAOTest {
 	@Test
 	public void deleteTest() {
 		userDAO.deleteUser(3);
+		
+		assert(userDAO.getUserById(3).getUsername().equals("admin"));
 		System.out.println(userDAO.getUsers());
 	}
 	
