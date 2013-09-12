@@ -75,7 +75,6 @@ public class ArticlesDAO extends DAOBase {
 		}
 	}
 
-	// TODO: Implement
 	/**
 	 * Read all user articles files and return list of articles
 	 * 

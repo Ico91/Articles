@@ -11,7 +11,6 @@ import javax.ws.rs.core.Context;
 
 import org.apache.log4j.Logger;
 
-//	TODO: Repair
 
 /**
  * Generate after login the path from a property file which defines where the articles to be
