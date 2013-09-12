@@ -1,4 +1,4 @@
-package articles.web.resources.administrator;
+package articles.web.resources.users;
 
 import java.util.Date;
 import java.util.List;
@@ -35,11 +35,11 @@ import com.google.gson.Gson;
  * 
  */
 @Path("")
-public class AdministratorResource extends AdministratorResourceBase {
+public class UsersResource extends UsersResourceBase {
 	private Gson gson = new Gson();
 	private StatisticsDAO statisticsDAO = new StatisticsDAO();
 
-	public AdministratorResource(@Context HttpServletRequest request) {
+	public UsersResource(@Context HttpServletRequest request) {
 		super(request);
 	}
 
@@ -144,7 +144,7 @@ public class AdministratorResource extends AdministratorResourceBase {
 	}
 
 	@Path("{id}")
-	public AdministratorSubResource getAdministratorSubResource() {
-		return new AdministratorSubResource(request);
+	public UsersSubResource getAdministratorSubResource() {
+		return new UsersSubResource(request);
 	}
 }

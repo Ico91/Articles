@@ -1,4 +1,4 @@
-package articles.web.resources.administrator;
+package articles.web.resources.users;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
@@ -13,12 +13,12 @@ import articles.dao.UserDAO;
  * @author Krasimir Atanasov
  * 
  */
-public class AdministratorResourceBase {
+public class UsersResourceBase {
 	protected UserDAO userDAO;
 	protected final Logger logger;
 	protected HttpServletRequest request;
 
-	public AdministratorResourceBase(@Context HttpServletRequest request) {
+	public UsersResourceBase(@Context HttpServletRequest request) {
 		this.request = request;
 		this.logger = Logger.getLogger(getClass());
 		this.userDAO = new UserDAO();

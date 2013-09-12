@@ -1,4 +1,4 @@
-package articles.web.resources.administrator;
+package articles.web.resources.users;
 
 import java.util.List;
 
@@ -21,9 +21,9 @@ import articles.validators.UserValidator;
 import articles.web.listener.ConfigurationListener;
 import articles.web.resources.ResourceRequest;
 
-public class AdministratorSubResource extends AdministratorResourceBase {
+public class UsersSubResource extends UsersResourceBase {
 
-	public AdministratorSubResource(HttpServletRequest request) {
+	public UsersSubResource(HttpServletRequest request) {
 		super(request);
 	}
 
