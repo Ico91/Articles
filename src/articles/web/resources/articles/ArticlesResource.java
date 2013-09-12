@@ -84,7 +84,7 @@ public class ArticlesResource extends ArticlesResourceBase {
 	 * @throws ArticlesResourceException
 	 */
 	@Path("{id}")
-	public ArticleSubResource getArticle(@PathParam("id") int id) {
+	public ArticleSubResource getArticle(@PathParam("id") String id) {
 		return new ArticleSubResource(this.servletRequest);
 	}
 
