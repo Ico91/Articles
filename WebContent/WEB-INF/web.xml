@@ -35,20 +35,20 @@
 	</filter-mapping>
 	<filter-mapping>
 		<filter-name>AdministratorFilter</filter-name>
-		<url-pattern>/administrator/users/*</url-pattern>
+		<url-pattern>/users/*</url-pattern>
 	</filter-mapping>
 	<servlet>
-		<display-name>Administration</display-name>
-		<servlet-name>Administration</servlet-name>
+		<display-name>Users</display-name>
+		<servlet-name>Users</servlet-name>
 		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
 		<init-param>
 			<param-name>com.sun.jersey.config.property.packages</param-name>
-			<param-value>articles.web.resources.administrator</param-value>
+			<param-value>articles.web.resources.users</param-value>
 		</init-param>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>Administration</servlet-name>
-		<url-pattern>/administrator/users/*</url-pattern>
+		<servlet-name>Users</servlet-name>
+		<url-pattern>/users/*</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>
