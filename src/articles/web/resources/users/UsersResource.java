@@ -1,5 +1,6 @@
 package articles.web.resources.users;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -44,15 +45,38 @@ public class UsersResource extends UsersResourceBase {
 	}
 
 	/**
-	 * Get information of all existing users
+	 * Get information of all existing users, or if search term is provided
+	 * returned list is based on found results. 
 	 * 
 	 * @return List of all users
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<User> getUsers() {
-		logger.info("Administrator readed all users info");
-		return this.userDAO.getUsers();
+	public List<User> getUsers(@QueryParam("search") String searchTerm) {
+		if(searchTerm == null) {
+			logger.info("Administrator readed all users info");
+			return this.users;
+		}
+		
+		return search(searchTerm, this.users);
+	}
+
+	/**
+	 * Returns a list of users based on the results of the search by username.
+	 * @param searchTerm
+	 * @param users - the container to search into
+	 * @return List of found {@link articles.model.User}
+	 */
+	private List<User> search(String searchTerm, List<User> users) {
+		List<User> usersToReturn = new ArrayList<User>();
+
+		for (User u : users) {
+			if(u.getUsername().contains(searchTerm)) {
+				usersToReturn.add(u);
+			}
+		}
+
+		return usersToReturn;
 	}
 
 	/**
@@ -118,8 +142,6 @@ public class UsersResource extends UsersResourceBase {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addUser(final UserDetails userToAdd) {
-		List<User> users = this.getUsers();
-		
 		return new ResourceRequest<UserDetails, User>() {
 
 			@Override
@@ -140,7 +162,7 @@ public class UsersResource extends UsersResourceBase {
 						+ " with id = " + user.getUserId());
 				return Response.noContent().build();
 			}
-		}.process(userToAdd, users, new UserValidator(userToAdd, users));
+		}.process(userToAdd, this.users, new UserValidator(userToAdd, this.users));
 	}
 
 	@Path("{id}")
