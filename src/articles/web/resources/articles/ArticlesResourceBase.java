@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 
 import articles.dao.ArticlesDAO;
 import articles.model.Articles.Article;
+import articles.model.UserType;
 import articles.web.listener.ConfigurationListener;
 
 /**
@@ -30,7 +31,13 @@ public abstract class ArticlesResourceBase {
 		this.servletRequest = servletRequest;
 		this.dao = new ArticlesDAO(ConfigurationListener.getPath());
 		this.userId = getUserId();
-		this.articles = this.dao.loadArticles(this.userId);
+
+		if (servletRequest.getSession().getAttribute(
+				ConfigurationListener.USERTYPE)== UserType.ADMIN) {
+			this.articles = this.dao.loadArticles();
+		} else {
+			this.articles = this.dao.loadUserArticles(this.userId);
+		}
 	}
 
 	/**

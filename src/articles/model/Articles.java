@@ -211,7 +211,7 @@ public class Articles {
 			if (getClass() != obj.getClass())
 				return false;
 			Article other = (Article) obj;
-			if (id == other.getId()) {
+			if (id.equals(other.getId())) {
 				return true;
 			}
 			return false;

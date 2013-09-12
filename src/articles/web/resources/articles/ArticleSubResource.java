@@ -13,8 +13,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import articles.model.UserType;
 import articles.model.Articles.Article;
 import articles.validators.ArticleValidator;
+import articles.web.listener.ConfigurationListener;
 import articles.web.resources.ResourceRequest;
 
 /**
@@ -40,7 +42,7 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getArticle(@PathParam("id") String id) {
-		Article article = this.dao.getArticleById(userId, id);
+		Article article = this.dao.getArticleById(id);
 
 		if (article == null) {
 			logger.info("User with id = " + userId
@@ -67,26 +69,40 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateArticle(final Article article, @PathParam("id") final String id) {
-		article.setId(id);
+	public Response updateArticle(final Article article,
+			@PathParam("id") final String articleId) {
+		// TODO: Duplicated with DELETE
+		if (dao.getArticleById(articleId) == null) {
+			logger.info("User with id = " + userId
+					+ " try to update article that does not exist");
+			return Response.status(Status.NOT_FOUND).build();
+		}
+
+		article.setId(articleId);
 
 		return new ResourceRequest<Article, Article>() {
 
 			@Override
 			public Response doProcess(Article objectToValidate,
 					List<Article> listOfObjects) {
-				if (!dao.updateArticle(userId, article)) {
+
+				boolean result = (servletRequest.getSession().getAttribute(
+						ConfigurationListener.USERTYPE) == UserType.ADMIN) ? dao
+						.updateArticleFromAllUserArticles(article) : dao
+						.updateUserArticle(userId, article);
+
+				if (!result) {
 					logger.info("User with id = " + userId
-							+ " try to update article that does not exist");
-					return Response.status(Status.NOT_FOUND).build();
+							+ " try to update other user's article");
+					return Response.status(Status.FORBIDDEN).build();
 				}
 
 				logger.info("User with id = " + userId
-						+ " updated an article with id = " + id + ".");
+						+ " updated an article with id = " + articleId + ".");
 				return Response.noContent().build();
 			}
-		}.process(article, this.articles, new ArticleValidator(article, articles));
-
+		}.process(article, this.articles, new ArticleValidator(article,
+				articles));
 	}
 
 	/**
@@ -99,11 +115,20 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	 */
 	@DELETE
 	public Response deleteArticle(@PathParam("id") String id) {
+		if (dao.getArticleById(id) == null) {
+			logger.info("User with id = " + userId
+					+ " try to update article that does not exist");
+			return Response.status(Status.NOT_FOUND).build();
+		}
 
-		if (!this.dao.deleteArticle(userId, id)) {
+		boolean result = (servletRequest.getSession().getAttribute(
+				ConfigurationListener.USERTYPE) == UserType.ADMIN) ? this.dao
+				.deleteArticle(id) : this.dao.deleteUserArticle(userId, id);
+
+		if (!result) {
 			logger.info("User with id = " + userId
 					+ " failed to delete article with id " + id);
-			return Response.status(Status.NOT_FOUND).build();
+			return Response.status(Status.FORBIDDEN).build();
 		}
 
 		logger.info("User with id = " + userId

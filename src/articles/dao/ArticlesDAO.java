@@ -17,6 +17,7 @@ import articles.dao.exceptions.DAOException;
 import articles.database.transactions.TransactionalTask;
 import articles.model.Articles;
 import articles.model.Articles.Article;
+import articles.model.User;
 import articles.model.UserActivity;
 import articles.validators.ArticleValidator;
 
@@ -49,7 +50,7 @@ public class ArticlesDAO extends DAOBase {
 	 * @throws DAOException
 	 *             when articles file not found, or contains invalid xml
 	 */
-	public synchronized List<Article> loadArticles(int userId) {
+	public synchronized List<Article> loadUserArticles(int userId) {
 		Articles articles;
 		try {
 			File file = new File(pathToArticlesFile(userId));
@@ -72,6 +73,29 @@ public class ArticlesDAO extends DAOBase {
 			logger.error(message);
 			throw new DAOException(message);
 		}
+	}
+
+	// TODO: Implement
+	/**
+	 * Read all user articles files and return list of articles
+	 * 
+	 * @return List of articles
+	 * @throws DAOException
+	 *             when articles file not found, or contains invalid xml
+	 */
+
+	public synchronized List<Article> loadArticles() {
+		List<Article> listOfArticles = new ArrayList<Article>();
+		List<Integer> userIds = getUserIds();
+
+		for (int i : userIds) {
+			List<Article> userArticles = loadUserArticles(i);
+			if (!userArticles.isEmpty()) {
+				listOfArticles.addAll(userArticles);
+			}
+		}
+
+		return listOfArticles;
 	}
 
 	/**
@@ -118,8 +142,7 @@ public class ArticlesDAO extends DAOBase {
 	 *            ID of the user
 	 */
 	public void deleteUserArticlesFile(int id) {
-		File articlesFile = new File(this.articlesPath + "/" + id
-				+ ".xml");
+		File articlesFile = new File(this.articlesPath + "/" + id + ".xml");
 
 		// Synchronization ?
 		if (articlesFile.exists()) {
@@ -136,8 +159,8 @@ public class ArticlesDAO extends DAOBase {
 	 *            ID of requested article
 	 * @return Requested article
 	 */
-	public Article getArticleById(int userId, String articleId) {
-		List<Article> listOfArticles = loadArticles(userId);
+	public Article getArticleById(String articleId) {
+		List<Article> listOfArticles = loadArticles();
 
 		for (Article a : listOfArticles) {
 			if (a.getId().equals(articleId))
@@ -157,7 +180,7 @@ public class ArticlesDAO extends DAOBase {
 	 * @return Added article with his unique ID
 	 */
 	public Article addArticle(final int userId, final Article article) {
-		final List<Article> articles = loadArticles(userId);
+		final List<Article> articles = loadUserArticles(userId);
 		validate(new ArticleValidator(article, articles));
 
 		return manager.execute(new TransactionalTask<Articles.Article>() {
@@ -179,7 +202,7 @@ public class ArticlesDAO extends DAOBase {
 	}
 
 	/**
-	 * Update content or title of specified article
+	 * Update content or title of article in list of specified user articles
 	 * 
 	 * @param userId
 	 *            User ID
@@ -187,13 +210,13 @@ public class ArticlesDAO extends DAOBase {
 	 *            Article to update
 	 * @return True on success, false otherwise
 	 */
-	public boolean updateArticle(final int userId, final Article article) {
-		final List<Article> articles = loadArticles(userId);
-		
-		if(article.getId() == null) {
+	public boolean updateUserArticle(final int userId, final Article article) {
+		final List<Article> articles = loadUserArticles(userId);
+
+		if (article.getId() == null) {
 			throw new DAOException("Invalid article id");
 		}
-		
+
 		validate(new ArticleValidator(article, articles));
 
 		return manager.execute(new TransactionalTask<Boolean>() {
@@ -221,7 +244,27 @@ public class ArticlesDAO extends DAOBase {
 	}
 
 	/**
-	 * Delete article from available articles
+	 * Update content or title of article in list of all user articles
+	 * 
+	 * @param userId
+	 *            User ID
+	 * @param article
+	 *            Article to update
+	 * @return True on success, false otherwise
+	 */
+	public boolean updateArticleFromAllUserArticles(Article article) {
+		List<Integer> ids = getUserIds();
+
+		for (int i : ids) {
+			if (updateUserArticle(i, article))
+				return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Delete article from available user articles
 	 * 
 	 * @param userId
 	 *            User ID
@@ -229,8 +272,8 @@ public class ArticlesDAO extends DAOBase {
 	 *            Article ID
 	 * @return True on success, false otherwise
 	 */
-	public boolean deleteArticle(final int userId, final String articleId) {
-		final List<Article> listOfArticles = loadArticles(userId);
+	public boolean deleteUserArticle(final int userId, final String articleId) {
+		final List<Article> listOfArticles = loadUserArticles(userId);
 
 		return manager.execute(new TransactionalTask<Boolean>() {
 
@@ -252,6 +295,22 @@ public class ArticlesDAO extends DAOBase {
 				return false;
 			}
 		});
+	}
+
+	/**
+	 * Delete article from all user articles
+	 * @param articleId
+	 * @return True on success, false otherwise
+	 */
+	public boolean deleteArticle(String articleId) {
+		List<Integer> ids = getUserIds();
+
+		for (int i : ids) {
+			if (deleteUserArticle(i, articleId))
+				return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -280,5 +339,22 @@ public class ArticlesDAO extends DAOBase {
 			List<Article> listOfArticles, UserActivity activity) {
 		addToStatistics(userId, entityManager, activity);
 		saveArticles(userId, listOfArticles);
+	}
+
+	/**
+	 * Get list of user ids
+	 * 
+	 * @return List of user ids
+	 */
+	private List<Integer> getUserIds() {
+		UserDAO userDAO = new UserDAO();
+		List<Integer> userIds = new ArrayList<Integer>();
+		List<User> users = userDAO.getUsers();
+
+		for (User u : users) {
+			userIds.add(u.getUserId());
+		}
+
+		return userIds;
 	}
 }

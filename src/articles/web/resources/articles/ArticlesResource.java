@@ -42,12 +42,15 @@ public class ArticlesResource extends ArticlesResourceBase {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Article> getArticles(@QueryParam("search") String searchTerm) {
+	public List<Article> getArticles(@QueryParam("search") String searchTerm,
+			@QueryParam("all") boolean allUsers) {
+
 		if (searchTerm == null) {
-			return this.articles;
+			return (!allUsers) ? this.dao.loadUserArticles(userId) : this.dao.loadArticles();
 		}
 
-		return search(searchTerm, this.articles);
+		return (!allUsers) ? search(searchTerm, this.dao.loadUserArticles(userId)) : search(
+				searchTerm, this.dao.loadArticles());
 	}
 
 	/**
@@ -65,13 +68,15 @@ public class ArticlesResource extends ArticlesResourceBase {
 		return new ResourceRequest<Article, Article>() {
 
 			@Override
-			public Response doProcess(Article article, List<Article> listOfArticles) {
+			public Response doProcess(Article article,
+					List<Article> listOfArticles) {
 				article = dao.addArticle(userId, article);
 
 				logger.info("User with id = " + userId + " created an article.");
 				return Response.ok(article, MediaType.APPLICATION_JSON).build();
 			}
-		}.process(article, this.articles, new ArticleValidator(article, articles));
+		}.process(article, this.articles, new ArticleValidator(article,
+				articles));
 
 	}
 

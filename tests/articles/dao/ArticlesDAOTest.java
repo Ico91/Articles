@@ -46,7 +46,7 @@ public class ArticlesDAOTest {
 	@Test
 	public void testLoadArticles() {
 		ArticlesDAO dao = new ArticlesDAO(path);
-		List<Article> listOfArticles = dao.loadArticles(userId);
+		List<Article> listOfArticles = dao.loadUserArticles(userId);
 
 		Assert.assertNotNull(listOfArticles);
 		Assert.assertFalse(listOfArticles.isEmpty());
@@ -55,11 +55,11 @@ public class ArticlesDAOTest {
 	@Test
 	public void testSaveArticles() {
 		ArticlesDAO dao = new ArticlesDAO(path);
-		List<Article> listOfArticles = dao.loadArticles(userId);
+		List<Article> listOfArticles = dao.loadUserArticles(userId);
 		int expected = listOfArticles.size();
 
 		dao.saveArticles(userId + 1, listOfArticles);
-		listOfArticles = dao.loadArticles(userId + 1);
+		listOfArticles = dao.loadUserArticles(userId + 1);
 		dao.deleteUserArticlesFile(userId + 1);
 
 		Assert.assertTrue(expected == listOfArticles.size());
@@ -81,7 +81,7 @@ public class ArticlesDAOTest {
 	@Test
 	public void testGetArticleById() {
 		ArticlesDAO dao = new ArticlesDAO(path);
-		Article article = dao.getArticleById(userId, ids.get(3));
+		Article article = dao.getArticleById(ids.get(3));
 
 		Assert.assertTrue(article.getId().equals(ids.get(3)));
 		Assert.assertTrue(article.getTitle().equals("Title of article 3"));
@@ -95,7 +95,7 @@ public class ArticlesDAOTest {
 		articleToAdd.setTitle("Some title");
 
 		Article expected = dao.addArticle(userId, articleToAdd);
-		Article actual = dao.getArticleById(userId, expected.getId());
+		Article actual = dao.getArticleById(expected.getId());
 
 		Assert.assertTrue(actual.getTitle().equals(expected.getTitle())
 				&& actual.getContent().equals(expected.getContent()));
@@ -109,9 +109,9 @@ public class ArticlesDAOTest {
 		expected.setContent("Updated content");
 		expected.setTitle("Updated title");
 
-		dao.updateArticle(userId, expected);
+		dao.updateUserArticle(userId, expected);
 
-		Article actual = dao.getArticleById(userId, ids.get(1));
+		Article actual = dao.getArticleById(ids.get(1));
 
 		Assert.assertTrue(actual.getTitle().equals(expected.getTitle())
 				&& actual.getContent().equals(expected.getContent()));
@@ -121,11 +121,11 @@ public class ArticlesDAOTest {
 	public void testDeleteArticle() {
 		ArticlesDAO dao = new ArticlesDAO(path);
 		
-		if(!dao.deleteArticle(userId, ids.get(5))) {
+		if(!dao.deleteUserArticle(userId, ids.get(5))) {
 			Assert.fail("Failed to delete article");
 		}
 		
-		Article result = dao.getArticleById(userId, ids.get(5));
+		Article result = dao.getArticleById(ids.get(5));
 		Assert.assertTrue(result == null);
 	}
 
@@ -180,14 +180,14 @@ public class ArticlesDAOTest {
 	@Test
 	public void getInvalidArticleId() {
 		ArticlesDAO dao = new ArticlesDAO(path);
-		Article expected = dao.getArticleById(userId, "4!42-1235-1231235-325sc");
+		Article expected = dao.getArticleById("4!42-1235-1231235-325sc");
 		Assert.assertTrue(expected == null);
 	}
 	
 	@Test
 	public void deleteInvalidArticleId() {
 		ArticlesDAO dao = new ArticlesDAO(path);
-		Assert.assertFalse(dao.deleteArticle(userId, "kasjdfsfk-5842asfj-~!!!"));
+		Assert.assertFalse(dao.deleteUserArticle(userId, "kasjdfsfk-5842asfj-~!!!"));
 	}
 	
 	@Test(expected = DAOException.class)
@@ -196,7 +196,7 @@ public class ArticlesDAOTest {
 		Article invalid = new Article();
 		invalid.setTitle("Testing title");
 		invalid.setTitle("Some test title");
-		dao.updateArticle(userId, invalid);
+		dao.updateUserArticle(userId, invalid);
 	}
 	
 	@Test(expected = DAOException.class)
@@ -206,7 +206,7 @@ public class ArticlesDAOTest {
 		
 		invalid.setTitle("Some test title");
 		invalid.setId(ids.get(3));
-		dao.updateArticle(userId, invalid);
+		dao.updateUserArticle(userId, invalid);
 	}
 	
 	@Test(expected = DAOException.class)
@@ -217,7 +217,7 @@ public class ArticlesDAOTest {
 		invalid.setTitle("Some test title");
 		invalid.setContent("");
 		invalid.setId(ids.get(3));
-		dao.updateArticle(userId, invalid);
+		dao.updateUserArticle(userId, invalid);
 	}
 	
 	@Test(expected = DAOException.class)
@@ -228,7 +228,7 @@ public class ArticlesDAOTest {
 		invalid.setTitle("");
 		invalid.setContent("Test content");
 		invalid.setId(ids.get(3));
-		dao.updateArticle(userId, invalid);
+		dao.updateUserArticle(userId, invalid);
 	}
 	
 	@Test(expected = DAOException.class)
@@ -238,6 +238,6 @@ public class ArticlesDAOTest {
 		
 		invalid.setContent("Test content");
 		invalid.setId(ids.get(3));
-		dao.updateArticle(userId, invalid);
+		dao.updateUserArticle(userId, invalid);
 	}
 }
