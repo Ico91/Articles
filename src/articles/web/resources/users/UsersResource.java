@@ -1,6 +1,6 @@
 package articles.web.resources.users;
 
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -8,7 +8,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -17,16 +16,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import articles.dao.ArticlesDAO;
-import articles.dao.StatisticsDAO;
 import articles.dto.UserDetails;
 import articles.model.User;
 import articles.validators.UserValidator;
 import articles.web.listener.ConfigurationListener;
-import articles.web.resources.DateAdapter;
 import articles.web.resources.ResourceRequest;
-import articles.web.resources.StatisticsRequest;
-
-import com.google.gson.Gson;
 
 /**
  * Class used to process all administrator requests
@@ -36,75 +30,43 @@ import com.google.gson.Gson;
  */
 @Path("")
 public class UsersResource extends UsersResourceBase {
-	private Gson gson = new Gson();
-	private StatisticsDAO statisticsDAO = new StatisticsDAO();
-
 	public UsersResource(@Context HttpServletRequest request) {
 		super(request);
 	}
 
 	/**
-	 * Get information of all existing users
+	 * Get information of all existing users, or if search term is provided
+	 * returned list is based on found results. 
 	 * 
 	 * @return List of all users
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<User> getUsers() {
-		logger.info("Administrator readed all users info");
-		return this.userDAO.getUsers();
+	public List<User> getUsers(@QueryParam("search") String searchTerm) {
+		if(searchTerm == null) {
+			logger.info("Administrator readed all users info");
+			return this.users;
+		}
+		
+		return search(searchTerm, this.users);
 	}
 
 	/**
-	 * Returns statistics information for all users.
-	 * 
-	 * @param dateInput
-	 *            - date to load the statistics for. The specified date is
-	 *            required in the ISO format (yyyy/mm/dd)
-	 * @return Map containing all user ids as keys and List of
-	 *         {@link articles.model.dto.UserStatisticsDTO } as values
+	 * Returns a list of users based on the results of the search by username.
+	 * @param searchTerm
+	 * @param users - the container to search into
+	 * @return List of found {@link articles.model.User}
 	 */
-	@GET
-	@Path("/statistics")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getStatistics(@QueryParam("date") DateAdapter dateInput) {
-		return new StatisticsRequest() {
+	private List<User> search(String searchTerm, List<User> users) {
+		List<User> usersToReturn = new ArrayList<User>();
 
-			@Override
-			public Response execute(Date dateInput) {
-				return Response.ok()
-						.entity(gson.toJson(statisticsDAO.load(dateInput)))
-						.build();
+		for (User u : users) {
+			if(u.getUsername().contains(searchTerm)) {
+				usersToReturn.add(u);
 			}
-		}.getStatistics(dateInput);
-	}
+		}
 
-	/**
-	 * Returns statistics information according to the specified user.
-	 * 
-	 * @param userIdRequest
-	 *            - id of the requested user's statistics
-	 * @param dateInput
-	 *            - date to load the statistics for. The specified date is
-	 *            required in the ISO format (yyyy/mm/dd)
-	 * @return List of {@link articles.model.dto.UserStatisticsDTO }
-	 */
-	@GET
-	@Path("/statistics/{userId}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getUserStatistics(@PathParam("userId") final int userId,
-			@QueryParam("date") DateAdapter dateInput) {
-		return new StatisticsRequest() {
-
-			@Override
-			public Response execute(Date dateInput) {
-				return Response
-						.ok()
-						.entity(gson.toJson(statisticsDAO.load(userId,
-								dateInput))).build();
-			}
-
-		}.getStatistics(dateInput);
+		return usersToReturn;
 	}
 
 	/**
@@ -118,8 +80,6 @@ public class UsersResource extends UsersResourceBase {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addUser(final UserDetails userToAdd) {
-		List<User> users = this.getUsers();
-		
 		return new ResourceRequest<UserDetails, User>() {
 
 			@Override
@@ -140,7 +100,7 @@ public class UsersResource extends UsersResourceBase {
 						+ " with id = " + user.getUserId());
 				return Response.noContent().build();
 			}
-		}.process(userToAdd, users, new UserValidator(userToAdd, users));
+		}.process(userToAdd, this.users, new UserValidator(userToAdd, this.users));
 	}
 
 	@Path("{id}")
