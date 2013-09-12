@@ -39,7 +39,7 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getArticle(@PathParam("id") int id) {
+	public Response getArticle(@PathParam("id") String id) {
 		Article article = this.dao.getArticleById(userId, id);
 
 		if (article == null) {
@@ -67,7 +67,7 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateArticle(final Article article, @PathParam("id") final int id) {
+	public Response updateArticle(final Article article, @PathParam("id") final String id) {
 		article.setId(id);
 
 		return new ResourceRequest<Article, Article>() {
@@ -98,7 +98,7 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	 * @return Response with response code
 	 */
 	@DELETE
-	public Response deleteArticle(@PathParam("id") int id) {
+	public Response deleteArticle(@PathParam("id") String id) {
 
 		if (!this.dao.deleteArticle(userId, id)) {
 			logger.info("User with id = " + userId

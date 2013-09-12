@@ -126,7 +126,7 @@ public class Articles {
 		@XmlElement(required = true)
 		protected String content;
 		@XmlAttribute(name = "id")
-		protected int id;
+		protected String id;
 
 		/**
 		 * Gets the value of the title property.
@@ -176,7 +176,7 @@ public class Articles {
 		 * @return possible object is {@link Integer }
 		 * 
 		 */
-		public int getId() {
+		public String getId() {
 			return id;
 		}
 
@@ -187,7 +187,7 @@ public class Articles {
 		 *            allowed object is {@link Integer }
 		 * 
 		 */
-		public void setId(int value) {
+		public void setId(String value) {
 			this.id = value;
 		}
 		
@@ -197,7 +197,7 @@ public class Articles {
 			int result = 1;
 			result = prime * result
 					+ ((content == null) ? 0 : content.hashCode());
-			result = prime * result + id;
+			result = prime * result + id.hashCode();
 			result = prime * result + ((title == null) ? 0 : title.hashCode());
 			return result;
 		}
