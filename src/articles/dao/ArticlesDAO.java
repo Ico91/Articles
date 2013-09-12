@@ -3,6 +3,7 @@ package articles.dao;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.xml.bind.JAXBContext;
@@ -135,11 +136,11 @@ public class ArticlesDAO extends DAOBase {
 	 *            ID of requested article
 	 * @return Requested article
 	 */
-	public Article getArticleById(int userId, int articleId) {
+	public Article getArticleById(int userId, String articleId) {
 		List<Article> listOfArticles = loadArticles(userId);
 
 		for (Article a : listOfArticles) {
-			if (a.getId() == articleId)
+			if (a.getId().equals(articleId))
 				return a;
 		}
 
@@ -163,7 +164,7 @@ public class ArticlesDAO extends DAOBase {
 
 			@Override
 			public Article executeTask(EntityManager entityManager) {
-				article.setId(generateArticleId(articles));
+				article.setId(generateArticleId());
 				articles.add(article);
 
 				commit(userId, entityManager, articles,
@@ -189,9 +190,10 @@ public class ArticlesDAO extends DAOBase {
 	public boolean updateArticle(final int userId, final Article article) {
 		final List<Article> articles = loadArticles(userId);
 		
-		if(article.getId() < 1) {
+		if(article.getId() == null) {
 			throw new DAOException("Invalid article id");
 		}
+		
 		validate(new ArticleValidator(article, articles));
 
 		return manager.execute(new TransactionalTask<Boolean>() {
@@ -199,7 +201,7 @@ public class ArticlesDAO extends DAOBase {
 			@Override
 			public Boolean executeTask(EntityManager entityManager) {
 				for (int i = 0; i < articles.size(); i++) {
-					if (articles.get(i).getId() == article.getId()) {
+					if (articles.get(i).getId().equals(article.getId())) {
 						articles.remove(i);
 						articles.add(i, article);
 
@@ -227,7 +229,7 @@ public class ArticlesDAO extends DAOBase {
 	 *            Article ID
 	 * @return True on success, false otherwise
 	 */
-	public boolean deleteArticle(final int userId, final int articleId) {
+	public boolean deleteArticle(final int userId, final String articleId) {
 		final List<Article> listOfArticles = loadArticles(userId);
 
 		return manager.execute(new TransactionalTask<Boolean>() {
@@ -235,7 +237,7 @@ public class ArticlesDAO extends DAOBase {
 			@Override
 			public Boolean executeTask(EntityManager entityManager) {
 				for (int i = 0; i < listOfArticles.size(); i++) {
-					if (listOfArticles.get(i).getId() == articleId) {
+					if (listOfArticles.get(i).getId().equals(articleId)) {
 						listOfArticles.remove(i);
 
 						commit(userId, entityManager, listOfArticles,
@@ -258,17 +260,8 @@ public class ArticlesDAO extends DAOBase {
 	 * @param articles
 	 * @return Unique ID
 	 */
-	private int generateArticleId(List<Article> articles) {
-		int max = Integer.MIN_VALUE;
-
-		for (Article a : articles) {
-			if (a.getId() > max)
-				max = a.getId();
-		}
-		if (max < 1)
-			return 1;
-
-		return ++max;
+	private String generateArticleId() {
+		return UUID.randomUUID().toString();
 	}
 
 	/**
