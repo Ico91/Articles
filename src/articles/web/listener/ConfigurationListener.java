@@ -7,11 +7,11 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
 import javax.ws.rs.core.Context;
 
 import org.apache.log4j.Logger;
+
+//	TODO: Repair
 
 /**
  * Generate after login the path from a property file which defines where the articles to be
@@ -20,8 +20,7 @@ import org.apache.log4j.Logger;
  * @author Galina Hristova
  */
 @WebListener
-public class ConfigurationListener implements HttpSessionListener,
-		ServletContextListener {
+public class ConfigurationListener implements ServletContextListener {
 	private static final String CONFIGURATION_PATH = "WEB-INF/config.properties";
 	public static final String USERID = "userId";
 	public static final String USERTYPE = "userType";
@@ -49,15 +48,7 @@ public class ConfigurationListener implements HttpSessionListener,
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
 		this.context = event.getServletContext();
-	}
-
-	@Override
-	public void sessionDestroyed(HttpSessionEvent arg0) {
-
-	}
-
-	@Override
-	public void sessionCreated(HttpSessionEvent arg0) {
+		
 		try {
 			Properties properties = new Properties();
 			properties.load(this.context

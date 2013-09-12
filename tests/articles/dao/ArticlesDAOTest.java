@@ -3,6 +3,7 @@ package articles.dao;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -14,15 +15,18 @@ import articles.model.Articles.Article;
 
 public class ArticlesDAOTest {
 
-	private static String path = "/home/stinky/Desktop/Test/";
+	private static String path = "/home/stinky/Desktop/Projects/Test";
 	private static final int userId = 12;
-
+	private static List<String> ids = new ArrayList<String>();
+	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+		
 		List<Article> listOfArticles = new ArrayList<Article>();
-		for (int i = 1; i < 10; i++) {
+		for (int i = 0; i < 10; i++) {
+			ids.add(UUID.randomUUID().toString());
 			Article article = new Article();
-			article.setId(i);
+			article.setId(ids.get(i));
 			article.setContent("This is content for article " + i);
 			article.setTitle("Title of article " + i);
 
@@ -77,9 +81,9 @@ public class ArticlesDAOTest {
 	@Test
 	public void testGetArticleById() {
 		ArticlesDAO dao = new ArticlesDAO(path);
-		Article article = dao.getArticleById(userId, 3);
+		Article article = dao.getArticleById(userId, ids.get(3));
 
-		Assert.assertTrue(article.getId() == 3);
+		Assert.assertTrue(article.getId().equals(ids.get(3)));
 		Assert.assertTrue(article.getTitle().equals("Title of article 3"));
 	}
 
@@ -101,13 +105,13 @@ public class ArticlesDAOTest {
 	public void testUpdateArticle() {
 		ArticlesDAO dao = new ArticlesDAO(path);
 		Article expected = new Article();
-		expected.setId(1);
+		expected.setId(ids.get(1));
 		expected.setContent("Updated content");
 		expected.setTitle("Updated title");
 
 		dao.updateArticle(userId, expected);
 
-		Article actual = dao.getArticleById(userId, 1);
+		Article actual = dao.getArticleById(userId, ids.get(1));
 
 		Assert.assertTrue(actual.getTitle().equals(expected.getTitle())
 				&& actual.getContent().equals(expected.getContent()));
@@ -117,11 +121,11 @@ public class ArticlesDAOTest {
 	public void testDeleteArticle() {
 		ArticlesDAO dao = new ArticlesDAO(path);
 		
-		if(!dao.deleteArticle(userId, 5)) {
+		if(!dao.deleteArticle(userId, ids.get(5))) {
 			Assert.fail("Failed to delete article");
 		}
 		
-		Article result = dao.getArticleById(userId, 5);
+		Article result = dao.getArticleById(userId, ids.get(5));
 		Assert.assertTrue(result == null);
 	}
 
@@ -176,14 +180,14 @@ public class ArticlesDAOTest {
 	@Test
 	public void getInvalidArticleId() {
 		ArticlesDAO dao = new ArticlesDAO(path);
-		Article expected = dao.getArticleById(userId, -3);
+		Article expected = dao.getArticleById(userId, "4!42-1235-1231235-325sc");
 		Assert.assertTrue(expected == null);
 	}
 	
 	@Test
 	public void deleteInvalidArticleId() {
 		ArticlesDAO dao = new ArticlesDAO(path);
-		Assert.assertFalse(dao.deleteArticle(userId, -3));
+		Assert.assertFalse(dao.deleteArticle(userId, "kasjdfsfk-5842asfj-~!!!"));
 	}
 	
 	@Test(expected = DAOException.class)
@@ -201,7 +205,7 @@ public class ArticlesDAOTest {
 		Article invalid = new Article();
 		
 		invalid.setTitle("Some test title");
-		invalid.setId(3);
+		invalid.setId(ids.get(3));
 		dao.updateArticle(userId, invalid);
 	}
 	
@@ -212,7 +216,7 @@ public class ArticlesDAOTest {
 		
 		invalid.setTitle("Some test title");
 		invalid.setContent("");
-		invalid.setId(3);
+		invalid.setId(ids.get(3));
 		dao.updateArticle(userId, invalid);
 	}
 	
@@ -223,7 +227,7 @@ public class ArticlesDAOTest {
 		
 		invalid.setTitle("");
 		invalid.setContent("Test content");
-		invalid.setId(3);
+		invalid.setId(ids.get(3));
 		dao.updateArticle(userId, invalid);
 	}
 	
@@ -233,7 +237,7 @@ public class ArticlesDAOTest {
 		Article invalid = new Article();
 		
 		invalid.setContent("Test content");
-		invalid.setId(3);
+		invalid.setId(ids.get(3));
 		dao.updateArticle(userId, invalid);
 	}
 }

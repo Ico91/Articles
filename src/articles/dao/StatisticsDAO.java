@@ -10,6 +10,7 @@ import javax.persistence.EntityManager;
 import articles.database.transactions.TransactionManager;
 import articles.database.transactions.TransactionalTask;
 import articles.dto.UserStatisticsDTO;
+import articles.model.UserActivity;
 
 /**
  * Provides methods for accessing statistics information from database
@@ -34,9 +35,10 @@ public class StatisticsDAO extends DAOBase {
 	 *            - id of the user
 	 * @param date
 	 *            - date to get the activities from
+	 * @param activity
 	 * @return List of UserStatistics transport objects
 	 */
-	public List<UserStatisticsDTO> load(final int userId, final Date date) {
+	public List<UserStatisticsDTO> load(final int userId, final Date date, final UserActivity activity) {
 		return manager
 				.execute(new TransactionalTask<List<UserStatisticsDTO>>() {
 
@@ -45,20 +47,28 @@ public class StatisticsDAO extends DAOBase {
 							EntityManager entityManager) {
 						StatisticsStorage statisticsStorage = new StatisticsStorage(
 								entityManager);
-						return statisticsStorage.load(userId, date);
+						if (date != null && activity == null)
+							return statisticsStorage.loadByDate(userId, date);
+						else if (activity != null && date == null)
+							return statisticsStorage.loadByActivity(userId, activity);
+						else if (date != null && activity != null) 
+							return statisticsStorage.loadByDateActivity(userId, date, activity);
+						else 
+							return statisticsStorage.loadAll(userId);
 					}
 				});
 	}
-
+	
 	/**
 	 * Loads information about user activities for all users, according to the
-	 * specified date.
+	 * specified date and activity.
 	 * 
 	 * @param date
+	 * @param activity
 	 * @return Map of user id as keys and list of
 	 *         {@link articles.model.dto.UserStatisticsDTO} as values
 	 */
-	public Map<Integer, List<UserStatisticsDTO>> load(final Date date) {
+	public Map<Integer, List<UserStatisticsDTO>> loadAll(final Date date, final UserActivity activity) {
 		return manager
 				.execute(new TransactionalTask<Map<Integer, List<UserStatisticsDTO>>>() {
 
@@ -69,7 +79,14 @@ public class StatisticsDAO extends DAOBase {
 								entityManager);
 						Map<Integer, List<UserStatisticsDTO>> result = new HashMap<Integer, List<UserStatisticsDTO>>();
 						for (int uId : statisticsStorage.getUsers()) {
-							result.put(uId, statisticsStorage.load(uId, date));
+							if (date != null && activity == null)
+								result.put(uId, statisticsStorage.loadByDate(uId, date));
+							else if (activity != null && date == null)
+								result.put(uId, statisticsStorage.loadByActivity(uId, activity));
+							else if (date != null && activity != null) 
+								result.put(uId, statisticsStorage.loadByDateActivity(uId, date, activity));
+							else 
+								result.put(uId, statisticsStorage.loadAll(uId));
 						}
 						return result;
 					}
