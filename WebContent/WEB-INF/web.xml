@@ -37,6 +37,11 @@
 		<filter-name>AdministratorFilter</filter-name>
 		<url-pattern>/users/*</url-pattern>
 	</filter-mapping>
+	
+	<filter-mapping>
+		<filter-name>AdministratorFilter</filter-name>
+		<url-pattern>/statistics/*</url-pattern>
+	</filter-mapping>
 	<servlet>
 		<display-name>Users</display-name>
 		<servlet-name>Users</servlet-name>
@@ -49,6 +54,20 @@
 	<servlet-mapping>
 		<servlet-name>Users</servlet-name>
 		<url-pattern>/users/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<display-name>Statistics</display-name>
+		<servlet-name>Statistics</servlet-name>
+		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+		<init-param>
+			<param-name>com.sun.jersey.config.property.packages</param-name>
+			<param-value>articles.web.resources.statistics</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Statistics</servlet-name>
+		<url-pattern>/statistics/*</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>

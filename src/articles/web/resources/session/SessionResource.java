@@ -130,23 +130,23 @@ public class SessionResource {
 	@Path("statistics")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStatistics(@QueryParam("date") DateAdapter dateInput,
+			@QueryParam("activity") UserActivity activity,
 			@Context final HttpServletRequest servletRequest) {
 
 		return new StatisticsRequest() {
 
 			@Override
-			public Response execute(Date dateInput) {
+			public Response execute(Date dateInput, UserActivity activity) {
 				Gson gson = new Gson();
 				StatisticsDAO statisticsDAO = new StatisticsDAO();
-				return Response
-						.ok()
+				return Response.ok()
 						.entity(gson.toJson(statisticsDAO.load(
 								(int) servletRequest.getSession(false)
-										.getAttribute(
-												ConfigurationListener.USERID),
-								dateInput))).build();
+										.getAttribute(ConfigurationListener.USERID),
+										dateInput, activity))).build();
+
 			}
 
-		}.getStatistics(dateInput);
+		}.getStatistics(dateInput, activity);
 	}
 }
