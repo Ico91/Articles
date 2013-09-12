@@ -1,4 +1,4 @@
-package articles.web.resources.users;
+package articles.web.resources.session;
 
 import java.util.Date;
 
@@ -39,8 +39,8 @@ import com.google.gson.Gson;
  * 
  */
 @Path("")
-public class UsersResource {
-	static final Logger logger = Logger.getLogger(UsersResource.class);
+public class SessionResource {
+	static final Logger logger = Logger.getLogger(SessionResource.class);
 	@Context
 	ServletContext context;
 

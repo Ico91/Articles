@@ -52,12 +52,12 @@
 	</servlet-mapping>
 	
 	<servlet>
-		<display-name>User Authorization</display-name>
-		<servlet-name>User Authorization</servlet-name>
+		<display-name>Session</display-name>
+		<servlet-name>Session</servlet-name>
 		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
 		<init-param>
 			<param-name>com.sun.jersey.config.property.packages</param-name>
-			<param-value>articles.web.resources.users</param-value>
+			<param-value>articles.web.resources.session</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
@@ -71,8 +71,8 @@
 		</init-param>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>User Authorization</servlet-name>
-		<url-pattern>/users/*</url-pattern>
+		<servlet-name>Session</servlet-name>
+		<url-pattern>/session/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>Articles Service</servlet-name>
