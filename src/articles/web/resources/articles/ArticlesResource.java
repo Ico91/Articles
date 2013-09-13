@@ -15,6 +15,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import articles.builders.ResultBuilder;
+import articles.dto.ResultDTO;
 import articles.model.Articles.Article;
 import articles.validators.ArticleValidator;
 import articles.web.resources.ResourceRequest;
@@ -42,15 +44,27 @@ public class ArticlesResource extends ArticlesResourceBase {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Article> getArticles(@QueryParam("search") String searchTerm,
-			@QueryParam("all") boolean allUsers) {
+	public Response getArticles(@QueryParam("search") String searchTerm,
+			@QueryParam("all") boolean allUsers, @QueryParam("from") int from,
+			@QueryParam("to") int to) {
+
+		ResultBuilder<Article> resultBuilder = new ResultBuilder<Article>();
+		ResultDTO<Article> result;
 
 		if (searchTerm == null) {
-			return (!allUsers) ? this.dao.loadUserArticles(userId) : this.dao.loadArticles();
+
+			result = (!allUsers) ? resultBuilder.buildResult(
+					this.dao.loadUserArticles(userId), from, to)
+					: resultBuilder.buildResult(this.dao.loadArticles(), from,
+							to);
+		} else {
+			result = (!allUsers) ? resultBuilder.buildResult(
+					search(searchTerm, this.dao.loadUserArticles(userId)),
+					from, to) : resultBuilder.buildResult(
+					search(searchTerm, this.dao.loadArticles()), from, to);
 		}
 
-		return (!allUsers) ? search(searchTerm, this.dao.loadUserArticles(userId)) : search(
-				searchTerm, this.dao.loadArticles());
+		return Response.ok(result, MediaType.APPLICATION_JSON).build();
 	}
 
 	/**
