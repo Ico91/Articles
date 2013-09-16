@@ -10,10 +10,7 @@ public class ResultBuilder<T> {
 		if(from > allResults.size())
 			return new ResultDTO<T>(new ArrayList<T>(), allResults.size());
 		
-		if(to <= 0)
-			to = allResults.size();
-
-		if(to > allResults.size())
+		if(to <= 0 || to > allResults.size())
 			to = allResults.size();
 
 		return new ResultDTO<T>(allResults.subList(from, to), allResults.size());

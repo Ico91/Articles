@@ -9,9 +9,9 @@ import articles.validators.MessageBuilder;
 import articles.validators.MessageKey;
 import articles.validators.Validator;
 
-public abstract class ResourceRequest <T, E>{
+public abstract class PageRequest<T> {
 	
-	public Response process(T object, List<E> listOfObject, Validator validator) {
+	public Response process(List<T> listOfObject, Validator validator) {
 		List<MessageKey> messageKeys = validator.validate();
 
 		if (!messageKeys.isEmpty()) {
@@ -21,8 +21,8 @@ public abstract class ResourceRequest <T, E>{
 							.getErrorMessage()).build();
 		}
 		
-		return doProcess(object, listOfObject);
+		return doProcess(listOfObject);
 	}
 	
-	public abstract Response doProcess(T object, List<E> listOfObjects);
+	public abstract Response doProcess(List<T> listOfObjects);
 }
