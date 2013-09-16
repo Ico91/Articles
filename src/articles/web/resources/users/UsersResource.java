@@ -98,7 +98,7 @@ public class UsersResource extends UsersResourceBase {
 
 				logger.info("Created user " + user.getUsername()
 						+ " with id = " + user.getUserId());
-				return Response.noContent().build();
+				return Response.ok(user).build();
 			}
 		}.process(userToAdd, this.users, new UserValidator(userToAdd, this.users));
 	}
