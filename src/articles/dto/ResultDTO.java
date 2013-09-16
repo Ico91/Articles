@@ -9,9 +9,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
 import articles.model.Articles.Article;
+import articles.model.User;
 
 @XmlRootElement
-@XmlSeeAlso(Article.class)
+@XmlSeeAlso({Article.class, User.class})
 public class ResultDTO<T> {
 	@XmlAnyElement
 	private List<T> results;
