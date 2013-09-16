@@ -5,7 +5,7 @@ import java.util.List;
 
 import articles.dto.ResultDTO;
 
-public class ResultBuilder<T> {
+public class ArticlesPageBuilder<T> {
 	public ResultDTO<T> buildResult(List<T> allResults, int from, int to) {
 		if(from > allResults.size())
 			return new ResultDTO<T>(new ArrayList<T>(), allResults.size());

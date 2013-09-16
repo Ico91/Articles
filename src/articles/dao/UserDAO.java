@@ -7,6 +7,10 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.EntityType;
 
 import org.apache.log4j.Logger;
 
@@ -129,6 +133,32 @@ public class UserDAO extends DAOBase {
 		});
 
 		return users;
+	}
+
+	public List<User> getUsers(final String searchTerm, final int from,
+			final int to) {
+		return manager.execute(new TransactionalTask<List<User>>() {
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public List<User> executeTask(EntityManager entityManager) {
+				CriteriaBuilder qBuilder = entityManager.getCriteriaBuilder();
+				CriteriaQuery<User> qQuery = qBuilder.createQuery(User.class);
+				EntityType<User> eType = entityManager.getMetamodel().entity(
+						User.class);
+				Root<User> root = qQuery.from(User.class);
+
+				if (searchTerm != null)
+					qQuery.where(qBuilder.like(root.get(eType
+							.getDeclaredSingularAttribute("username",
+									String.class)), "%" + searchTerm + "%"));
+
+				Query query = entityManager.createQuery(qQuery);
+				query.setFirstResult(from);
+				query.setMaxResults(to);
+				return query.getResultList();
+			}
+		});
 	}
 
 	/**

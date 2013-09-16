@@ -7,12 +7,12 @@ import javax.ws.rs.core.Response.Status;
 
 import articles.validators.MessageBuilder;
 import articles.validators.MessageKey;
-import articles.validators.Validator;
+import articles.validators.PageParametersValidator;
 
 public abstract class PageRequest<T> {
 	
-	public Response process(List<T> listOfObject, Validator validator) {
-		List<MessageKey> messageKeys = validator.validate();
+	public Response process(int from, int to) {
+		List<MessageKey> messageKeys = new PageParametersValidator(from, to).validate();
 
 		if (!messageKeys.isEmpty()) {
 			return Response
@@ -21,8 +21,8 @@ public abstract class PageRequest<T> {
 							.getErrorMessage()).build();
 		}
 		
-		return doProcess(listOfObject);
+		return doProcess(from, to);
 	}
 	
-	public abstract Response doProcess(List<T> listOfObjects);
+	public abstract Response doProcess(int from, int to);
 }

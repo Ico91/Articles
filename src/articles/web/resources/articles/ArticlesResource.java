@@ -15,10 +15,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import articles.builders.ResultBuilder;
+import articles.builders.ArticlesPageBuilder;
 import articles.model.Articles.Article;
 import articles.validators.ArticleValidator;
-import articles.validators.PaginationParamValidator;
 import articles.web.resources.PageRequest;
 import articles.web.resources.ResourceRequest;
 
@@ -45,26 +44,27 @@ public class ArticlesResource extends ArticlesResourceBase {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getArticles(@QueryParam("search") String searchTerm,
-			@QueryParam("all") boolean allUsers,
+	public Response getArticles(@QueryParam("search") final String searchTerm,
+			@QueryParam("all") final boolean allUsers,
 			@QueryParam("from") final int from, @QueryParam("to") final int to) {
-
-		List<Article> listOfArticles = (allUsers) ? this.dao.loadArticles()
-				: this.dao.loadUserArticles(userId);
-		
-		if (searchTerm != null) {
-			listOfArticles = search(searchTerm, listOfArticles);
-		}
 
 		return new PageRequest<Article>() {
 
 			@Override
-			public Response doProcess(List<Article> listOfObjects) {
+			public Response doProcess(int from, int to) {
+				List<Article> listOfArticles = (allUsers) ? dao.loadArticles()
+						: dao.loadUserArticles(userId);
+
+				if (searchTerm != null) {
+					listOfArticles = search(searchTerm, listOfArticles);
+				}
+
 				return Response.ok(
-						new ResultBuilder<Article>().buildResult(listOfObjects,
+						new ArticlesPageBuilder<Article>().buildResult(listOfArticles,
 								from, to), MediaType.APPLICATION_JSON).build();
 			}
-		}.process(listOfArticles, new PaginationParamValidator(from, to, listOfArticles.size()));
+
+		}.process(from, to);
 	}
 
 	/**

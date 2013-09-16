@@ -1,6 +1,5 @@
 package articles.web.resources.users;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,11 +14,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import articles.builders.ResultBuilder;
 import articles.dao.ArticlesDAO;
+import articles.dto.ResultDTO;
 import articles.dto.UserDetails;
 import articles.model.User;
-import articles.validators.PaginationParamValidator;
 import articles.validators.UserValidator;
 import articles.web.listener.ConfigurationListener;
 import articles.web.resources.PageRequest;
@@ -45,23 +43,20 @@ public class UsersResource extends UsersResourceBase {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getUsers(@QueryParam("search") String searchTerm,
+	public Response getUsers(@QueryParam("search") final String searchTerm,
 			@QueryParam("from") final int from, @QueryParam("to") final int to) {
-		// TODO: Use JPA methods
-
-		List<User> listOfUsers = (searchTerm == null) ? this.users : search(
-				searchTerm, this.users);
 
 		return new PageRequest<User>() {
 
 			@Override
-			public Response doProcess(List<User> listOfObjects) {
+			public Response doProcess(int from, int to) {
 				return Response.ok(
-						new ResultBuilder<User>().buildResult(listOfObjects,
-								from, to), MediaType.APPLICATION_JSON).build();
+						new ResultDTO<User>(userDAO.getUsers(searchTerm, from, to), userDAO.getUsers(
+								searchTerm, 0, 0).size()),
+						MediaType.APPLICATION_JSON).build();
 			}
-		}.process(listOfUsers, new PaginationParamValidator(from, to,
-				listOfUsers.size()));
+
+		}.process(from, to);
 	}
 
 	/**
@@ -72,17 +67,17 @@ public class UsersResource extends UsersResourceBase {
 	 *            - the container to search into
 	 * @return List of found {@link articles.model.User}
 	 */
-	private List<User> search(String searchTerm, List<User> users) {
-		List<User> usersToReturn = new ArrayList<User>();
-
-		for (User u : users) {
-			if (u.getUsername().contains(searchTerm)) {
-				usersToReturn.add(u);
-			}
-		}
-
-		return usersToReturn;
-	}
+//	private List<User> search(String searchTerm, List<User> users) {
+//		List<User> usersToReturn = new ArrayList<User>();
+//
+//		for (User u : users) {
+//			if (u.getUsername().contains(searchTerm)) {
+//				usersToReturn.add(u);
+//			}
+//		}
+//
+//		return usersToReturn;
+//	}
 
 	/**
 	 * Create new user
