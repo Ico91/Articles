@@ -54,12 +54,13 @@ class StatisticsStorage {
 					+ event.toString() + ", for user with user id: " + userId);
 		}
 	}
-	
-	//	TODO: Coments
+
+	// TODO: Comments
 	public List<UserStatistics> getUserStatistics(int userId, Date date,
 			UserActivity activity, int from, int to) {
 
-		StatisticsQueryBuilder qBuilder = new StatisticsQueryBuilder(entityManager);
+		StatisticsQueryBuilder qBuilder = new StatisticsQueryBuilder(
+				entityManager);
 		qBuilder.filterByUserId(userId);
 		return executeQuery(date, activity, from, to, qBuilder);
 	}
@@ -70,23 +71,6 @@ class StatisticsStorage {
 		StatisticsQueryBuilder qBuilder = new StatisticsQueryBuilder(
 				entityManager);
 		return executeQuery(date, activity, from, to, qBuilder);
-	}
-
-	// TODO: Coments
-	@SuppressWarnings("unchecked")
-	private List<UserStatistics> executeQuery(Date date, UserActivity activity,
-			int from, int to, StatisticsQueryBuilder qBuilder) {
-		if (date != null)
-			qBuilder.filterByDate(date);
-		if (activity != null)
-			qBuilder.filterByActivity(activity);
-		Query q = qBuilder.build();
-		q.setFirstResult(from);
-		
-		if (to - from >= 0)
-			q.setMaxResults(to - from);
-
-		return q.getResultList();
 	}
 
 	/**
@@ -105,5 +89,22 @@ class StatisticsStorage {
 			throw new DAOException(
 					"Error while loading user ids from statistics table");
 		}
+	}
+
+	// TODO: Comments
+	@SuppressWarnings("unchecked")
+	private List<UserStatistics> executeQuery(Date date, UserActivity activity,
+			int from, int to, StatisticsQueryBuilder qBuilder) {
+		if (date != null)
+			qBuilder.filterByDate(date);
+		if (activity != null)
+			qBuilder.filterByActivity(activity);
+		Query q = qBuilder.build();
+		q.setFirstResult(from);
+
+		if (to - from >= 0)
+			q.setMaxResults(to - from);
+
+		return q.getResultList();
 	}
 }

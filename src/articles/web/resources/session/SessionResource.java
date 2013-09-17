@@ -1,7 +1,6 @@
 package articles.web.resources.session;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -21,19 +20,14 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.log4j.Logger;
 
-import articles.dao.StatisticsDAO;
 import articles.dao.UserDAO;
 import articles.dto.LoginRequest;
-import articles.dto.ResultDTO;
 import articles.dto.UserDTO;
-import articles.dto.UserStatisticsDTO;
 import articles.model.User;
 import articles.model.UserActivity;
-import articles.model.UserStatistics;
-import articles.utils.ModelToDTOTransformer;
 import articles.web.listener.ConfigurationListener;
 import articles.web.resources.DateAdapter;
-import articles.web.resources.PageRequest;
+import articles.web.resources.statistics.StatisticsResource;
 
 /**
  * Class for performing user requests
@@ -119,7 +113,7 @@ public class SessionResource {
 
 	}
 
-	// TODO: Coments
+	// TODO: Comments
 	/**
 	 * Returns statistics information for the currently logged user.
 	 * 
@@ -139,22 +133,7 @@ public class SessionResource {
 			@QueryParam("to") final int to,
 			@Context final HttpServletRequest servletRequest) {
 
-		return new PageRequest<UserStatistics>() {
-
-			@Override
-			public Response doProcess(int from, int to) {
-				StatisticsDAO dao = new StatisticsDAO();
-				Date date = (dateInput != null) ? dateInput.getDate() : null;
-				
-				int userId = (int )servletRequest.getSession(false).getAttribute(ConfigurationListener.USERID);
-				int totalResults = dao.loadUserStatistics(userId, date, activity, 0, 0).size();
-				List<UserStatistics> listOfUserStatistics = dao.loadUserStatistics(userId, date, activity, from, to);
-				
-				return Response.ok(new ResultDTO<UserStatisticsDTO>(
-						ModelToDTOTransformer.fillListOfStatisticsDTO(listOfUserStatistics), totalResults), 
-						MediaType.APPLICATION_JSON).build();
-				
-			}
-		}.process(from, to);
+		int userId = (int) servletRequest.getSession(false).getAttribute(ConfigurationListener.USERID);
+		return new StatisticsResource().getUserStatistics(userId, dateInput, activity, from, to);
 	}
 }

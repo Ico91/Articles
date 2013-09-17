@@ -22,7 +22,7 @@ import articles.web.resources.PageRequest;
 
 @Path("")
 public class StatisticsResource {
-	//	TODO: Comments
+	// TODO: Comments
 	/**
 	 * Returns statistics information for all users for specific date.
 	 * 
@@ -34,31 +34,15 @@ public class StatisticsResource {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getStatistics(@QueryParam("date") final DateAdapter dateInput,
-			@QueryParam("activity") final UserActivity activity, 
-			@QueryParam("from") final int from,
-			@QueryParam("to") final int to) {
-		
-		return new PageRequest<UserStatistics>() {
+	public Response getStatistics(
+			@QueryParam("date") final DateAdapter dateInput,
+			@QueryParam("activity") final UserActivity activity,
+			@QueryParam("from") final int from, @QueryParam("to") final int to) {
 
-			@Override
-			public Response doProcess(int from, int to) {
-				StatisticsDAO dao = new StatisticsDAO();
-				Date date = (dateInput != null) ? dateInput.getDate() : null;
-				
-				int totalResults = dao.loadStatistics(date, activity, 0, 0).size();
-				List<UserStatistics> listOfUserStatistics = dao.loadStatistics(date, 
-						activity, from, to);
-				
-				return Response.ok(new ResultDTO<UserStatisticsDTO>(
-						ModelToDTOTransformer.fillListOfStatisticsDTO(listOfUserStatistics), totalResults), 
-						MediaType.APPLICATION_JSON).build();
-				
-			}
-		}.process(from, to);
+		return statisticsPageRequest(null, dateInput, activity, from, to);
 	}
-	
-	//	TODO: Comments
+
+	// TODO: Comments
 	/**
 	 * Returns statistics information according to the specified user.
 	 * 
@@ -75,25 +59,36 @@ public class StatisticsResource {
 	public Response getUserStatistics(@PathParam("userId") final int userId,
 			@QueryParam("date") final DateAdapter dateInput,
 			@QueryParam("activity") final UserActivity activity,
-			@QueryParam("from") final int from, 
-			@QueryParam("to") final int to) {
-		
-		//	Duplicated
+			@QueryParam("from") final int from, @QueryParam("to") final int to) {
+
+		return statisticsPageRequest(userId, dateInput, activity, from, to);
+	}
+
+	// TODO: Comments
+	private Response statisticsPageRequest(final Integer userId,
+			final DateAdapter dateInput, final UserActivity activity,
+			final int from, final int to) {
 		return new PageRequest<UserStatistics>() {
 
 			@Override
 			public Response doProcess(int from, int to) {
 				StatisticsDAO dao = new StatisticsDAO();
 				Date date = (dateInput != null) ? dateInput.getDate() : null;
-				
-				int totalResults = dao.loadUserStatistics(userId, date, activity, 0, 0).size();
-				List<UserStatistics> listOfUserStatistics = dao.loadUserStatistics(userId, 
-						date, activity, from, to);
-				
-				return Response.ok(new ResultDTO<UserStatisticsDTO>(
-						ModelToDTOTransformer.fillListOfStatisticsDTO(listOfUserStatistics), totalResults), 
-						MediaType.APPLICATION_JSON).build();
-				
+
+				int totalResults = (userId != null) ?
+						dao.loadUserStatistics(userId, date, activity, 0, 0).size() : 
+						dao.loadStatistics(date, activity, 0, 0).size();
+						
+				List<UserStatistics> listOfUserStatistics = (userId != null) ?
+						dao.loadUserStatistics(userId, date, activity, from, to) :
+						dao.loadStatistics(date, activity, from, to);
+
+				return Response
+						.ok(new ResultDTO<UserStatisticsDTO>(
+								ModelToDTOTransformer.fillListOfStatisticsDTO(listOfUserStatistics),
+								totalResults), MediaType.APPLICATION_JSON)
+						.build();
+
 			}
 		}.process(from, to);
 	}
