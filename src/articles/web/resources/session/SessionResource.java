@@ -1,6 +1,7 @@
 package articles.web.resources.session;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -23,14 +24,16 @@ import org.apache.log4j.Logger;
 import articles.dao.StatisticsDAO;
 import articles.dao.UserDAO;
 import articles.dto.LoginRequest;
+import articles.dto.ResultDTO;
 import articles.dto.UserDTO;
+import articles.dto.UserStatisticsDTO;
 import articles.model.User;
 import articles.model.UserActivity;
+import articles.model.UserStatistics;
+import articles.utils.ModelToDTOTransformer;
 import articles.web.listener.ConfigurationListener;
 import articles.web.resources.DateAdapter;
-import articles.web.resources.StatisticsRequest;
-
-import com.google.gson.Gson;
+import articles.web.resources.PageRequest;
 
 /**
  * Class for performing user requests
@@ -116,6 +119,7 @@ public class SessionResource {
 
 	}
 
+	// TODO: Coments
 	/**
 	 * Returns statistics information for the currently logged user.
 	 * 
@@ -129,24 +133,28 @@ public class SessionResource {
 	@GET
 	@Path("statistics")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getStatistics(@QueryParam("date") DateAdapter dateInput,
-			@QueryParam("activity") UserActivity activity,
+	public Response getStatistics(@QueryParam("date") final DateAdapter dateInput,
+			@QueryParam("activity") final UserActivity activity,
+			@QueryParam("from") final int from, 
+			@QueryParam("to") final int to,
 			@Context final HttpServletRequest servletRequest) {
 
-		return new StatisticsRequest() {
+		return new PageRequest<UserStatistics>() {
 
 			@Override
-			public Response execute(Date dateInput, UserActivity activity) {
-				Gson gson = new Gson();
-				StatisticsDAO statisticsDAO = new StatisticsDAO();
-				return Response.ok()
-						.entity(gson.toJson(statisticsDAO.load(
-								(int) servletRequest.getSession(false)
-										.getAttribute(ConfigurationListener.USERID),
-										dateInput, activity))).build();
-
+			public Response doProcess(int from, int to) {
+				StatisticsDAO dao = new StatisticsDAO();
+				Date date = (dateInput != null) ? dateInput.getDate() : null;
+				
+				int userId = (int )servletRequest.getSession(false).getAttribute(ConfigurationListener.USERID);
+				int totalResults = dao.loadUserStatistics(userId, date, activity, 0, 0).size();
+				List<UserStatistics> listOfUserStatistics = dao.loadUserStatistics(userId, date, activity, from, to);
+				
+				return Response.ok(new ResultDTO<UserStatisticsDTO>(
+						ModelToDTOTransformer.fillListOfStatisticsDTO(listOfUserStatistics), totalResults), 
+						MediaType.APPLICATION_JSON).build();
+				
 			}
-
-		}.getStatistics(dateInput, activity);
+		}.process(from, to);
 	}
 }

@@ -1,7 +1,5 @@
 package articles.dao;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -14,7 +12,7 @@ import javax.persistence.Query;
 import org.apache.log4j.Logger;
 
 import articles.dao.exceptions.DAOException;
-import articles.dto.UserStatisticsDTO;
+import articles.database.StatisticsQueryBuilder;
 import articles.model.UserActivity;
 import articles.model.UserStatistics;
 
@@ -25,15 +23,6 @@ import articles.model.UserStatistics;
  * 
  */
 class StatisticsStorage {
-	private static final String LOAD_USER_STATISTICS_DATE_ACTIVITY = "SELECT user_activity, activity_date "
-			+ "FROM statistics WHERE DATE(activity_date) = ?1 AND user_activity = ?2 AND userId = ?3";
-	private static final String LOAD_USER_STATISTICS_DATE = "SELECT user_activity, activity_date "
-			+ "FROM statistics WHERE DATE(activity_date) = ?1 and userId = ?2";
-	private static final String LOAD_USER_STATISTICS_ACTIVITY = "SELECT user_activity, activity_date "
-			+ "FROM statistics WHERE user_activity = ?1 and userId = ?2";
-	private static final String LOAD_ALL_USER_STATISTICS = "SELECT user_activity, activity_date " 
-			+ "FROM statistics WHERE userId = ?1";
-	
 	private static final String LOAD_USER_IDS = "SELECT userid FROM statistics";
 
 	private EntityManager entityManager;
@@ -66,140 +55,39 @@ class StatisticsStorage {
 		}
 	}
 	
-	/**
-	 * Loads information about user activities
-	 * 
-	 * @return List of UserStatistics transport objects
-	 * @throws StatisticsDAOException
-	 */
-	@SuppressWarnings("unchecked")
-	public List<UserStatisticsDTO> loadAll(int userId) {
-		Query selectQuery = entityManager
-				.createNativeQuery(LOAD_ALL_USER_STATISTICS);
-		selectQuery.setParameter(1, userId);
-		try {
-			List<Object[]> resultList = selectQuery.getResultList();
-			List<UserStatisticsDTO> statisticsList = new ArrayList<UserStatisticsDTO>();
-			for (Object[] result : resultList) {
-				statisticsList.add(new UserStatisticsDTO((Date) result[1],
-						UserActivity.values()[(int) result[0]]));
-			}
-			return statisticsList;
-		} catch (PersistenceException e) {
-			throw new DAOException(
-					"Error while loading statistics");
-		}
+	//	TODO: Coments
+	public List<UserStatistics> getUserStatistics(int userId, Date date,
+			UserActivity activity, int from, int to) {
+
+		StatisticsQueryBuilder qBuilder = new StatisticsQueryBuilder(entityManager);
+		qBuilder.filterByUserId(userId);
+		return executeQuery(date, activity, from, to, qBuilder);
 	}
 
-	/**
-	 * Loads information about all users activities for a specified date and activity, given the
-	 * user id.
-	 * 
-	 * @param userId
-	 *            - id of the user
-	 * @param date
-	 *            - date to get the activities from
-	 * @return List of UserStatistics transport objects
-	 * @throws StatisticsDAOException
-	 */
-	@SuppressWarnings("unchecked")
-	public List<UserStatisticsDTO> loadByDate(final int userId, final Date date) {
-
-		SimpleDateFormat databaseFormat = new SimpleDateFormat("yyyy-MM-dd");
-		Query selectQuery = entityManager
-				.createNativeQuery(LOAD_USER_STATISTICS_DATE);
-		selectQuery.setParameter(1, databaseFormat.format(date));
-		selectQuery.setParameter(2, userId);
-		List<UserStatisticsDTO> statisticsList = new ArrayList<UserStatisticsDTO>();
-		
-		try {
-			List<Object[]> resultList = selectQuery.getResultList();
-			
-			for (Object[] result : resultList) {
-				statisticsList.add(new UserStatisticsDTO((Date) result[1],
-						UserActivity.values()[(int) result[0]]));
-			}
-		} catch (PersistenceException e) {
-			throw new DAOException(
-					"Error while loading statistics for user with user id: "
-							+ userId);
-		}
-		
-		return statisticsList;
-
-	}
-	
-	/**
-	 * Loads information about all users activities for a specified date and activity, given the
-	 * user id.
-	 * 
-	 * @param userId
-	 *            - id of the user
-	 * @param date
-	 *            - date to get the activities from
-	 * @return List of UserStatistics transport objects
-	 * @throws StatisticsDAOException
-	 */
-	@SuppressWarnings("unchecked")
-	public List<UserStatisticsDTO> loadByActivity(final int userId, final UserActivity activity) {
-
-		Query selectQuery = entityManager
-				.createNativeQuery(LOAD_USER_STATISTICS_ACTIVITY);
-		selectQuery.setParameter(1, activity.ordinal());
-		selectQuery.setParameter(2, userId);
-		List<UserStatisticsDTO> statisticsList = new ArrayList<UserStatisticsDTO>();
-		try {
-			List<Object[]> resultList = selectQuery.getResultList();
-				for (Object[] result : resultList) {
-					statisticsList.add(new UserStatisticsDTO((Date) result[1],
-							UserActivity.values()[(int) result[0]]));
-				}
-				
-				return statisticsList;
-		} catch (PersistenceException e) {
-			throw new DAOException(
-					"Error while loading statistics for user with user id: "
-							+ userId);
-		}
-		
-	}
-	
-	/**
-	 * Loads information about all users activities for a specified date, given the
-	 * user id.
-	 * 
-	 * @param userId
-	 *            - id of the user
-	 * @param date
-	 *            - date to get the activities from
-	 * @return List of UserStatistics transport objects
-	 * @throws StatisticsDAOException
-	 */
-	@SuppressWarnings("unchecked")
-	public List<UserStatisticsDTO> loadByDateActivity(final int userId, final Date date, final UserActivity activity) {
-		SimpleDateFormat databaseFormat = new SimpleDateFormat("yyyy-MM-dd");
-		Query selectQuery = entityManager
-				.createNativeQuery(LOAD_USER_STATISTICS_DATE_ACTIVITY);
-		selectQuery.setParameter(1, databaseFormat.format(date));
-		selectQuery.setParameter(2, activity.ordinal());
-		selectQuery.setParameter(3, userId);
-		List<UserStatisticsDTO> statisticsList = new ArrayList<UserStatisticsDTO>();
-		try {
-			List<Object[]> resultList = selectQuery.getResultList();
-				for (Object[] result : resultList) {
-					statisticsList.add(new UserStatisticsDTO((Date) result[1],
-							UserActivity.values()[(int) result[0]]));
-				}
-				
-				return statisticsList;
-		} catch (PersistenceException e) {
-			throw new DAOException(
-					"Error while loading statistics for user with user id: "
-							+ userId);
-		}
-		
+	// TODO:Coments
+	public List<UserStatistics> getStatistics(Date date, UserActivity activity,
+			int from, int to) {
+		StatisticsQueryBuilder qBuilder = new StatisticsQueryBuilder(
+				entityManager);
+		return executeQuery(date, activity, from, to, qBuilder);
 	}
 
+	// TODO: Coments
+	@SuppressWarnings("unchecked")
+	private List<UserStatistics> executeQuery(Date date, UserActivity activity,
+			int from, int to, StatisticsQueryBuilder qBuilder) {
+		if (date != null)
+			qBuilder.filterByDate(date);
+		if (activity != null)
+			qBuilder.filterByActivity(activity);
+		Query q = qBuilder.build();
+		q.setFirstResult(from);
+		
+		if (to - from >= 0)
+			q.setMaxResults(to - from);
+
+		return q.getResultList();
+	}
 
 	/**
 	 * Loads all users' id from the statistics table.

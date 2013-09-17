@@ -143,17 +143,17 @@ public class UserDAO extends DAOBase {
 			@Override
 			public List<User> executeTask(EntityManager entityManager) {
 				CriteriaBuilder qBuilder = entityManager.getCriteriaBuilder();
-				CriteriaQuery<User> qQuery = qBuilder.createQuery(User.class);
+				CriteriaQuery<User> cQuery = qBuilder.createQuery(User.class);
 				EntityType<User> eType = entityManager.getMetamodel().entity(
 						User.class);
-				Root<User> root = qQuery.from(User.class);
+				Root<User> root = cQuery.from(User.class);
 
 				if (searchTerm != null)
-					qQuery.where(qBuilder.like(root.get(eType
+					cQuery.where(qBuilder.like(root.get(eType
 							.getDeclaredSingularAttribute("username",
 									String.class)), "%" + searchTerm + "%"));
 
-				Query query = entityManager.createQuery(qQuery);
+				Query query = entityManager.createQuery(cQuery);
 				query.setFirstResult(from);
 				query.setMaxResults(to);
 				return query.getResultList();

@@ -17,13 +17,15 @@ import articles.model.UserActivity;
 public class UserStatisticsDTO {
 	private Date activityDate;
 	private UserActivity userActivity;
-
+	private int userId;
+	
 	public UserStatisticsDTO() {
 	}
 
-	public UserStatisticsDTO(Date activityDate, UserActivity userActivity) {
+	public UserStatisticsDTO(Date activityDate, UserActivity userActivity, int userId) {
 		this.activityDate = new Date(activityDate.getTime());
 		this.userActivity = userActivity;
+		this.userId = userId;
 	}
 
 	@Override
@@ -54,7 +56,7 @@ public class UserStatisticsDTO {
 	@Override
 	public String toString() {
 		return "UserStatisticsDTO [activityDate=" + activityDate
-				+ ", userActivity=" + userActivity + "]";
+				+ ", userActivity=" + userActivity + ", userId=" + userId +"]";
 	}
 
 	public Date getactivityDate() {
@@ -71,5 +73,13 @@ public class UserStatisticsDTO {
 
 	public void setuserActivity(UserActivity userActivity) {
 		this.userActivity = userActivity;
+	}
+	
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+	
+	public int getUserId() {
+		return this.userId;
 	}
 }

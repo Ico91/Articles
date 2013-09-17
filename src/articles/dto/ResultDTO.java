@@ -12,7 +12,7 @@ import articles.model.Articles.Article;
 import articles.model.User;
 
 @XmlRootElement
-@XmlSeeAlso({Article.class, User.class})
+@XmlSeeAlso({Article.class, User.class, UserStatisticsDTO.class})
 public class ResultDTO<T> {
 	@XmlAnyElement
 	private List<T> results;

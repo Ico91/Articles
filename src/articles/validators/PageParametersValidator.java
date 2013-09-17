@@ -25,6 +25,9 @@ public class PageParametersValidator implements Validator {
 		if(from == to && from != 0)
 			messages.add(PageMessageKeys.FROM_EQUALS_TO);
 		
+		if(to < from && to != 0)
+			messages.add(PageMessageKeys.TO_LOWER_THAN_FROM);
+		
 		return messages;
 	}
 
