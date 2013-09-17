@@ -11,8 +11,8 @@ import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
 
+import articles.builders.StatisticsQueryBuilder;
 import articles.dao.exceptions.DAOException;
-import articles.database.StatisticsQueryBuilder;
 import articles.model.UserActivity;
 import articles.model.UserStatistics;
 

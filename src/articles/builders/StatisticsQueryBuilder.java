@@ -1,4 +1,4 @@
-package articles.database;
+package articles.builders;
 
 import java.util.Date;
 
