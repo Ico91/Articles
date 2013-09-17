@@ -16,6 +16,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.log4j.Logger;
@@ -41,6 +42,20 @@ public class SessionResource {
 	@Context
 	ServletContext context;
 
+	//	TODO: Comments
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response userInfo(@Context HttpServletRequest servletRequest) {
+		UserDAO dao = new UserDAO();
+		int userId = (int) servletRequest.getSession(false).getAttribute(ConfigurationListener.USERID);
+		User currentUser = dao.getUserById(userId);
+		
+		if(currentUser == null)
+			return Response.status(Status.FORBIDDEN).build();
+
+		return Response.ok(new UserDTO(currentUser), MediaType.APPLICATION_JSON).build();
+	}
+	
 	/**
 	 * If a user with the username and password, entered by a client, exists
 	 * returns a response for success, otherwise returns response the the client
