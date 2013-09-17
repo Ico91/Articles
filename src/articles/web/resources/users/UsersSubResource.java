@@ -99,7 +99,7 @@ public class UsersSubResource extends UsersResourceBase {
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response delete(@PathParam("id") int id) {
-		if (isCurrentAdmint(id)) {
+		if (isAdmin(id)) {
 			logger.info("Admin whii id = " + id + " try to delete himself");
 			return Response.status(Status.BAD_REQUEST)
 					.entity(new MessageDTO("Cannot delete yourself")).build();
@@ -126,7 +126,7 @@ public class UsersSubResource extends UsersResourceBase {
 	 *            ID to check
 	 * @return True if id is same as current admin
 	 */
-	private boolean isCurrentAdmint(int id) {
+	private boolean isAdmin(int id) {
 		int currentAdminId = Integer.parseInt(this.request.getSession()
 				.getAttribute(ConfigurationListener.USERID).toString());
 		return (id == currentAdminId) ? true : false;

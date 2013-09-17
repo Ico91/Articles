@@ -127,11 +127,11 @@ public class SessionResource {
 	@GET
 	@Path("statistics")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getStatistics(@QueryParam("date") final DateAdapter dateInput,
-			@QueryParam("activity") final UserActivity activity,
-			@QueryParam("from") final int from, 
-			@QueryParam("to") final int to,
-			@Context final HttpServletRequest servletRequest) {
+	public Response getStatistics(@QueryParam("date") DateAdapter dateInput,
+			@QueryParam("activity") UserActivity activity,
+			@QueryParam("from") int from, 
+			@QueryParam("to") int to,
+			@Context HttpServletRequest servletRequest) {
 
 		int userId = (int) servletRequest.getSession(false).getAttribute(ConfigurationListener.USERID);
 		return new StatisticsResource().getUserStatistics(userId, dateInput, activity, from, to);

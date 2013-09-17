@@ -35,9 +35,9 @@ public class StatisticsResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStatistics(
-			@QueryParam("date") final DateAdapter dateInput,
-			@QueryParam("activity") final UserActivity activity,
-			@QueryParam("from") final int from, @QueryParam("to") final int to) {
+			@QueryParam("date") DateAdapter dateInput,
+			@QueryParam("activity") UserActivity activity,
+			@QueryParam("from") int from, @QueryParam("to") int to) {
 
 		return statisticsPageRequest(null, dateInput, activity, from, to);
 	}
@@ -57,9 +57,9 @@ public class StatisticsResource {
 	@Path("/{userId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUserStatistics(@PathParam("userId") final int userId,
-			@QueryParam("date") final DateAdapter dateInput,
-			@QueryParam("activity") final UserActivity activity,
-			@QueryParam("from") final int from, @QueryParam("to") final int to) {
+			@QueryParam("date") DateAdapter dateInput,
+			@QueryParam("activity") UserActivity activity,
+			@QueryParam("from") int from, @QueryParam("to") final int to) {
 
 		return statisticsPageRequest(userId, dateInput, activity, from, to);
 	}

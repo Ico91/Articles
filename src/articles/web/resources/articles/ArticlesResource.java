@@ -39,8 +39,8 @@ public class ArticlesResource extends ArticlesResourceBase {
 	 * searchTerm in title or content, else return list of all articles
 	 * 
 	 * @param searchTerm
+	 * @param all
 	 * @return List of articles
-	 * @throws ArticlesResourceException
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -60,7 +60,7 @@ public class ArticlesResource extends ArticlesResourceBase {
 				}
 
 				return Response.ok(
-						new ArticlesPageBuilder<Article>().buildResult(listOfArticles,
+						new ArticlesPageBuilder().buildResult(listOfArticles,
 								from, to), MediaType.APPLICATION_JSON).build();
 			}
 
