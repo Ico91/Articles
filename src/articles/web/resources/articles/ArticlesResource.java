@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -46,7 +47,8 @@ public class ArticlesResource extends ArticlesResourceBase {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getArticles(@QueryParam("search") final String searchTerm,
 			@QueryParam("all") final boolean allUsers,
-			@QueryParam("from") int from, @QueryParam("to") int to) {
+			@QueryParam("from") int from, 
+			@QueryParam("to") int to) {
 
 		return new PageRequest<Article>() {
 
