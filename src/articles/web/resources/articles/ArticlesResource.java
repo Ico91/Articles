@@ -46,7 +46,7 @@ public class ArticlesResource extends ArticlesResourceBase {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getArticles(@QueryParam("search") final String searchTerm,
 			@QueryParam("all") final boolean allUsers,
-			@QueryParam("from") final int from, @QueryParam("to") final int to) {
+			@QueryParam("from") int from, @QueryParam("to") int to) {
 
 		return new PageRequest<Article>() {
 
