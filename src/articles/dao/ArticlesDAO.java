@@ -29,6 +29,8 @@ import articles.validators.ArticleValidator;
  */
 public class ArticlesDAO extends DAOBase {
 	private String articlesPath;
+	// TODO: Better synchronization
+	private static final Object lockObject = new Object();
 
 	/**
 	 * Constructs new ArticlesDAO object
@@ -50,7 +52,7 @@ public class ArticlesDAO extends DAOBase {
 	 * @throws DAOException
 	 *             when articles file not found, or contains invalid xml
 	 */
-	public synchronized List<Article> loadUserArticles(int userId) {
+	public List<Article> loadUserArticles(int userId) {
 		Articles articles;
 		try {
 			File file = new File(pathToArticlesFile(userId));
@@ -62,15 +64,17 @@ public class ArticlesDAO extends DAOBase {
 			}
 
 			JAXBContext jaxbContext = JAXBContext.newInstance(Articles.class);
-
 			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-			articles = (Articles) jaxbUnmarshaller.unmarshal(file);
+
+			synchronized (lockObject) {
+				articles = (Articles) jaxbUnmarshaller.unmarshal(file);
+			}
 
 			return articles.getArticle();
 
 		} catch (JAXBException e) {
 			String message = "Invalid articles file format!";
-			logger.error(message);
+			logger.error(e.getMessage());
 			throw new DAOException(message);
 		}
 	}
@@ -83,7 +87,7 @@ public class ArticlesDAO extends DAOBase {
 	 *             when articles file not found, or contains invalid xml
 	 */
 
-	public synchronized List<Article> loadArticles() {
+	public List<Article> loadArticles() {
 		List<Article> listOfArticles = new ArrayList<Article>();
 		List<Integer> userIds = getUserIds();
 
@@ -106,20 +110,22 @@ public class ArticlesDAO extends DAOBase {
 	 *            List of articles to write
 	 * @throws DAOException
 	 */
-	public synchronized void saveArticles(int userId, List<Article> articlesList) {
+	public void saveArticles(int userId, List<Article> articlesList) {
 		Articles article = new Articles();
 		article.setArticle(articlesList);
 		try {
 
 			File file = new File(pathToArticlesFile(userId));
 			JAXBContext jaxbContext = JAXBContext.newInstance(Articles.class);
-
 			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-			jaxbMarshaller.marshal(article, file);
+			
+			synchronized (lockObject) {
+				jaxbMarshaller.marshal(article, file);
+			}
 
 		} catch (JAXBException e) {
 			String message = "Failed to save articles to file!";
-			logger.error(message);
+			logger.error(e.getMessage());
 			throw new DAOException(message);
 		}
 	}
@@ -298,6 +304,7 @@ public class ArticlesDAO extends DAOBase {
 
 	/**
 	 * Delete article from all user articles
+	 * 
 	 * @param articleId
 	 * @return True on success, false otherwise
 	 */
