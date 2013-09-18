@@ -53,8 +53,8 @@ public class ArticlesResource extends ArticlesResourceBase {
 
 			@Override
 			public Response doProcess(int from, int to) {
-				List<Article> listOfArticles = (allUsers) ? dao.loadArticles()
-						: dao.loadUserArticles(userId);
+				List<Article> listOfArticles = (allUsers) ? articlesDao.loadArticles(userIds)
+						: articlesDao.loadUserArticles(userId);
 
 				if (searchTerm != null) {
 					listOfArticles = search(searchTerm, listOfArticles);
@@ -85,14 +85,13 @@ public class ArticlesResource extends ArticlesResourceBase {
 			@Override
 			public Response doProcess(Article article,
 					List<Article> listOfArticles) {
-				article = dao.addArticle(userId, article);
+				article = articlesDao.addArticle(userId, article);
 
 				logger.info("User with id = " + userId + " created an article.");
 				return Response.ok(article, MediaType.APPLICATION_JSON).build();
 			}
 		}.process(article, this.articles, new ArticleValidator(article,
 				articles));
-
 	}
 
 	/**

@@ -275,7 +275,21 @@ public class UserDAO extends DAOBase {
 			}
 		});
 	}
+	
+	/**
+	 * Get list of all user IDs
+	 * @return List of user IDs
+	 */
+	public List<Integer> getListOfUserIds() {
+		List<User> users = getUsers();
+		List<Integer> userIds = new ArrayList<Integer>();
+		
+		for(User u : users)
+			userIds.add(u.getUserId());
 
+		return userIds;
+	}
+	
 	// TODO common things - consider common method
 	@SuppressWarnings("unchecked")
 	private User getUser(final int userId, EntityManager entityManager) {

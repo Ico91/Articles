@@ -27,7 +27,7 @@ public class ConfigurationListener implements ServletContextListener {
 	public static final String PERSISTENCE_NAME_TEST = "TestPE";
 	private static String path = "";
 	private Logger logger = Logger.getLogger(getClass());
-
+	
 	@Context
 	ServletContext context;
 
@@ -41,7 +41,6 @@ public class ConfigurationListener implements ServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent event) {
-
 	}
 
 	@Override
@@ -58,5 +57,4 @@ public class ConfigurationListener implements ServletContextListener {
 			throw new RuntimeException(e);
 		}
 	}
-
 }

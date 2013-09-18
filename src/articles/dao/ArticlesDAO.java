@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.persistence.EntityManager;
 import javax.xml.bind.JAXBContext;
@@ -17,7 +18,6 @@ import articles.dao.exceptions.DAOException;
 import articles.database.transactions.TransactionalTask;
 import articles.model.Articles;
 import articles.model.Articles.Article;
-import articles.model.User;
 import articles.model.UserActivity;
 import articles.validators.ArticleValidator;
 
@@ -28,10 +28,18 @@ import articles.validators.ArticleValidator;
  * 
  */
 public class ArticlesDAO extends DAOBase {
+	private static ConcurrentHashMap<Integer, Object> lockObjects = new ConcurrentHashMap<Integer, Object>();
+	
 	private String articlesPath;
-	// TODO: Better synchronization
-	private static final Object lockObject = new Object();
-
+	
+	private static Object getLockObject(int key) {
+		if(lockObjects.containsKey(key))
+				return lockObjects.get(key);
+		
+		lockObjects.put(key, new Object());
+		return lockObjects.get(key);
+	}
+	
 	/**
 	 * Constructs new ArticlesDAO object
 	 * 
@@ -65,8 +73,8 @@ public class ArticlesDAO extends DAOBase {
 
 			JAXBContext jaxbContext = JAXBContext.newInstance(Articles.class);
 			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-
-			synchronized (lockObject) {
+			
+			synchronized (ArticlesDAO.getLockObject(userId)) {
 				articles = (Articles) jaxbUnmarshaller.unmarshal(file);
 			}
 
@@ -87,9 +95,8 @@ public class ArticlesDAO extends DAOBase {
 	 *             when articles file not found, or contains invalid xml
 	 */
 
-	public List<Article> loadArticles() {
+	public List<Article> loadArticles(List<Integer> userIds) {
 		List<Article> listOfArticles = new ArrayList<Article>();
-		List<Integer> userIds = getUserIds();
 
 		for (int i : userIds) {
 			List<Article> userArticles = loadUserArticles(i);
@@ -119,7 +126,7 @@ public class ArticlesDAO extends DAOBase {
 			JAXBContext jaxbContext = JAXBContext.newInstance(Articles.class);
 			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 			
-			synchronized (lockObject) {
+			synchronized(ArticlesDAO.getLockObject(userId)) {
 				jaxbMarshaller.marshal(article, file);
 			}
 
@@ -164,8 +171,8 @@ public class ArticlesDAO extends DAOBase {
 	 *            ID of requested article
 	 * @return Requested article
 	 */
-	public Article getArticleById(String articleId) {
-		List<Article> listOfArticles = loadArticles();
+	public Article getArticleById(String articleId, List<Integer> userIds) {
+		List<Article> listOfArticles = loadArticles(userIds);
 
 		for (Article a : listOfArticles) {
 			if (a.getId().equals(articleId))
@@ -257,10 +264,8 @@ public class ArticlesDAO extends DAOBase {
 	 *            Article to update
 	 * @return True on success, false otherwise
 	 */
-	public boolean updateArticleFromAllUserArticles(Article article) {
-		List<Integer> ids = getUserIds();
-
-		for (int i : ids) {
+	public boolean updateArticleFromAllUserArticles(Article article, List<Integer> userIds) {
+		for (int i : userIds) {
 			if (updateUserArticle(i, article))
 				return true;
 		}
@@ -308,10 +313,8 @@ public class ArticlesDAO extends DAOBase {
 	 * @param articleId
 	 * @return True on success, false otherwise
 	 */
-	public boolean deleteArticle(String articleId) {
-		List<Integer> ids = getUserIds();
-
-		for (int i : ids) {
+	public boolean deleteArticle(String articleId, List<Integer> userIds) {
+		for (int i : userIds) {
 			if (deleteUserArticle(i, articleId))
 				return true;
 		}
@@ -337,7 +340,7 @@ public class ArticlesDAO extends DAOBase {
 	 * @return Full path to file
 	 */
 	private String pathToArticlesFile(int userId) {
-		return this.articlesPath + "/" + userId + ".xml";
+		return this.articlesPath + userId + ".xml";
 	}
 
 	// TODO: Better name
@@ -345,22 +348,5 @@ public class ArticlesDAO extends DAOBase {
 			List<Article> listOfArticles, UserActivity activity) {
 		addToStatistics(userId, entityManager, activity);
 		saveArticles(userId, listOfArticles);
-	}
-
-	/**
-	 * Get list of user ids
-	 * 
-	 * @return List of user ids
-	 */
-	private List<Integer> getUserIds() {
-		UserDAO userDAO = new UserDAO();
-		List<Integer> userIds = new ArrayList<Integer>();
-		List<User> users = userDAO.getUsers();
-
-		for (User u : users) {
-			userIds.add(u.getUserId());
-		}
-
-		return userIds;
 	}
 }

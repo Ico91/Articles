@@ -42,7 +42,7 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getArticle(@PathParam("id") String id) {
-		Article article = this.dao.getArticleById(id);
+		Article article = this.articlesDao.getArticleById(id, userIds);
 
 		if (article == null) {
 			logger.info("User with id = " + userId
@@ -72,7 +72,7 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	public Response updateArticle(final Article article,
 			@PathParam("id") final String articleId) {
 		// TODO: Duplicated with DELETE
-		if (dao.getArticleById(articleId) == null) {
+		if (articlesDao.getArticleById(articleId, userIds) == null) {
 			logger.info("User with id = " + userId
 					+ " try to update article that does not exist");
 			return Response.status(Status.NOT_FOUND).build();
@@ -87,8 +87,8 @@ public class ArticleSubResource extends ArticlesResourceBase {
 					List<Article> listOfObjects) {
 
 				boolean result = (servletRequest.getSession().getAttribute(
-						ConfigurationListener.USERTYPE) == UserType.ADMIN) ? dao
-						.updateArticleFromAllUserArticles(article) : dao
+						ConfigurationListener.USERTYPE) == UserType.ADMIN) ? articlesDao
+						.updateArticleFromAllUserArticles(article, userIds) : articlesDao
 						.updateUserArticle(userId, article);
 
 				if (!result) {
@@ -115,15 +115,15 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	 */
 	@DELETE
 	public Response deleteArticle(@PathParam("id") String id) {
-		if (dao.getArticleById(id) == null) {
+		if (articlesDao.getArticleById(id, userIds) == null) {
 			logger.info("User with id = " + userId
 					+ " try to update article that does not exist");
 			return Response.status(Status.NOT_FOUND).build();
 		}
 
 		boolean result = (servletRequest.getSession().getAttribute(
-				ConfigurationListener.USERTYPE) == UserType.ADMIN) ? this.dao
-				.deleteArticle(id) : this.dao.deleteUserArticle(userId, id);
+				ConfigurationListener.USERTYPE) == UserType.ADMIN) ? this.articlesDao
+				.deleteArticle(id, userIds) : this.articlesDao.deleteUserArticle(userId, id);
 
 		if (!result) {
 			logger.info("User with id = " + userId
