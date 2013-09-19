@@ -343,7 +343,6 @@ public class ArticlesDAO extends DAOBase {
 		return this.articlesPath + userId + ".xml";
 	}
 
-	// TODO: Better name
 	private void commit(int userId, EntityManager entityManager,
 			List<Article> listOfArticles, UserActivity activity) {
 		addToStatistics(userId, entityManager, activity);

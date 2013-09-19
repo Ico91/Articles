@@ -12,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import articles.dao.StatisticsDAO;
+import articles.dao.UserDAO;
 import articles.dto.ResultDTO;
 import articles.dto.UserStatisticsDTO;
 import articles.model.UserActivity;
@@ -73,6 +74,8 @@ public class StatisticsResource {
 			@Override
 			public Response doProcess(int from, int to) {
 				StatisticsDAO dao = new StatisticsDAO();
+				UserDAO userDao = new UserDAO();
+				
 				Date date = (dateInput != null) ? dateInput.getDate() : null;
 
 				int totalResults = (userId != null) ?
@@ -85,10 +88,9 @@ public class StatisticsResource {
 
 				return Response
 						.ok(new ResultDTO<UserStatisticsDTO>(
-								ModelToDTOTransformer.fillListOfStatisticsDTO(listOfUserStatistics),
-								totalResults), MediaType.APPLICATION_JSON)
-						.build();
-
+								ModelToDTOTransformer.fillListOfStatisticsDTO(listOfUserStatistics, 
+										userDao.getUsersMap()), totalResults), 
+										MediaType.APPLICATION_JSON).build();
 			}
 		}.process(from, to);
 	}

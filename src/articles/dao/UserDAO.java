@@ -2,7 +2,9 @@ package articles.dao;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
@@ -307,7 +309,18 @@ public class UserDAO extends DAOBase {
 
 		return user;
 	}
-
+	
+	public Map<Integer, String> getUsersMap() {
+		Map<Integer, String> userMap = new HashMap<Integer, String>();
+		List<User> listOfUsers = getUsers();
+		
+		for(User u : listOfUsers) {
+			userMap.put(u.getUserId(), u.getUsername());
+		}
+		
+		return userMap;
+	}
+	
 	@SuppressWarnings("unchecked")
 	private User getUserByUsername(String username, EntityManager entityManager) {
 		Query selectUserQuery = entityManager
