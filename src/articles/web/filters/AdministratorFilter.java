@@ -37,7 +37,7 @@ public class AdministratorFilter implements Filter {
 		HttpSession session = req.getSession(false);
 		
 		if(req.getMethod().equals("OPTIONS")) {
-			chain.doFilter(req, resp);
+			//chain.doFilter(req, resp);
 			return;
 		}
 		

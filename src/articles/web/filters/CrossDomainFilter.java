@@ -43,6 +43,8 @@ public class CrossDomainFilter implements Filter {
 		resp.addHeader("Access-Control-Allow-Methods",
 				"GET, POST, PUT, DELETE, OPTIONS, HEAD");
 		resp.addHeader("Access-Control-Max-Age", "1209600");
+
+		resp.addHeader("p3p", "CP=\"Allow p3p\"");
 		
 		chain.doFilter(req, resp);
 	}
