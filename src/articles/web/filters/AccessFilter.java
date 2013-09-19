@@ -28,6 +28,7 @@ public class AccessFilter implements Filter {
 		HttpSession session = req.getSession(false);
 		
 		if(req.getMethod().equals("OPTIONS")) {
+			chain.doFilter(req, resp);
 			return;
 		}
 		

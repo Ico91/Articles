@@ -35,7 +35,12 @@ public class AdministratorFilter implements Filter {
 		HttpServletResponse resp = (HttpServletResponse) response;
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpSession session = req.getSession(false);
-
+		
+		if(req.getMethod().equals("OPTIONS")) {
+			chain.doFilter(req, resp);
+			return;
+		}
+		
 		if (session != null) {
 			if ((UserType) session.getAttribute(ConfigurationListener.USERTYPE) == UserType.ADMIN) {
 				chain.doFilter(req, resp);
