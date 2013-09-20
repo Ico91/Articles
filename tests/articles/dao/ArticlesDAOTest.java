@@ -15,12 +15,15 @@ import articles.model.Articles.Article;
 
 public class ArticlesDAOTest {
 
-	private static String path = "/home/stinky/Desktop/Projects/Test/";
+	private static String path = "TestsFolder/";
 	private static final int userId = 1;
 	private static List<String> ids = new ArrayList<String>();
 	private static List<Integer> userIds = new ArrayList<Integer>();
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+		File dir = new File(path, "");
+		dir.mkdir();
+		
 		ArticlesDAO dao = new ArticlesDAO(path);
 		List<Article> listOfArticles = new ArrayList<Article>();
 		
@@ -44,6 +47,8 @@ public class ArticlesDAOTest {
 		ArticlesDAO dao = new ArticlesDAO(path);
 		for(int i : userIds)
 			dao.deleteUserArticlesFile(i);
+		File dir = new File(path);
+		dir.delete();
 	}
 
 	@Test
