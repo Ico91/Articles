@@ -3,6 +3,7 @@ package articles.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
@@ -33,6 +34,7 @@ public class ResultDTO<T> {
 		this.totalResults = totalResults;
 	}
 	
+	@XmlAnyElement
 	public List<T> getResults() {
 		return this.results;
 	}
