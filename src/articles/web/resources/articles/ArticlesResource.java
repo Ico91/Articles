@@ -1,8 +1,5 @@
 package articles.web.resources.articles;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -15,11 +12,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import articles.builders.ArticlesPageBuilder;
 import articles.model.Articles.Article;
-import articles.validators.ArticleValidator;
-import articles.web.resources.PageRequest;
-import articles.web.resources.ResourceRequest;
+import articles.web.listener.ConfigurationListener;
+import articles.web.requests.articles.AddArticleRequest;
+import articles.web.requests.articles.ArticlesPageRequest;
 
 /**
  * Class used to process article requests
@@ -46,26 +42,15 @@ public class ArticlesResource extends ArticlesResourceBase {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getArticles(@QueryParam("search") final String searchTerm,
 			@QueryParam("all") final boolean allUsers,
-			@QueryParam("from") int from, 
-			@QueryParam("to") int to) {
+			@QueryParam("from") final int from, @QueryParam("to") final int to) {
 
-		return new PageRequest<Article>() {
-
-			@Override
-			public Response doProcess(int from, int to) {
-				List<Article> listOfArticles = (allUsers) ? articlesDao.loadArticles(userIds)
-						: articlesDao.loadUserArticles(userId);
-
-				if (searchTerm != null) {
-					listOfArticles = search(searchTerm, listOfArticles);
-				}
-
-				return Response.ok(
-						new ArticlesPageBuilder().buildResult(listOfArticles,
-								from, to), MediaType.APPLICATION_JSON).build();
-			}
-
-		}.process(from, to);
+		ArticlesPageRequest request =  new ArticlesPageRequest(from, to, userId, 
+				ConfigurationListener.getPath(), userIds);
+		
+		request.setSearchTerm(searchTerm);
+		request.setAllUsers(allUsers);
+		
+		return request.process();
 	}
 
 	/**
@@ -80,18 +65,8 @@ public class ArticlesResource extends ArticlesResourceBase {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response add(Article article) {
-		return new ResourceRequest<Article, Article>() {
-
-			@Override
-			public Response doProcess(Article article,
-					List<Article> listOfArticles) {
-				article = articlesDao.addArticle(userId, article);
-
-				logger.info("User with id = " + userId + " created an article.");
-				return Response.ok(article, MediaType.APPLICATION_JSON).build();
-			}
-		}.process(article, this.articles, new ArticleValidator(article,
-				articles));
+		return new AddArticleRequest(article, ConfigurationListener.getPath(),
+				this.userIds, this.userId).process();
 	}
 
 	/**
@@ -105,30 +80,5 @@ public class ArticlesResource extends ArticlesResourceBase {
 	@Path("{id}")
 	public ArticleSubResource getArticle(@PathParam("id") String id) {
 		return new ArticleSubResource(this.servletRequest);
-	}
-
-	/**
-	 * Search for searchTerm in title and content of articles
-	 * 
-	 * @param searchTerm
-	 *            String to search
-	 * @param listOfArticles
-	 *            List of articles that seek
-	 * @return List of articles that contains the searchTerm
-	 * @throws ArticlesResourceException
-	 */
-	private List<Article> search(String searchTerm, List<Article> listOfArticles) {
-		List<Article> articlesToReturn = new ArrayList<Article>();
-
-		for (Article a : listOfArticles) {
-			String articleTitle = a.getTitle();
-			String articleContent = a.getContent();
-
-			if (articleTitle.contains(searchTerm)
-					|| articleContent.contains(searchTerm))
-				articlesToReturn.add(a);
-		}
-
-		return articlesToReturn;
 	}
 }

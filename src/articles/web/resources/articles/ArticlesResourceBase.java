@@ -36,9 +36,9 @@ public abstract class ArticlesResourceBase {
 		
 		if (servletRequest.getSession().getAttribute(
 				ConfigurationListener.USERTYPE)== UserType.ADMIN) {
-			this.articles = this.articlesDao.loadArticles(this.userIds);
+			this.articles = this.articlesDao.loadArticles(this.userIds, null);
 		} else {
-			this.articles = this.articlesDao.loadUserArticles(this.userId);
+			this.articles = this.articlesDao.loadUserArticles(this.userId, null);
 		}
 	}
 

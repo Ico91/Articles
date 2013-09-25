@@ -1,9 +1,7 @@
 package articles.dao;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
@@ -23,8 +21,6 @@ import articles.model.UserStatistics;
  * 
  */
 class StatisticsStorage {
-	private static final String LOAD_USER_IDS = "SELECT userid FROM statistics";
-
 	private EntityManager entityManager;
 	private Logger logger = Logger.getLogger(getClass());
 
@@ -45,6 +41,7 @@ class StatisticsStorage {
 		statistics.setActivityDate(new Date());
 		statistics.setUserActivity(event);
 		statistics.setUserId(userId);
+		
 		try {
 			entityManager.persist(statistics);
 		} catch (PersistenceException e) {
@@ -73,32 +70,16 @@ class StatisticsStorage {
 		return executeQuery(date, activity, from, to, qBuilder);
 	}
 
-	/**
-	 * Loads all users' id from the statistics table.
-	 * 
-	 * @return Collection holding unique user identifications.
-	 */
-	@SuppressWarnings("unchecked")
-	public Set<Integer> getUsers() {
-		Query selectQuery = entityManager.createNativeQuery(LOAD_USER_IDS);
-		try {
-			Set<Integer> resultList = new HashSet<Integer>();
-			resultList.addAll(selectQuery.getResultList());
-			return resultList;
-		} catch (PersistenceException e) {
-			throw new DAOException(
-					"Error while loading user ids from statistics table");
-		}
-	}
-
 	// TODO: Comments
 	@SuppressWarnings("unchecked")
 	private List<UserStatistics> executeQuery(Date date, UserActivity activity,
 			int from, int to, StatisticsQueryBuilder qBuilder) {
+		
 		if (date != null)
 			qBuilder.filterByDate(date);
 		if (activity != null)
 			qBuilder.filterByActivity(activity);
+		
 		Query q = qBuilder.build();
 		q.setFirstResult(from);
 

@@ -18,7 +18,6 @@ import org.apache.log4j.Logger;
 
 import articles.database.transactions.TransactionManager;
 import articles.database.transactions.TransactionalTask;
-import articles.dto.UserDetails;
 import articles.model.User;
 import articles.model.UserActivity;
 
@@ -37,6 +36,7 @@ public class UserDAO extends DAOBase {
 	private static final String SELECT_USER_BY_ID = "SELECT u FROM User u WHERE u.userId = :userId";
 	private static final String DELETE_QUERY = "DELETE FROM User u WHERE u.userId = :userId";
 	private static final String NOT_FOUND = "No user found.";
+	private static final String SELECT_ALL_USERS = "SELECT u from User u";
 
 	public UserDAO() {
 		logger = Logger.getLogger(getClass());
@@ -57,7 +57,7 @@ public class UserDAO extends DAOBase {
 	public User login(final String username, final String password,
 			final UserActivity userActivity, final Date loginDate) {
 
-		User user = manager.execute(new TransactionalTask<User>() {
+		return manager.execute(new TransactionalTask<User>() {
 
 			@SuppressWarnings("unchecked")
 			@Override
@@ -85,7 +85,6 @@ public class UserDAO extends DAOBase {
 			}
 
 		});
-		return user;
 	}
 
 	/**
@@ -95,7 +94,7 @@ public class UserDAO extends DAOBase {
 	 * @return user on success, otherwise null
 	 */
 	public User getUserById(final int userId) {
-		User user = manager.execute(new TransactionalTask<User>() {
+		return manager.execute(new TransactionalTask<User>() {
 
 			@Override
 			public User executeTask(EntityManager entityManager)
@@ -104,8 +103,6 @@ public class UserDAO extends DAOBase {
 			}
 
 		});
-
-		return user;
 	}
 
 	/**
@@ -114,7 +111,7 @@ public class UserDAO extends DAOBase {
 	 * @return list of users
 	 */
 	public List<User> getUsers() {
-		List<User> users = manager.execute(new TransactionalTask<List<User>>() {
+		return manager.execute(new TransactionalTask<List<User>>() {
 			@SuppressWarnings("unchecked")
 			@Override
 			public List<User> executeTask(EntityManager entityManager)
@@ -122,7 +119,7 @@ public class UserDAO extends DAOBase {
 				List<User> users = new ArrayList<User>();
 
 				Query selectUsersQuery = entityManager
-						.createQuery("SELECT u from User u");
+						.createQuery(SELECT_ALL_USERS);
 				users = (List<User>) selectUsersQuery.getResultList();
 
 				if (users.isEmpty()) {
@@ -133,8 +130,6 @@ public class UserDAO extends DAOBase {
 				return users;
 			}
 		});
-
-		return users;
 	}
 
 	public List<User> getUsers(final String searchTerm, final int from,
@@ -156,8 +151,11 @@ public class UserDAO extends DAOBase {
 									String.class)), "%" + searchTerm + "%"));
 
 				Query query = entityManager.createQuery(cQuery);
+				
 				query.setFirstResult(from);
-				query.setMaxResults(to);
+				if (to - from > 0)
+					query.setMaxResults(to - from);
+				
 				return query.getResultList();
 			}
 		});
@@ -169,27 +167,16 @@ public class UserDAO extends DAOBase {
 	 * @param newUser
 	 * @return true on success
 	 */
-	public User addUser(final UserDetails newUser) {
-		User addedUser = manager.execute(new TransactionalTask<User>() {
+	public User addUser(final User newUser) {
+		return manager.execute(new TransactionalTask<User>() {
 			@Override
 			public User executeTask(EntityManager entityManager)
 					throws PersistenceException {
-				User addedUser = null;
-
-				User user = new User();
-				user.setUsername(newUser.getUsername());
-				user.setPassword(newUser.getPassword());
-				user.setUserType(newUser.getType());
-				entityManager.persist(user);
-
-				addedUser = getUserByUsername(newUser.getUsername(),
-						entityManager);
-
-				return addedUser;
+				entityManager.persist(newUser);
+				
+				return getUserByUsername(newUser.getUsername(), entityManager);
 			}
 		});
-
-		return addedUser;
 	}
 
 	/**
@@ -200,7 +187,7 @@ public class UserDAO extends DAOBase {
 	 * @param user
 	 * @return true on success, false if user with the ID does not exist
 	 */
-	public boolean updateUser(final int userId, final UserDetails user) {
+	public boolean updateUser(final int userId, final User user) {
 		return manager.execute(new TransactionalTask<Boolean>() {
 			@Override
 			public Boolean executeTask(EntityManager entityManager)
@@ -210,17 +197,17 @@ public class UserDAO extends DAOBase {
 						.createQuery(UPDATE_USER_QUERY);
 				updateUserQuery.setParameter("username", user.getUsername());
 				updateUserQuery.setParameter("password", user.getPassword());
-				updateUserQuery.setParameter("userType", user.getType());
+				updateUserQuery.setParameter("userType", user.getUserType());
 				updateUserQuery.setParameter("userId", userId);
 
 				User user = getUser(userId, entityManager);
 
-				if (user != null) {
-					updateUserQuery.executeUpdate();
-					return true;
-				} else {
+				if (user == null)
 					return false;
-				}
+				
+				updateUserQuery.executeUpdate();
+				return true;
+				
 			}
 		});
 	}
@@ -277,21 +264,22 @@ public class UserDAO extends DAOBase {
 			}
 		});
 	}
-	
+
 	/**
 	 * Get list of all user IDs
+	 * 
 	 * @return List of user IDs
 	 */
 	public List<Integer> getListOfUserIds() {
 		List<User> users = getUsers();
 		List<Integer> userIds = new ArrayList<Integer>();
-		
-		for(User u : users)
+
+		for (User u : users)
 			userIds.add(u.getUserId());
 
 		return userIds;
 	}
-	
+
 	// TODO common things - consider common method
 	@SuppressWarnings("unchecked")
 	private User getUser(final int userId, EntityManager entityManager) {
@@ -305,22 +293,20 @@ public class UserDAO extends DAOBase {
 			return null;
 		}
 
-		User user = users.get(0);
-
-		return user;
+		return users.get(0);
 	}
-	
+
 	public Map<Integer, String> getUsersMap() {
 		Map<Integer, String> userMap = new HashMap<Integer, String>();
 		List<User> listOfUsers = getUsers();
-		
-		for(User u : listOfUsers) {
+
+		for (User u : listOfUsers) {
 			userMap.put(u.getUserId(), u.getUsername());
 		}
-		
+
 		return userMap;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private User getUserByUsername(String username, EntityManager entityManager) {
 		Query selectUserQuery = entityManager
@@ -336,7 +322,7 @@ public class UserDAO extends DAOBase {
 		return users.get(0);
 	}
 
-	private boolean updateLastLogin(final int userId, final Date loginDate,
+	private void updateLastLogin(final int userId, final Date loginDate,
 			final EntityManager entityManager) {
 		Query updateLastLoginQuery = entityManager
 				.createQuery(UPDATE_LASTLOGIN_QUERY);
@@ -344,7 +330,6 @@ public class UserDAO extends DAOBase {
 		updateLastLoginQuery.setParameter("userId", userId);
 
 		updateLastLoginQuery.executeUpdate();
-		return true;
 	}
 
 }

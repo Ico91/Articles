@@ -23,6 +23,8 @@ public class ArticlesPageBuilder {
 	public ResultDTO<Article> buildResult(List<Article> allResults, int from, int to) {
 		if(from > allResults.size())
 			return new ResultDTO<Article>(new ArrayList<Article>(), allResults.size());
+		//	List.sublist toIndex param is exclusive
+		to++;
 		
 		if(to <= 0 || to > allResults.size())
 			to = allResults.size();

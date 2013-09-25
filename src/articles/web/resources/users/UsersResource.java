@@ -1,7 +1,5 @@
 package articles.web.resources.users;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -12,16 +10,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
-import articles.dao.ArticlesDAO;
-import articles.dto.ResultDTO;
 import articles.dto.UserDetails;
-import articles.model.User;
-import articles.validators.UserValidator;
-import articles.web.listener.ConfigurationListener;
-import articles.web.resources.PageRequest;
-import articles.web.resources.ResourceRequest;
+import articles.web.requests.users.AddUserRequest;
+import articles.web.requests.users.UsersPageRequest;
 
 /**
  * Class used to process all administrator requests
@@ -46,17 +38,7 @@ public class UsersResource extends UsersResourceBase {
 	public Response getUsers(@QueryParam("search") final String searchTerm,
 			@QueryParam("from") final int from, @QueryParam("to") final int to) {
 
-		return new PageRequest<User>() {
-
-			@Override
-			public Response doProcess(int from, int to) {
-				return Response.ok(
-						new ResultDTO<User>(userDAO.getUsers(searchTerm, from, to), userDAO.getUsers(
-								searchTerm, 0, 0).size()),
-						MediaType.APPLICATION_JSON).build();
-			}
-
-		}.process(from, to);
+		return new UsersPageRequest(from, to, userDAO, searchTerm).process();
 	}
 
 	/**
@@ -67,17 +49,17 @@ public class UsersResource extends UsersResourceBase {
 	 *            - the container to search into
 	 * @return List of found {@link articles.model.User}
 	 */
-//	private List<User> search(String searchTerm, List<User> users) {
-//		List<User> usersToReturn = new ArrayList<User>();
-//
-//		for (User u : users) {
-//			if (u.getUsername().contains(searchTerm)) {
-//				usersToReturn.add(u);
-//			}
-//		}
-//
-//		return usersToReturn;
-//	}
+	// private List<User> search(String searchTerm, List<User> users) {
+	// List<User> usersToReturn = new ArrayList<User>();
+	//
+	// for (User u : users) {
+	// if (u.getUsername().contains(searchTerm)) {
+	// usersToReturn.add(u);
+	// }
+	// }
+	//
+	// return usersToReturn;
+	// }
 
 	/**
 	 * Create new user
@@ -90,28 +72,7 @@ public class UsersResource extends UsersResourceBase {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addUser(final UserDetails userToAdd) {
-		return new ResourceRequest<UserDetails, User>() {
-
-			@Override
-			public Response doProcess(UserDetails objectToValidate,
-					List<User> listOfObjects) {
-				User user = userDAO.addUser(userToAdd);
-				if (user == null) {
-					logger.info("Failed to create user");
-					return Response.status(Status.BAD_REQUEST).build();
-				}
-
-				// Create new articles file for user
-				ArticlesDAO articlesDAO = new ArticlesDAO(
-						ConfigurationListener.getPath());
-				articlesDAO.createUserArticlesFile(user.getUserId());
-
-				logger.info("Created user " + user.getUsername()
-						+ " with id = " + user.getUserId());
-				return Response.ok(user).build();
-			}
-		}.process(userToAdd, this.users, new UserValidator(userToAdd,
-				this.users));
+		return new AddUserRequest(userToAdd).process();
 	}
 
 	@Path("{id}")

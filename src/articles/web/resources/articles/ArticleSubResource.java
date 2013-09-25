@@ -1,7 +1,5 @@
 package articles.web.resources.articles;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -13,11 +11,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import articles.model.UserType;
 import articles.model.Articles.Article;
-import articles.validators.ArticleValidator;
+import articles.model.UserType;
 import articles.web.listener.ConfigurationListener;
-import articles.web.resources.ResourceRequest;
+import articles.web.requests.articles.UpdateArticleRequest;
 
 /**
  * Class used to process request to specified article
@@ -71,7 +68,7 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateArticle(final Article article,
 			@PathParam("id") final String articleId) {
-		// TODO: Duplicated with DELETE
+		
 		if (articlesDao.getArticleById(articleId, userIds) == null) {
 			logger.info("User with id = " + userId
 					+ " try to update article that does not exist");
@@ -79,30 +76,9 @@ public class ArticleSubResource extends ArticlesResourceBase {
 		}
 
 		article.setId(articleId);
-
-		return new ResourceRequest<Article, Article>() {
-
-			@Override
-			public Response doProcess(Article objectToValidate,
-					List<Article> listOfObjects) {
-
-				boolean result = (servletRequest.getSession().getAttribute(
-						ConfigurationListener.USERTYPE) == UserType.ADMIN) ? articlesDao
-						.updateArticleFromAllUserArticles(article, userIds) : articlesDao
-						.updateUserArticle(userId, article);
-
-				if (!result) {
-					logger.info("User with id = " + userId
-							+ " try to update other user's article");
-					return Response.status(Status.FORBIDDEN).build();
-				}
-
-				logger.info("User with id = " + userId
-						+ " updated an article with id = " + articleId + ".");
-				return Response.noContent().build();
-			}
-		}.process(article, this.articles, new ArticleValidator(article,
-				articles));
+		
+		return new UpdateArticleRequest(article, ConfigurationListener.getPath(), 
+				this.userIds).process();
 	}
 
 	/**

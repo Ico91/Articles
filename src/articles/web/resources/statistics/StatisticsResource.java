@@ -18,8 +18,8 @@ import articles.dto.UserStatisticsDTO;
 import articles.model.UserActivity;
 import articles.model.UserStatistics;
 import articles.utils.ModelToDTOTransformer;
+import articles.web.requests.PageRequest;
 import articles.web.resources.DateAdapter;
-import articles.web.resources.PageRequest;
 
 @Path("")
 public class StatisticsResource {
@@ -35,8 +35,7 @@ public class StatisticsResource {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getStatistics(
-			@QueryParam("date") DateAdapter dateInput,
+	public Response getStatistics(@QueryParam("date") DateAdapter dateInput,
 			@QueryParam("activity") UserActivity activity,
 			@QueryParam("from") int from, @QueryParam("to") int to) {
 
@@ -65,34 +64,37 @@ public class StatisticsResource {
 		return statisticsPageRequest(userId, dateInput, activity, from, to);
 	}
 
-	// TODO: Comments
+	// TODO: Comments + StatisticsPageRequest
 	private Response statisticsPageRequest(final Integer userId,
 			final DateAdapter dateInput, final UserActivity activity,
 			final int from, final int to) {
-		return new PageRequest<UserStatistics>() {
+
+		return new PageRequest(from, to) {
 
 			@Override
-			public Response doProcess(int from, int to) {
-				StatisticsDAO dao = new StatisticsDAO();
+			protected Object doProcess() {
+				StatisticsDAO statisticsDao = new StatisticsDAO();
 				UserDAO userDao = new UserDAO();
-				
+
 				Date date = (dateInput != null) ? dateInput.getDate() : null;
 
-				int totalResults = (userId != null) ?
-						dao.loadUserStatistics(userId, date, activity, 0, 0).size() : 
-						dao.loadStatistics(date, activity, 0, 0).size();
-						
-				List<UserStatistics> listOfUserStatistics = (userId != null) ?
-						dao.loadUserStatistics(userId, date, activity, from, to) :
-						dao.loadStatistics(date, activity, from, to);
+				int totalResults = (userId != null) ? statisticsDao
+						.loadUserStatistics(userId, date, activity, 0, 0)
+						.size() : statisticsDao.loadStatistics(date, activity,
+						0, 0).size();
 
-				return Response
-						.ok(new ResultDTO<UserStatisticsDTO>(
-								ModelToDTOTransformer.fillListOfStatisticsDTO(listOfUserStatistics, 
-										userDao.getUsersMap()), totalResults), 
-										MediaType.APPLICATION_JSON).build();
+				List<UserStatistics> listOfUserStatistics = (userId != null) ? statisticsDao
+						.loadUserStatistics(userId, date, activity, from, to)
+						: statisticsDao
+								.loadStatistics(date, activity, from, to);
+
+				return new ResultDTO<UserStatisticsDTO>(
+						ModelToDTOTransformer.fillListOfStatisticsDTO(
+								listOfUserStatistics, userDao.getUsersMap()),
+						totalResults);
+
 			}
-		}.process(from, to);
+		}.process();
 	}
 
 }

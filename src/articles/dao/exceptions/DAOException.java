@@ -1,7 +1,7 @@
 package articles.dao.exceptions;
 
 /**
- * Exception thrown by ArticlesDAO
+ * Exception thrown by all DAO objects
  * 
  * @author Krasimir Atanasov
  * 
@@ -9,13 +9,6 @@ package articles.dao.exceptions;
 public class DAOException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Constructs new ArticlesDAOException object with specified exception
-	 * message
-	 * 
-	 * @param message
-	 *            Exception message
-	 */
 	public DAOException(String message) {
 		super(message);
 	}

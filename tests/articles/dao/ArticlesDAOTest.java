@@ -54,7 +54,7 @@ public class ArticlesDAOTest {
 	@Test
 	public void testLoadArticles() {
 		ArticlesDAO dao = new ArticlesDAO(path);
-		List<Article> listOfArticles = dao.loadUserArticles(userId);
+		List<Article> listOfArticles = dao.loadUserArticles(userId, null);
 
 		Assert.assertNotNull(listOfArticles);
 		Assert.assertFalse(listOfArticles.isEmpty());
@@ -63,11 +63,11 @@ public class ArticlesDAOTest {
 	@Test
 	public void testSaveArticles() {
 		ArticlesDAO dao = new ArticlesDAO(path);
-		List<Article> listOfArticles = dao.loadUserArticles(userId);
+		List<Article> listOfArticles = dao.loadUserArticles(userId, null);
 		int expected = listOfArticles.size();
 
 		dao.saveArticles(-userId, listOfArticles);
-		listOfArticles = dao.loadUserArticles(-userId);
+		listOfArticles = dao.loadUserArticles(-userId, null);
 		dao.deleteUserArticlesFile(-userId);
 
 		Assert.assertTrue(expected == listOfArticles.size());

@@ -60,7 +60,7 @@ public class ArticlesDAO extends DAOBase {
 	 * @throws DAOException
 	 *             when articles file not found, or contains invalid xml
 	 */
-	public List<Article> loadUserArticles(int userId) {
+	public List<Article> loadUserArticles(int userId, String searchTerm) {
 		Articles articles;
 		try {
 			File file = new File(pathToArticlesFile(userId));
@@ -78,7 +78,8 @@ public class ArticlesDAO extends DAOBase {
 				articles = (Articles) jaxbUnmarshaller.unmarshal(file);
 			}
 
-			return articles.getArticle();
+			return (searchTerm == null) ? articles.getArticle() 
+					: search(searchTerm, articles.getArticle());
 
 		} catch (JAXBException e) {
 			String message = "Invalid articles file format!";
@@ -95,16 +96,16 @@ public class ArticlesDAO extends DAOBase {
 	 *             when articles file not found, or contains invalid xml
 	 */
 
-	public List<Article> loadArticles(List<Integer> userIds) {
+	public List<Article> loadArticles(List<Integer> userIds, String searchTerm) {
 		List<Article> listOfArticles = new ArrayList<Article>();
 
 		for (int i : userIds) {
-			List<Article> userArticles = loadUserArticles(i);
+			List<Article> userArticles = loadUserArticles(i, searchTerm);
 			if (!userArticles.isEmpty()) {
 				listOfArticles.addAll(userArticles);
 			}
 		}
-
+		
 		return listOfArticles;
 	}
 
@@ -156,7 +157,6 @@ public class ArticlesDAO extends DAOBase {
 	public void deleteUserArticlesFile(int id) {
 		File articlesFile = new File(this.articlesPath + "/" + id + ".xml");
 
-		// Synchronization ?
 		if (articlesFile.exists()) {
 			articlesFile.delete();
 		}
@@ -172,7 +172,7 @@ public class ArticlesDAO extends DAOBase {
 	 * @return Requested article
 	 */
 	public Article getArticleById(String articleId, List<Integer> userIds) {
-		List<Article> listOfArticles = loadArticles(userIds);
+		List<Article> listOfArticles = loadArticles(userIds, null);
 
 		for (Article a : listOfArticles) {
 			if (a.getId().equals(articleId))
@@ -192,14 +192,14 @@ public class ArticlesDAO extends DAOBase {
 	 * @return Added article with his unique ID
 	 */
 	public Article addArticle(final int userId, final Article article) {
-		final List<Article> articles = loadUserArticles(userId);
+		final List<Article> articles = loadUserArticles(userId, null);
+		article.setId(generateArticleId());
 		validate(new ArticleValidator(article, articles));
 
 		return manager.execute(new TransactionalTask<Articles.Article>() {
 
 			@Override
 			public Article executeTask(EntityManager entityManager) {
-				article.setId(generateArticleId());
 				articles.add(article);
 
 				commit(userId, entityManager, articles,
@@ -223,7 +223,7 @@ public class ArticlesDAO extends DAOBase {
 	 * @return True on success, false otherwise
 	 */
 	public boolean updateUserArticle(final int userId, final Article article) {
-		final List<Article> articles = loadUserArticles(userId);
+		final List<Article> articles = loadUserArticles(userId, null);
 
 		if (article.getId() == null) {
 			throw new DAOException("Invalid article id");
@@ -283,7 +283,7 @@ public class ArticlesDAO extends DAOBase {
 	 * @return True on success, false otherwise
 	 */
 	public boolean deleteUserArticle(final int userId, final String articleId) {
-		final List<Article> listOfArticles = loadUserArticles(userId);
+		final List<Article> listOfArticles = loadUserArticles(userId, null);
 
 		return manager.execute(new TransactionalTask<Boolean>() {
 
@@ -322,6 +322,31 @@ public class ArticlesDAO extends DAOBase {
 		return false;
 	}
 
+	/**
+	 * Search for searchTerm in title and content of articles
+	 * 
+	 * @param searchTerm
+	 *            String to search
+	 * @param listOfArticles
+	 *            List of articles that seek
+	 * @return List of articles that contains the searchTerm
+	 * @throws ArticlesResourceException
+	 */
+	public List<Article> search(String searchTerm, List<Article> listOfArticles) {
+		List<Article> articlesToReturn = new ArrayList<Article>();
+
+		for (Article a : listOfArticles) {
+			String articleTitle = a.getTitle();
+			String articleContent = a.getContent();
+
+			if (articleTitle.contains(searchTerm)
+					|| articleContent.contains(searchTerm))
+				articlesToReturn.add(a);
+		}
+
+		return articlesToReturn;
+	}
+	
 	/**
 	 * Generate unique article id
 	 * 

@@ -36,4 +36,12 @@ public class ResultDTO<T> {
 	public void setTotalResults(long totalResults) {
 		this.totalResults = totalResults;
 	}
+	
+	public List<T> getResults() {
+		return this.results;
+	}
+	
+	public long getTotalResults() {
+		return this.totalResults;
+	}
 }

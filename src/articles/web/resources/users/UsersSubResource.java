@@ -1,7 +1,5 @@
 package articles.web.resources.users;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -17,9 +15,8 @@ import articles.dao.ArticlesDAO;
 import articles.dto.MessageDTO;
 import articles.dto.UserDetails;
 import articles.model.User;
-import articles.validators.UserValidator;
 import articles.web.listener.ConfigurationListener;
-import articles.web.resources.ResourceRequest;
+import articles.web.requests.users.UpdateUserRequest;
 
 public class UsersSubResource extends UsersResourceBase {
 
@@ -62,30 +59,7 @@ public class UsersSubResource extends UsersResourceBase {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response update(@PathParam("id") int id, final UserDetails user) {
-		List<User> users = this.userDAO.getUsers();
-		final int userId = id;
-
-		// Remove user from list of all users
-		for (int i = 0; i < users.size(); i++) {
-			if (users.get(i).getUserId() == id) {
-				users.remove(i);
-			}
-		}
-
-		return new ResourceRequest<UserDetails, User>() {
-
-			@Override
-			public Response doProcess(UserDetails objectToValidate,
-					List<User> listOfObjects) {
-				if (!userDAO.updateUser(userId, user)) {
-					logger.info("Failed to update user with id = " + userId);
-					return Response.status(Status.NOT_FOUND).build();
-				}
-
-				logger.info("Updated user with id = " + userId);
-				return Response.noContent().build();
-			}
-		}.process(user, users, new UserValidator(user, users));
+		return new UpdateUserRequest(user, id).process();
 	}
 
 	/**

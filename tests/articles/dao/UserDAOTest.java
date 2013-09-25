@@ -15,7 +15,6 @@ import org.junit.Test;
 import articles.database.transactions.TransactionManager;
 import articles.database.transactions.TransactionalTask;
 import articles.dto.LoginRequest;
-import articles.dto.UserDetails;
 import articles.model.User;
 import articles.model.UserActivity;
 import articles.model.UserType;
@@ -61,7 +60,11 @@ public class UserDAOTest {
 	
 	@Test
 	public void addUserTest() {
-		UserDetails newUser = new UserDetails("guest", "122", UserType.USER);
+		User newUser = new User();
+		newUser.setUsername("guest");
+		newUser.setPassword("122");
+		newUser.setUserType(UserType.USER);
+		
 		User user = userDAO.addUser(newUser);
 		List<User> users = userDAO.getUsers();
 		String expectedUsername = null;
@@ -78,7 +81,11 @@ public class UserDAOTest {
 	
 	@Test
 	public void updateUser() {
-		UserDetails updateUser = new UserDetails("admin", "222", UserType.ADMIN);
+		User updateUser = new User();
+		updateUser.setUsername("admin");
+		updateUser.setPassword("222");
+		updateUser.setUserType(UserType.ADMIN);
+		
 		userDAO.updateUser(3, updateUser);
 		User expected = userDAO.getUserById(3);
 		
