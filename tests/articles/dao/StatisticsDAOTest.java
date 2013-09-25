@@ -44,8 +44,8 @@ public class StatisticsDAOTest {
 	}
 
 	private static void initDB() {
+		cleanDB();
 		statisticsDAO.manager.execute(new TransactionalTask<UserStatistics>() {
-
 			@Override
 			public UserStatistics executeTask(EntityManager entityManager) {
 				for(int i = 0; i < 3; i ++) {
@@ -67,6 +67,18 @@ public class StatisticsDAOTest {
 				return true;
 			}
 
+		});
+	}
+	
+	private static void cleanDB() {
+		statisticsDAO.manager.execute(new TransactionalTask<Boolean>() {
+
+			@Override
+			public Boolean executeTask(EntityManager entityManager) {
+				Query clean = entityManager.createNativeQuery("delete from statistics");
+				clean.executeUpdate();
+				return true;
+			}
 		});
 	}
 }
