@@ -6,7 +6,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import articles.validators.MessageKey;
+import articles.messages.MessageKey;
 
 @XmlRootElement
 public class MessageDTO {

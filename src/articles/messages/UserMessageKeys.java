@@ -1,4 +1,4 @@
-package articles.validators;
+package articles.messages;
 
 /**
  * Defines the error messages used while validating an user

@@ -3,6 +3,9 @@ package articles.validators;
 import java.util.ArrayList;
 import java.util.List;
 
+import articles.messages.MessageKey;
+import articles.messages.PageMessageKeys;
+
 public class PageParametersValidator implements Validator {
 	private int from;
 	private int to;

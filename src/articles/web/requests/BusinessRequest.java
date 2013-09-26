@@ -6,8 +6,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import articles.validators.MessageBuilder;
-import articles.validators.MessageKey;
+import articles.builders.MessageBuilder;
+import articles.messages.MessageKey;
 import articles.validators.Validator;
 
 public abstract class BusinessRequest {

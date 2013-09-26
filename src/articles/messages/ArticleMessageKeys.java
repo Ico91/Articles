@@ -1,4 +1,4 @@
-package articles.validators;
+package articles.messages;
 
 public enum ArticleMessageKeys implements MessageKey{
 	

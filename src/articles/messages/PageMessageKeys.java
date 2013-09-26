@@ -1,4 +1,4 @@
-package articles.validators;
+package articles.messages;
 
 public enum PageMessageKeys implements MessageKey {
 	NEGATIVE_FROM_PARAMETER("NEGATIVE_FROM_PARAMETER"),

@@ -1,8 +1,9 @@
-package articles.validators;
+package articles.builders;
 
 import java.util.List;
 
 import articles.dto.MessageDTO;
+import articles.messages.MessageKey;
 
 /**
  * Class used to build message from list of message keys

@@ -4,8 +4,8 @@ import java.util.List;
 
 import articles.dto.MessageDTO;
 import articles.dto.UserDetails;
+import articles.messages.RequestMessageKeys;
 import articles.model.User;
-import articles.validators.RequestMessageKeys;
 import articles.validators.Validator;
 
 public class UpdateUserRequest extends UserRequest {

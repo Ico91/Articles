@@ -3,8 +3,8 @@ package articles.web.requests.articles;
 import java.util.List;
 
 import articles.dto.MessageDTO;
+import articles.messages.RequestMessageKeys;
 import articles.model.Articles.Article;
-import articles.validators.RequestMessageKeys;
 
 public class UpdateArticleRequest extends ArticleRequest {
 

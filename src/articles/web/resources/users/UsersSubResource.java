@@ -14,8 +14,8 @@ import javax.ws.rs.core.Response.Status;
 import articles.dao.ArticlesDAO;
 import articles.dto.MessageDTO;
 import articles.dto.UserDetails;
+import articles.messages.RequestMessageKeys;
 import articles.model.User;
-import articles.validators.RequestMessageKeys;
 import articles.web.listener.ConfigurationListener;
 import articles.web.requests.users.UpdateUserRequest;
 

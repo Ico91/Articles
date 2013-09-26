@@ -11,9 +11,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import articles.messages.RequestMessageKeys;
 import articles.model.Articles.Article;
 import articles.model.UserType;
-import articles.validators.RequestMessageKeys;
 import articles.web.listener.ConfigurationListener;
 import articles.web.requests.articles.UpdateArticleRequest;
 
