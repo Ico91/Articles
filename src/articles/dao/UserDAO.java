@@ -116,11 +116,9 @@ public class UserDAO extends DAOBase {
 			@Override
 			public List<User> executeTask(EntityManager entityManager)
 					throws PersistenceException {
-				List<User> users = new ArrayList<User>();
-
 				Query selectUsersQuery = entityManager
 						.createQuery(SELECT_ALL_USERS);
-				users = (List<User>) selectUsersQuery.getResultList();
+				List<User> users = (List<User>) selectUsersQuery.getResultList();
 
 				if (users.isEmpty()) {
 					logger.info(NOT_FOUND);
