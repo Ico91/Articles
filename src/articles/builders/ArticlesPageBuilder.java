@@ -24,7 +24,7 @@ public class ArticlesPageBuilder {
 		if(from > allResults.size())
 			return new ResultDTO<Article>(new ArrayList<Article>(), allResults.size());
 		//	List.sublist toIndex param is exclusive
-		to++;
+		// to++;
 		
 		if(to <= 0 || to > allResults.size())
 			to = allResults.size();
