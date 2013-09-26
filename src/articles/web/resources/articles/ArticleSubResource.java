@@ -11,6 +11,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage;
+import com.sun.research.ws.wadl.Request;
+
+import articles.dto.MessageDTO;
 import articles.messages.RequestMessageKeys;
 import articles.model.Articles.Article;
 import articles.model.UserType;
@@ -113,7 +117,8 @@ public class ArticleSubResource extends ArticlesResourceBase {
 		logger.info("User with id = " + userId
 				+ " deleted an article with id = " + id + ".");
 
-		return Response.ok(RequestMessageKeys.ARTICLE_DELETED.getValue(),
-				MediaType.APPLICATION_JSON).build();
+		MessageDTO dto = new MessageDTO();
+		dto.addMessage(RequestMessageKeys.ARTICLE_DELETED.getValue());
+		return Response.ok(dto, MediaType.APPLICATION_JSON).build();
 	}
 }

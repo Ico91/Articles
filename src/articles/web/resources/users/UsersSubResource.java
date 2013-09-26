@@ -94,8 +94,9 @@ public class UsersSubResource extends UsersResourceBase {
 		articlesDAO.deleteUserArticlesFile(id);
 
 		logger.info("Deleted user with id = " + id);
-		return Response.ok(RequestMessageKeys.USER_DELETED.toString(),
-				MediaType.APPLICATION_JSON).build();
+		MessageDTO dto = new MessageDTO();
+		dto.addMessage(RequestMessageKeys.USER_DELETED.getValue());
+		return Response.ok(dto, MediaType.APPLICATION_JSON).build();
 	}
 
 	/**
