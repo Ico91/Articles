@@ -36,7 +36,7 @@ public class CrossDomainFilter implements Filter {
 		
 		this.logger.info("Request from: " + origin + " to URI:" + req.getRequestURI());
 		
-		resp.addHeader("Access-Control-Allow-Origin", req.getHeader("origin"));
+		resp.addHeader("Access-Control-Allow-Origin", origin);
 		resp.addHeader("Access-Control-Allow-Headers",
 				"origin, content-type, accept, authorization");
 		resp.addHeader("Access-Control-Allow-Credentials", "true");

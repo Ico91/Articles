@@ -11,9 +11,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage;
-import com.sun.research.ws.wadl.Request;
-
 import articles.dto.MessageDTO;
 import articles.messages.RequestMessageKeys;
 import articles.model.Articles.Article;

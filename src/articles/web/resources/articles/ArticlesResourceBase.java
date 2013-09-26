@@ -9,8 +9,6 @@ import org.apache.log4j.Logger;
 
 import articles.dao.ArticlesDAO;
 import articles.dao.UserDAO;
-import articles.model.Articles.Article;
-import articles.model.UserType;
 import articles.web.listener.ConfigurationListener;
 
 /**
@@ -23,7 +21,6 @@ public abstract class ArticlesResourceBase {
 	protected final Logger logger = Logger.getLogger(getClass());
 
 	protected HttpServletRequest servletRequest;
-	protected List<Article> articles;
 	protected List<Integer> userIds;
 	protected ArticlesDAO articlesDao;
 	protected int userId;
@@ -33,13 +30,6 @@ public abstract class ArticlesResourceBase {
 		this.articlesDao = new ArticlesDAO(ConfigurationListener.getPath());
 		this.userIds = new UserDAO().getListOfUserIds();
 		this.userId = getUserId();
-		
-		if (servletRequest.getSession().getAttribute(
-				ConfigurationListener.USERTYPE)== UserType.ADMIN) {
-			this.articles = this.articlesDao.loadArticles(this.userIds, null);
-		} else {
-			this.articles = this.articlesDao.loadUserArticles(this.userId, null);
-		}
 	}
 
 	/**
