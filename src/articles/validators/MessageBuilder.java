@@ -18,13 +18,6 @@ public class MessageBuilder {
 	}
 
 	public MessageDTO getErrorMessage() {
-		StringBuilder stringBuilder = new StringBuilder();
-		for (MessageKey key : this.messageKeys) {
-			stringBuilder.append(key.getValue());
-			stringBuilder.append(".");
-			stringBuilder.append(System.lineSeparator());
-		}
-
-		return new MessageDTO(stringBuilder.toString());
+		return new MessageDTO(messageKeys);
 	}
 }

@@ -15,6 +15,7 @@ import articles.dao.ArticlesDAO;
 import articles.dto.MessageDTO;
 import articles.dto.UserDetails;
 import articles.model.User;
+import articles.validators.RequestMessageKeys;
 import articles.web.listener.ConfigurationListener;
 import articles.web.requests.users.UpdateUserRequest;
 
@@ -74,9 +75,12 @@ public class UsersSubResource extends UsersResourceBase {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response delete(@PathParam("id") int id) {
 		if (isAdmin(id)) {
+			MessageDTO dto = new MessageDTO();
+			dto.addMessage(RequestMessageKeys.USER_CANNOT_DELETE_HIMSELF
+					.getValue());
 			logger.info("Admin whii id = " + id + " try to delete himself");
-			return Response.status(Status.BAD_REQUEST)
-					.entity(new MessageDTO("Cannot delete yourself")).build();
+
+			return Response.status(Status.BAD_REQUEST).entity(dto).build();
 		}
 
 		if (!this.userDAO.deleteUser(id)) {
@@ -90,7 +94,8 @@ public class UsersSubResource extends UsersResourceBase {
 		articlesDAO.deleteUserArticlesFile(id);
 
 		logger.info("Deleted user with id = " + id);
-		return Response.noContent().build();
+		return Response.ok(RequestMessageKeys.USER_DELETED.toString(),
+				MediaType.APPLICATION_JSON).build();
 	}
 
 	/**

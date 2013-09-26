@@ -7,12 +7,12 @@ package articles.validators;
  *
  */
 public enum UserMessageKeys implements MessageKey {
-	USERNAME_IS_NULL("Username is null"),
-	USERNAME_IS_EMPTY("Username is empty"),
-	PASSWORD_IS_NULL("Password is null"),
-	PASSWORD_IS_EMPTY("Password is empty"),
-	USERTYPE_IS_NULL("Usertype is null"),
-	NOT_UNIQUE_USERNAME("Username is not unique");
+	USERNAME_IS_NULL("USERNAME_IS_NULL"),
+	USERNAME_IS_EMPTY("USERNAME_IS_EMPTY"),
+	PASSWORD_IS_NULL("PASSWORD_IS_NULL"),
+	PASSWORD_IS_EMPTY("PASSWORD_IS_EMPTY"),
+	USERTYPE_IS_NULL("USERTYPE_IS_NULL"),
+	NOT_UNIQUE_USERNAME("NOT_UNIQUE_USERNAME");
 	
 	private String value;
 	

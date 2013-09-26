@@ -13,6 +13,7 @@ import javax.ws.rs.core.Response.Status;
 
 import articles.model.Articles.Article;
 import articles.model.UserType;
+import articles.validators.RequestMessageKeys;
 import articles.web.listener.ConfigurationListener;
 import articles.web.requests.articles.UpdateArticleRequest;
 
@@ -68,7 +69,7 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateArticle(final Article article,
 			@PathParam("id") final String articleId) {
-		
+
 		if (articlesDao.getArticleById(articleId, userIds) == null) {
 			logger.info("User with id = " + userId
 					+ " try to update article that does not exist");
@@ -76,9 +77,9 @@ public class ArticleSubResource extends ArticlesResourceBase {
 		}
 
 		article.setId(articleId);
-		
-		return new UpdateArticleRequest(article, ConfigurationListener.getPath(), 
-				this.userIds).process();
+
+		return new UpdateArticleRequest(article,
+				ConfigurationListener.getPath(), this.userIds).process();
 	}
 
 	/**
@@ -90,6 +91,7 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	 * @return Response with response code
 	 */
 	@DELETE
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteArticle(@PathParam("id") String id) {
 		if (articlesDao.getArticleById(id, userIds) == null) {
 			logger.info("User with id = " + userId
@@ -99,7 +101,8 @@ public class ArticleSubResource extends ArticlesResourceBase {
 
 		boolean result = (servletRequest.getSession().getAttribute(
 				ConfigurationListener.USERTYPE) == UserType.ADMIN) ? this.articlesDao
-				.deleteArticle(id, userIds) : this.articlesDao.deleteUserArticle(userId, id);
+				.deleteArticle(id, userIds) : this.articlesDao
+				.deleteUserArticle(userId, id);
 
 		if (!result) {
 			logger.info("User with id = " + userId
@@ -110,6 +113,7 @@ public class ArticleSubResource extends ArticlesResourceBase {
 		logger.info("User with id = " + userId
 				+ " deleted an article with id = " + id + ".");
 
-		return Response.noContent().build();
+		return Response.ok(RequestMessageKeys.ARTICLE_DELETED.getValue(),
+				MediaType.APPLICATION_JSON).build();
 	}
 }

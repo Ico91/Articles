@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import articles.dao.exceptions.DAOException;
 import articles.database.transactions.TransactionManager;
 import articles.model.UserActivity;
-import articles.validators.MessageBuilder;
 import articles.validators.MessageKey;
 import articles.validators.Validator;
 
@@ -57,10 +56,9 @@ public class DAOBase {
 		List<MessageKey> messageKeys = validator.validate();
 
 		if (messageKeys.size() != 0) {
-			MessageBuilder builder = new MessageBuilder(messageKeys);
-			logger.error(builder.getErrorMessage().getMessage());
+			logger.error("Validation errors occured!");
 
-			throw new DAOException(builder.getErrorMessage().getMessage());
+			throw new DAOException("Validation errors occured!");
 		}
 	}
 }

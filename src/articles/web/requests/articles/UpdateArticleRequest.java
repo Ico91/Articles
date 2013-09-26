@@ -4,6 +4,7 @@ import java.util.List;
 
 import articles.dto.MessageDTO;
 import articles.model.Articles.Article;
+import articles.validators.RequestMessageKeys;
 
 public class UpdateArticleRequest extends ArticleRequest {
 
@@ -13,8 +14,11 @@ public class UpdateArticleRequest extends ArticleRequest {
 
 	@Override
 	protected Object processEntity(Article entity) {
+		MessageDTO dto = new MessageDTO();
+		dto.addMessage(RequestMessageKeys.ARTICLE_UPDATED.getValue());
+		
 		return (this.articlesDAO.updateArticleFromAllUserArticles(entity,
-				userIds)) ? new MessageDTO("Article updated") : null;
+				userIds)) ? dto : null;
 	}
 
 }

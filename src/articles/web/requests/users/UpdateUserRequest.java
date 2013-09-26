@@ -5,6 +5,7 @@ import java.util.List;
 import articles.dto.MessageDTO;
 import articles.dto.UserDetails;
 import articles.model.User;
+import articles.validators.RequestMessageKeys;
 import articles.validators.Validator;
 
 public class UpdateUserRequest extends UserRequest {
@@ -24,8 +25,10 @@ public class UpdateUserRequest extends UserRequest {
 
 	@Override
 	protected Object processEntity(User entity) {
-		return (this.dao.updateUser(this.userId, entity)) ? new MessageDTO(
-				"User updated") : null;
+		MessageDTO dto = new MessageDTO();
+		dto.addMessage(RequestMessageKeys.USER_UPDATED.getValue());
+		
+		return (this.dao.updateUser(this.userId, entity)) ? dto : null;
 	}
 
 	private List<User> removeCurrentUserFromList(int id, List<User> users) {
