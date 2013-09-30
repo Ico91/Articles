@@ -130,7 +130,8 @@ public class ArticlesDAO extends DAOBase {
 			synchronized(ArticlesDAO.getLockObject(userId)) {
 				jaxbMarshaller.marshal(article, file);
 			}
-
+			
+			
 		} catch (JAXBException e) {
 			String message = "Failed to save articles to file!";
 			logger.error(e.getMessage());
