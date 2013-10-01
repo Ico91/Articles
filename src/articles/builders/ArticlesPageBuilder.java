@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import articles.dto.ResultDTO;
-import articles.model.Articles.Article;
+import articles.model.Article;
 
 /**
  * Class used to build page with articles

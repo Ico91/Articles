@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
-import articles.model.Articles.Article;
+import articles.model.Article;
 import articles.model.User;
 
 @XmlRootElement

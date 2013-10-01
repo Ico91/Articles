@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response.Status;
 
 import articles.dto.MessageDTO;
 import articles.messages.RequestMessageKeys;
-import articles.model.Articles.Article;
+import articles.model.Article;
 import articles.model.UserType;
 import articles.web.listener.ConfigurationListener;
 import articles.web.requests.articles.UpdateArticleRequest;
@@ -41,8 +41,7 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getArticle(@PathParam("id") String id) {
-		Article article = this.articlesDao.getArticleById(id, userIds);
-
+		Article article = this.articlesDao.getArticleById(id);
 		if (article == null) {
 			logger.info("User with id = " + userId
 					+ " request article that does not exist.");
@@ -68,19 +67,28 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateArticle(final Article article,
+	public Response updateArticle(Article article,
 			@PathParam("id") final String articleId) {
+		UserType userType = (UserType) servletRequest.getSession()
+				.getAttribute(ConfigurationListener.USERTYPE);
+		article.setId(articleId);
 
-		if (articlesDao.getArticleById(articleId, userIds) == null) {
+		if (articlesDao.getArticleById(articleId) == null) {
 			logger.info("User with id = " + userId
 					+ " try to update article that does not exist");
 			return Response.status(Status.NOT_FOUND).build();
 		}
 
-		article.setId(articleId);
+		if (userType != UserType.ADMIN) {
+			if (articlesDao.getUserArticleById(userId, articleId) == null) {
+				logger.info("User with id = " + userId
+						+ " try to update other user's article");
+				return Response.status(Status.FORBIDDEN).build();
+			}
+		}
 
 		return new UpdateArticleRequest(article,
-				ConfigurationListener.getPath(), this.userIds).process();
+				ConfigurationListener.getPath(), userId, userType).process();
 	}
 
 	/**
@@ -94,16 +102,22 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteArticle(@PathParam("id") String id) {
-		if (articlesDao.getArticleById(id, userIds) == null) {
+		UserType userType = (UserType) servletRequest.getSession()
+				.getAttribute(ConfigurationListener.USERTYPE);
+		boolean result = false;
+
+		if (articlesDao.getArticleById(id) == null) {
 			logger.info("User with id = " + userId
 					+ " try to update article that does not exist");
 			return Response.status(Status.NOT_FOUND).build();
 		}
 
-		boolean result = (servletRequest.getSession().getAttribute(
-				ConfigurationListener.USERTYPE) == UserType.ADMIN) ? this.articlesDao
-				.deleteArticle(id, userIds) : this.articlesDao
-				.deleteUserArticle(userId, id);
+		if (userType == UserType.ADMIN) {
+			result = this.articlesDao.deleteArticle(id, userId);
+		} else {
+			result = (articlesDao.userArticleExist(userId, id)) ? this.articlesDao
+					.deleteArticle(id, userId) : false;
+		}
 
 		if (!result) {
 			logger.info("User with id = " + userId
