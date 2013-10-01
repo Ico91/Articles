@@ -1,6 +1,7 @@
 package articles.web.requests.articles;
 
 import java.util.List;
+import java.util.UUID;
 
 import articles.dao.ArticlesDAO;
 import articles.model.Article;
@@ -22,6 +23,7 @@ public abstract class ArticleRequest extends ResourceRequest<Article, Article> {
 
 	@Override
 	protected Article toEntity(Article dto) {
+		dto.setId("");
 		return dto;
 	}
 
