@@ -59,7 +59,7 @@ public class Article {
 		if (getClass() != obj.getClass())
 			return false;
 		Article other = (Article) obj;
-		if(other.id == this.id)
+		if(other.id.equals(this.id))
 			return true;
 		return false;
 	}
