@@ -1,13 +1,11 @@
 package articles.database;
 
 import java.util.Calendar;
-import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import articles.model.ArticleInfo;
 import articles.model.User;
 import articles.model.UserType;
 import articles.web.listener.ConfigurationListener;
@@ -22,7 +20,7 @@ public class DBInit {
 		
 		
 		entityManager.getTransaction().begin();
-		/*User user = new User();
+		User user = new User();
 		user.setUsername("admin");
 		user.setPassword("123");
 		user.setLastLogin(Calendar.getInstance().getTime());
@@ -42,10 +40,7 @@ public class DBInit {
 		user.setUserType(UserType.USER);
 
 		entityManager.persist(user);
-		entityManager.getTransaction().commit();*/
-
-		ArticleInfo articleInfo = new ArticleInfo(1, UUID.randomUUID().toString());
-		entityManager.persist(articleInfo);
+		entityManager.getTransaction().commit();
 		
 		entityManager.close();
 	}
