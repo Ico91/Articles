@@ -1,7 +1,6 @@
 package articles.web.requests.articles;
 
 import java.util.List;
-import java.util.UUID;
 
 import articles.dao.ArticlesDAO;
 import articles.model.Article;
