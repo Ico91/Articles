@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import articles.dto.MessageDTO;
+import articles.messages.ArticleMessageKeys;
 import articles.messages.RequestMessageKeys;
 import articles.model.Articles.Article;
 import articles.model.UserType;
@@ -26,6 +27,8 @@ import articles.web.requests.articles.UpdateArticleRequest;
  */
 public class ArticleSubResource extends ArticlesResourceBase {
 
+	private MessageDTO dto;
+	
 	public ArticleSubResource(HttpServletRequest servletRequest) {
 		super(servletRequest);
 	}
@@ -46,7 +49,9 @@ public class ArticleSubResource extends ArticlesResourceBase {
 		if (article == null) {
 			logger.info("User with id = " + userId
 					+ " request article that does not exist.");
-			return Response.status(Status.NOT_FOUND).build();
+			dto = new MessageDTO();
+			dto.addMessage(ArticleMessageKeys.ARTICLE_NOT_EXIST.getValue());
+			return Response.status(Status.NOT_FOUND).entity(dto).build();
 
 		}
 
@@ -70,15 +75,15 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateArticle(final Article article,
 			@PathParam("id") final String articleId) {
-
+		dto = new MessageDTO();
 		if (articlesDao.getArticleById(articleId, userIds) == null) {
 			logger.info("User with id = " + userId
 					+ " try to update article that does not exist");
-			return Response.status(Status.NOT_FOUND).build();
+			dto.addMessage(ArticleMessageKeys.ARTICLE_NOT_EXIST.getValue());
+			return Response.status(Status.NOT_FOUND).entity(dto).build();
 		}
 
 		article.setId(articleId);
-
 		return new UpdateArticleRequest(article,
 				ConfigurationListener.getPath(), this.userIds).process();
 	}
@@ -94,10 +99,13 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteArticle(@PathParam("id") String id) {
+		
 		if (articlesDao.getArticleById(id, userIds) == null) {
 			logger.info("User with id = " + userId
 					+ " try to update article that does not exist");
-			return Response.status(Status.NOT_FOUND).build();
+			dto = new MessageDTO();
+			dto.addMessage(ArticleMessageKeys.ARTICLE_NOT_EXIST.getValue());
+			return Response.status(Status.NOT_FOUND).entity(dto).build();
 		}
 
 		boolean result = (servletRequest.getSession().getAttribute(
@@ -108,13 +116,15 @@ public class ArticleSubResource extends ArticlesResourceBase {
 		if (!result) {
 			logger.info("User with id = " + userId
 					+ " failed to delete article with id " + id);
-			return Response.status(Status.FORBIDDEN).build();
+			dto = new MessageDTO();
+			dto.addMessage(ArticleMessageKeys.CANNOT_DELETE_ARTICLE.getValue());
+			return Response.status(Status.FORBIDDEN).entity(dto).build();
 		}
 
 		logger.info("User with id = " + userId
 				+ " deleted an article with id = " + id + ".");
 
-		MessageDTO dto = new MessageDTO();
+		dto = new MessageDTO();
 		dto.addMessage(RequestMessageKeys.ARTICLE_DELETED.getValue());
 		return Response.ok(dto, MediaType.APPLICATION_JSON).build();
 	}

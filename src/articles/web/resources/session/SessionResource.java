@@ -23,7 +23,9 @@ import org.apache.log4j.Logger;
 
 import articles.dao.UserDAO;
 import articles.dto.LoginRequest;
+import articles.dto.MessageDTO;
 import articles.dto.UserDTO;
+import articles.messages.ErrorRequestMessageKeys;
 import articles.model.User;
 import articles.model.UserActivity;
 import articles.web.listener.ConfigurationListener;
@@ -39,6 +41,7 @@ import articles.web.resources.statistics.StatisticsResource;
 @Path("")
 public class SessionResource {
 	static final Logger logger = Logger.getLogger(SessionResource.class);
+	private MessageDTO dto;
 	@Context
 	ServletContext context;
 
@@ -50,8 +53,11 @@ public class SessionResource {
 		int userId = (int) servletRequest.getSession(false).getAttribute(ConfigurationListener.USERID);
 		User currentUser = dao.getUserById(userId);
 		
-		if(currentUser == null)
-			return Response.status(Status.FORBIDDEN).build();
+		if(currentUser == null) {
+			dto = new MessageDTO();
+			dto.addMessage(ErrorRequestMessageKeys.FORBIDDEN.getValue());
+			return Response.status(Status.FORBIDDEN).entity(dto).build();
+		}
 
 		return Response.ok(new UserDTO(currentUser), MediaType.APPLICATION_JSON).build();
 	}
@@ -76,13 +82,16 @@ public class SessionResource {
 			@Context HttpServletRequest servletRequest, @Context UriInfo uriInfo)
 			throws ServletException {
 
+		System.out.println(uriInfo);
 		UserDAO userDAO = new UserDAO();
 		User user = userDAO.login(loginRequest.getUsername(),
 				loginRequest.getPassword(), UserActivity.LOGIN, new Date());
 
 		if (user == null) {
+			dto = new MessageDTO();
+			dto.addMessage(ErrorRequestMessageKeys.WRONG_LOGIN.getValue());
 			logger.error("Unauthorized user tried to log in.");
-			return Response.status(Response.Status.UNAUTHORIZED).build();
+			return Response.status(Response.Status.UNAUTHORIZED).entity(dto).build();
 		}
 
 		servletRequest.getSession().invalidate();
@@ -114,8 +123,10 @@ public class SessionResource {
 		UserDAO userDAO = new UserDAO();
 
 		if (session == null) {
+			dto = new MessageDTO();
+			dto.addMessage(ErrorRequestMessageKeys.LOGOUT_ERROR.getValue());
 			logger.error("Unauthorized user tried to log out.");
-			return Response.status(Response.Status.UNAUTHORIZED).build();
+			return Response.status(Response.Status.UNAUTHORIZED).entity(dto).build();
 		}
 
 		int userId = (int) session.getAttribute(ConfigurationListener.USERID);

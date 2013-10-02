@@ -78,7 +78,7 @@ public class UsersSubResource extends UsersResourceBase {
 			MessageDTO dto = new MessageDTO();
 			dto.addMessage(RequestMessageKeys.USER_CANNOT_DELETE_HIMSELF
 					.getValue());
-			logger.info("Admin whii id = " + id + " try to delete himself");
+			logger.info("Admin with id = " + id + " try to delete himself");
 
 			return Response.status(Status.BAD_REQUEST).entity(dto).build();
 		}
