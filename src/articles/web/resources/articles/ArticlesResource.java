@@ -12,7 +12,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import articles.model.Articles.Article;
+import articles.model.Article;
 import articles.web.listener.ConfigurationListener;
 import articles.web.requests.articles.AddArticleRequest;
 import articles.web.requests.articles.ArticlesPageRequest;
@@ -45,7 +45,7 @@ public class ArticlesResource extends ArticlesResourceBase {
 			@QueryParam("from") final int from, @QueryParam("to") final int to) {
 
 		ArticlesPageRequest request =  new ArticlesPageRequest(from, to, userId, 
-				ConfigurationListener.getPath(), userIds);
+				ConfigurationListener.getPath());
 		
 		request.setSearchTerm(searchTerm);
 		request.setAllUsers(allUsers);
@@ -65,8 +65,7 @@ public class ArticlesResource extends ArticlesResourceBase {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response add(Article article) {
-		return new AddArticleRequest(article, ConfigurationListener.getPath(),
-				this.userIds, this.userId).process();
+		return new AddArticleRequest(article, ConfigurationListener.getPath(), this.userId).process();
 	}
 
 	/**

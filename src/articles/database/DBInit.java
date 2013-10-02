@@ -16,6 +16,9 @@ public class DBInit {
 	protected static final EntityManager entityManager =  factory.createEntityManager();
 
 	public static void main(String[] args) {
+		
+		
+		
 		entityManager.getTransaction().begin();
 		User user = new User();
 		user.setUsername("admin");
@@ -38,7 +41,7 @@ public class DBInit {
 
 		entityManager.persist(user);
 		entityManager.getTransaction().commit();
-
+		
 		entityManager.close();
 	}
 }

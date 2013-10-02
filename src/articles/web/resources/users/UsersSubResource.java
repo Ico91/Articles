@@ -11,7 +11,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import articles.dao.ArticlesDAO;
 import articles.dto.MessageDTO;
 import articles.dto.UserDetails;
 import articles.messages.RequestMessageKeys;
@@ -87,11 +86,6 @@ public class UsersSubResource extends UsersResourceBase {
 			logger.info("Failed to delete user with id = " + id);
 			return Response.status(Status.NOT_FOUND).build();
 		}
-
-		// Remove articles file of deleted user
-		ArticlesDAO articlesDAO = new ArticlesDAO(
-				ConfigurationListener.getPath());
-		articlesDAO.deleteUserArticlesFile(id);
 
 		logger.info("Deleted user with id = " + id);
 		MessageDTO dto = new MessageDTO();
