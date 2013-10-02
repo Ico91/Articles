@@ -5,7 +5,7 @@ import java.util.List;
 
 import articles.messages.ArticleMessageKeys;
 import articles.messages.MessageKey;
-import articles.model.Article;
+import articles.model.Articles.Article;
 
 /**
  * Class used to validate articles

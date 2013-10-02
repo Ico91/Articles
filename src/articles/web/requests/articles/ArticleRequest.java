@@ -3,7 +3,7 @@ package articles.web.requests.articles;
 import java.util.List;
 
 import articles.dao.ArticlesDAO;
-import articles.model.Article;
+import articles.model.Articles.Article;
 import articles.validators.ArticleValidator;
 import articles.validators.Validator;
 import articles.web.requests.ResourceRequest;
@@ -14,15 +14,15 @@ public abstract class ArticleRequest extends ResourceRequest<Article, Article> {
 	protected List<Article> listOfArticles;
 	protected List<Integer> userIds;
 	
-	public ArticleRequest(Article dto, String path) {
+	public ArticleRequest(Article dto, String path, List<Integer> userIds) {
 		super(dto);
 		this.articlesDAO = new ArticlesDAO(path);
-		this.listOfArticles = articlesDAO.getArticles();
+		this.userIds = userIds;
+		this.listOfArticles = articlesDAO.loadArticles(userIds, null);
 	}
 
 	@Override
 	protected Article toEntity(Article dto) {
-		dto.setId("");
 		return dto;
 	}
 

@@ -14,7 +14,7 @@ import javax.ws.rs.core.Response.Status;
 import articles.dto.MessageDTO;
 import articles.messages.ArticleMessageKeys;
 import articles.messages.RequestMessageKeys;
-import articles.model.Article;
+import articles.model.Articles.Article;
 import articles.model.UserType;
 import articles.web.listener.ConfigurationListener;
 import articles.web.requests.articles.UpdateArticleRequest;
@@ -44,7 +44,8 @@ public class ArticleSubResource extends ArticlesResourceBase {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getArticle(@PathParam("id") String id) {
-		Article article = this.articlesDao.getArticleById(id);
+		Article article = this.articlesDao.getArticleById(id, userIds);
+
 		if (article == null) {
 			logger.info("User with id = " + userId
 					+ " request article that does not exist.");
@@ -137,4 +138,3 @@ public class ArticleSubResource extends ArticlesResourceBase {
 		dto.addMessage(RequestMessageKeys.ARTICLE_DELETED.getValue());
 		return Response.ok(dto, MediaType.APPLICATION_JSON).build();
 	}
-}

@@ -4,7 +4,7 @@ import java.util.List;
 
 import articles.builders.ArticlesPageBuilder;
 import articles.dao.ArticlesDAO;
-import articles.model.Article;
+import articles.model.Articles.Article;
 import articles.web.requests.PageRequest;
 
 public class ArticlesPageRequest extends PageRequest {
@@ -12,20 +12,20 @@ public class ArticlesPageRequest extends PageRequest {
 	private int userId;
 	private ArticlesDAO articlesDao;
 	private String searchTerm;
+	private List<Integer> userIds;
 
-	public ArticlesPageRequest(int from, int to, int userId, String path) {
+	public ArticlesPageRequest(int from, int to, int userId, String path,
+			List<Integer> userIds) {
 		super(from, to);
 		this.allUsers = false;
 		this.searchTerm = null;
 		this.articlesDao = new ArticlesDAO(path);
+		this.userIds = userIds;
 		this.userId = userId;
 	}
 
 	public void setSearchTerm(String searchTerm) {
-		if (searchTerm != null)
-			this.searchTerm = searchTerm;
-		else
-			this.searchTerm = "";
+		this.searchTerm = searchTerm;
 	}
 
 	public void setAllUsers(boolean allUsers) {
@@ -34,9 +34,9 @@ public class ArticlesPageRequest extends PageRequest {
 
 	@Override
 	protected Object doProcess() {
-		List<Article> listOfArticles = (allUsers) ? articlesDao
-				.searchArticles(searchTerm) : articlesDao.searchUserArticles(
-				searchTerm, userId);
+		List<Article> listOfArticles = (allUsers) ? articlesDao.loadArticles(
+				userIds, searchTerm) : articlesDao.loadUserArticles(userId,
+				searchTerm);
 
 		return new ArticlesPageBuilder().buildResult(listOfArticles, from, to);
 	}
